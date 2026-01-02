@@ -1,33 +1,39 @@
 # Contributing to Keyana
 
-First off, thank you for considering contributing to Keyana! 🎉
+Thank you for your interest in contributing to Keyana.
 
-## 🤝 How Can I Contribute?
+## Bug Reports
 
-### Reporting Bugs
-- Use the GitHub issue tracker
-- Describe the bug in detail
-- Include steps to reproduce
-- Mention your OS and Go version
+Use the GitHub issue tracker to report bugs. Include:
+- Description of the bug
+- Steps to reproduce
+- Your OS and Go version
+- Expected vs actual behavior
 
-### Suggesting Features
-- Open an issue with the `enhancement` label
+## Feature Requests
+
+Open an issue with the `enhancement` label:
+- Describe the feature
 - Explain the use case
-- Describe the expected behavior
+- Example of expected behavior
 
-### Submitting Pattern Templates
-We're always looking for new secret patterns!
+## Contributing Patterns
+
+We welcome new secret detection patterns.
+
+### Pattern Submission
 
 1. Create a YAML file in `templates/`
-2. Follow this schema:
+2. Use this format:
+
 ```yaml
-name: Your Scanner Name
+name: Scanner Name
 version: 1.0.0
 author: Your Name
 category: api-keys
 patterns:
-  - id: unique-pattern-id
-    name: Human Readable Name
+  - id: unique-id
+    name: Pattern Name
     regex: 'your_regex_here'
     confidence: 90
     severity: high
@@ -37,12 +43,14 @@ patterns:
       - api
       - credentials
 ```
-3. Test thoroughly with false positive checks
-4. Submit a PR
 
-### Code Contributions
+3. Test for false positives
+4. Submit a pull request
 
-#### Development Setup
+## Code Contributions
+
+### Setup
+
 ```bash
 git clone https://github.com/shaniidev/keyana.git
 cd keyana
@@ -50,63 +58,63 @@ go mod download
 go build ./cmd/keyana
 ```
 
-#### Code Style
-- Follow standard Go conventions
+### Style Guidelines
+
+- Follow Go conventions
 - Run `gofmt` before committing
 - Add comments for exported functions
 - Write tests for new features
 
-#### Pull Request Process
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+### Pull Request Process
 
-## 📝 Commit Message Guidelines
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit changes: `git commit -m 'Add your feature'`
+4. Push to branch: `git push origin feature/your-feature`
+5. Open a pull request
+
+## Commit Messages
 
 Format:
 ```
-<emoji> <type>: <subject>
+<type>: <subject>
 
 <body>
 ```
 
 Types:
-- `✨ feat`: New feature
-- `🐛 fix`: Bug fix
-- `📚 docs`: Documentation
-- `🎨 style`: Code style/formatting
-- `♻️ refactor`: Code refactoring
-- `⚡ perf`: Performance improvement
-- `✅ test`: Adding tests
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation
+- `style`: Code formatting
+- `refactor`: Code refactoring
+- `perf`: Performance improvement
+- `test`: Adding tests
 
 Example:
 ```
-✨ feat: Add GitHub token pattern detection
+feat: Add GitHub token pattern detection
 
-Added new pattern template for detecting GitHub personal access tokens
+Added pattern template for GitHub personal access tokens
 with entropy validation and false positive filtering.
 ```
 
-## 🧪 Testing
+## Testing
 
 Run tests before submitting:
 ```bash
 go test ./...
 ```
 
-Add tests for new features:
+Test specific packages:
 ```bash
 go test ./internal/scan -v
 ```
 
-## 📄 License
+## License
 
 By contributing, you agree that your contributions will be licensed under the MIT License.
 
-## 💬 Questions?
+## Questions
 
-Feel free to open a discussion on GitHub or reach out to @shaniidev
-
-Thank you for contributing! 🚀
+Open a discussion on GitHub or contact @shaniidev
