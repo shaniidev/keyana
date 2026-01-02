@@ -1,0 +1,399 @@
+# Discord Secret Detection Patterns
+# Author: github.com/shaniidev
+# Category: Communication
+# Total Patterns: 50
+
+name: Discord Credentials & Secrets
+version: 1.0
+author: github.com/shaniidev
+category: communication
+provider: Discord
+severity: critical
+updated: 2026-01-02
+
+patterns:
+  - id: discord-bot-token
+    name: Discord Bot Token
+    description: Discord API bot authentication token
+    regex: '(?i)(discord|bot).{0,20}token[:=]?\s*[''"]?([A-Za-z0-9_-]{24}\.[A-Za-z0-9_-]{6}\.[A-Za-z0-9_-]{27}|[MN][A-Za-z0-9_-]{23,}\.[A-Za-z0-9_-]{6}\.[A-Za-z0-9_-]{27})[''"]?'
+    confidence: 98
+    severity: critical
+    tags: [discord, bot, token, credentials]
+    
+  - id: discord-bot-token-mfa
+    name: Discord Bot Token (MFA)
+    description: Bot token with MFA prefix
+    regex: '\bmfa\.[A-Za-z0-9_-]{84}\b'
+    confidence: 98
+    severity: critical
+    tags: [discord, bot, token, mfa]
+    
+  - id: discord-webhook-url
+    name: Discord Webhook URL
+    description: Channel webhook for posting messages
+    regex: 'https://discord(app)?\.com/api/webhooks/[0-9]+/[A-Za-z0-9_-]+'
+    confidence: 98
+    severity: high
+    tags: [discord, webhook, url]
+    
+  - id: discord-oauth-client-id
+    name: Discord OAuth Client ID
+    description: Application OAuth client ID
+    regex: '(?i)discord.{0,20}client.{0,20}id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 85
+    severity: medium
+    tags: [discord, oauth, client-id]
+    context_keywords: [discord, client, id]
+    
+  - id: discord-oauth-secret
+    name: Discord OAuth Client Secret
+    description: Application OAuth secret
+    regex: '(?i)discord.{0,20}client.{0,20}secret[:=]\s*[''"]?([A-Za-z0-9_-]{32})[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [discord, oauth, client-secret, credentials]
+    context_keywords: [discord, client, secret]
+    
+  - id: discord-application-id
+    name: Discord Application ID
+    description: Bot/app application identifier
+    regex: '(?i)discord.{0,20}(app(lication)?|application).{0,20}id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 78
+    severity: low
+    tags: [discord, application, identifier]
+    context_keywords: [discord, application, id]
+    
+  - id: discord-guild-id
+    name: Discord Guild/Server ID
+    description: Server identifier
+    regex: '(?i)discord.{0,20}(guild|server).{0,20}id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [discord, guild, server, identifier]
+    context_keywords: [discord, guild, server, id]
+    
+  - id: discord-channel-id
+    name: Discord Channel ID
+    description: Text/voice channel identifier
+    regex: '(?i)discord.{0,20}channel.{0,20}id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 70
+    severity: low
+    tags: [discord, channel, identifier]
+    context_keywords: [discord, channel, id]
+    
+  - id: discord-user-id
+    name: Discord User ID
+    description: User snowflake ID
+    regex: '(?i)discord.{0,20}user.{0,20}id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 68
+    severity: low
+    tags: [discord, user, identifier]
+    context_keywords: [discord, user, id]
+    
+  - id: discord-role-id
+    name: Discord Role ID
+    description: Server role identifier
+    regex: '(?i)discord.{0,20}role.{0,20}id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 68
+    severity: low
+    tags: [discord, role, identifier]
+    context_keywords: [discord, role, id]
+    
+  - id: discord-public-key
+    name: Discord Interactions Public Key
+    description: Ed25519 public key for interactions
+    regex: '(?i)discord.{0,20}public.{0,20}key[:=]\s*[''"]?([a-f0-9]{64})[''"]?'
+    confidence: 88
+    severity: medium
+    tags: [discord, interactions, public-key]
+    context_keywords: [discord, public, key]
+    
+  - id: discord-api-key
+    name: Discord API Key
+    description: Generic Discord API key reference
+    regex: '(?i)discord.{0,20}api.{0,20}key[:=]\s*[''"]?([A-Za-z0-9_\-]{50,})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [discord, api, key]
+    context_keywords: [discord, api, key]
+    
+  - id: discord-invite-link
+    name: Discord Invite Link
+    description: Server invite link
+    regex: 'https://(discord\.gg|discord\.com/invite)/[a-zA-Z0-9]+'
+    confidence: 75
+    severity: low
+    tags: [discord, invite, link]
+    
+  - id: discord-webhook-canonical
+    name: Discord Webhook (Canonical)
+    description: Webhook URL format detection  
+    regex: 'https://discordapp\.com/api/webhooks/\d+/[A-Za-z0-9_-]+'
+    confidence: 96
+    severity: high
+    tags: [discord, webhook, legacy, url]
+    
+  - id: discord-cdn-attachment
+    name: Discord CDN Attachment URL
+    description: File attachment CDN URL (may contain token)
+    regex: 'https://cdn\.discordapp\.com/attachments/[0-9]+/[0-9]+/[^\s]+\?[^\s]*token=[^\s&]+'
+    confidence: 82
+    severity: medium
+    tags: [discord, cdn, attachment, token]
+    
+  - id: discord-activity-instance
+    name: Discord Activity Instance Token
+    description: Embedded activity token
+    regex: '(?i)activity.{0,20}(instance|token)[:=]\s*[''"]?([A-Za-z0-9_\-]{50,})[''"]?'
+    confidence: 80
+    severity: medium
+    tags: [discord, activity, token]
+    context_keywords: [activity, instance, token]
+    
+  - id: discord-voice-token
+    name: Discord Voice Token
+    description: Voice channel join token
+    regex: '(?i)voice.{0,20}token[:=]\s*[''"]?([A-Za-z0-9_\-]{50,})[''"]?'
+    confidence: 78
+    severity: medium
+    tags: [discord, voice, token]
+    context_keywords: [voice, token]
+    
+  - id: discord-gateway-session
+    name: Discord Gateway Session ID
+    description: WebSocket gateway session
+    regex: '(?i)gateway.{0,20}session.{0,20}id[:=]\s*[''"]?([A-Za-z0-9]+)[''"]?'
+    confidence: 72
+    severity: low
+    tags: [discord, gateway, session]
+    context_keywords: [gateway, session, id]
+    
+  - id: discord-nitro-gift
+    name: Discord Nitro Gift Link
+    description: Nitro gift code URL
+    regex: 'https://discord\.gift/[A-Za-z0-9]+'
+    confidence: 85
+    severity: medium
+    tags: [discord, nitro, gift]
+    
+  - id: discord-rich-presence
+    name: Discord Rich Presence Client ID
+    description: RPC application ID
+    regex: '(?i)(rich.{0,5}presence|rpc).{0,20}client.{0,20}id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 75
+    severity: low
+    tags: [discord, rich-presence, rpc, client-id]
+    context_keywords: [rich, presence, rpc, client]
+    
+  - id: discord-integration-token
+    name: Discord Integration Token
+    description: Third-party integration token
+    regex: '(?i)discord.{0,20}integration.{0,20}token[:=]\s*[''"]?([A-Za-z0-9_\-]{50,})[''"]?'
+    confidence: 82
+    severity: high
+    tags: [discord, integration, token]
+    context_keywords: [discord, integration, token]
+    
+  - id: discord-interaction-token
+    name: Discord Interaction Token
+    description: Slash command interaction token
+    regex: '(?i)interaction.{0,20}token[:=]\s*[''"]?([A-Za-z0-9_\-]{50,})[''"]?'
+    confidence: 80
+    severity: medium
+    tags: [discord, interaction, slash-command, token]
+    context_keywords: [interaction, token]
+    
+  - id: discord-stage-channel
+    name: Discord Stage Channel Token
+    description: Stage channel speaking token
+    regex: '(?i)stage.{0,20}(channel)?token[:=]\s*[''"]?([A-Za-z0-9_\-]{30,})[''"]?'
+    confidence: 75
+    severity: medium
+    tags: [discord, stage, token]
+    context_keywords: [stage, channel, token]
+    
+  - id: discord-sticker-id
+    name: Discord Custom Sticker ID
+    description: Server sticker identifier
+    regex: '(?i)sticker.{0,20}id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 65
+    severity: low
+    tags: [discord, sticker, identifier]
+    
+  - id: discord-emoji-id
+    name: Discord Custom Emoji ID
+    description: Custom emoji identifier
+    regex: '(?i)emoji.{0,20}id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 65
+    severity: low
+    tags: [discord, emoji, identifier]
+    
+  - id: discord-scheduled-event
+    name: Discord Scheduled Event ID
+    description: Server event identifier
+    regex: '(?i)scheduled.{0,10}event.{0,20}id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 68
+    severity: low
+    tags: [discord, scheduled-event, identifier]
+    
+  - id: discord-application-command
+    name: Discord Application Command ID
+    description: Slash command identifier
+    regex: '(?i)(application|slash).{0,10}command.{0,20}id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 70
+    severity: low
+    tags: [discord, command, identifier]
+    
+  - id: discord-thread-id
+    name: Discord Thread ID
+    description: Thread channel identifier
+    regex: '(?i)thread.{0,20}id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 68
+    severity: low
+    tags: [discord, thread, identifier]
+    
+  - id: discord-forum-channel
+    name: Discord Forum Channel ID
+    description: Forum channel identifier
+    regex: '(?i)forum.{0,10}channel.{0,20}id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 70
+    severity: low
+    tags: [discord, forum, channel, identifier]
+    
+  - id: discord-auto-mod-rule
+    name: Discord AutoMod Rule ID
+    description: Auto moderation rule identifier
+    regex: '(?i)auto.{0,5}mod.{0,20}(rule)?id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [discord, automod, rule, identifier]
+
+  # Discord.js/py library patterns
+  - id: discordjs-token-client
+    name: Discord.js Client Token
+    description: Bot token in discord.js code
+    regex: 'client\.login\s*\(\s*[''"]([A-Za-z0-9_\-]{50,})[''"]'
+    confidence: 95
+    severity: critical
+    tags: [discord, discordjs, token, javascript]
+    
+  - id: discordpy-token-run
+    name: Discord.py Bot Token
+    description: Bot token in discord.py code
+    regex: 'bot\.run\s*\(\s*[''"]([A-Za-z0-9_\-]{50,})[''"]'
+    confidence: 95
+    severity: critical
+    tags: [discord, discordpy, token, python]
+    
+  - id: discord-env-token
+    name: Discord Token (Environment)
+    description: Token in environment variable
+    regex: '(?i)DISCORD_(BOT_)?TOKEN\s*[:=]\s*[''"]?([A-Za-z0-9_\-\.]{50,})[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [discord, environment, token]
+    
+  - id: discord-config-json
+    name: Discord Config JSON Token
+    description: Token in config.json file
+    regex: '"(token|discord_token|bot_token)"\s*:\s*"([A-Za-z0-9_\-\.]{50,})"'
+    confidence: 94
+    severity: critical
+    tags: [discord, config, json, token]
+    
+  - id: discord-dotenv-token
+    name: Discord .env Token
+    description: Token in .env file format
+    regex: '(DISCORD_TOKEN|BOT_TOKEN|TOKEN)\s*=\s*([A-Za-z0-9_\-\.]{50,})'
+    confidence: 95
+    severity: critical
+    tags: [discord, dotenv, environment, token]
+    
+  # Webhook variations
+  - id: discord-webhook-ptb
+    name: Discord Webhook (PTB/Canary)
+    description: Public test build webhook
+    regex: 'https://(ptb|canary)\.discord\.com/api/webhooks/[0-9]+/[A-Za-z0-9_-]+'
+    confidence: 94
+    severity: high
+    tags: [discord, webhook, ptb, canary]
+    
+  - id: discord-followup-webhook
+    name: Discord Followup Webhook
+    description: Interaction followup URL
+    regex: 'https://discord\.com/api/(v\d+/)?webhooks/[0-9]+/[A-Za-z0-9_-]+/messages/@original'
+    confidence: 88
+    severity: medium
+    tags: [discord, webhook, followup, interaction]
+    
+  - id: discord-audit-log-entry
+    name: Discord Audit Log Entry ID
+    description: Audit log entry identifier
+    regex: '(?i)audit.{0,10}log.{0,20}(entry)?id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 68
+    severity: low
+    tags: [discord, audit-log, identifier]
+    
+  - id: discord-soundboard-sound
+    name: Discord Soundboard Sound ID
+    description: Soundboard custom sound identifier
+    regex: '(?i)soundboard.{0,20}(sound)?id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 65
+    severity: low
+    tags: [discord, soundboard, identifier]
+    
+  - id: discord-monetization
+    name: Discord Monetization SKU ID
+    description: Premium feature SKU identifier
+    regex: '(?i)sku.{0,20}id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 70
+    severity: low
+    tags: [discord, monetization, sku, identifier]
+    
+  - id: discord-team-id
+    name: Discord Developer Team ID
+    description: Developer portal team identifier
+    regex: '(?i)discord.{0,20}team.{0,20}id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [discord, team, developer, identifier]
+    
+  - id: discord-linked-role
+    name: Discord Linked Role Token
+    description: Connection metadata token
+    regex: '(?i)linked.{0,10}role.{0,20}token[:=]\s*[''"]?([A-Za-z0-9_\-]{30,})[''"]?'
+    confidence: 78
+    severity: medium
+    tags: [discord, linked-role, connection, token]
+    
+  - id: discord-premium-button
+    name: Discord Premium Button SKU
+    description: Premium subscription button
+    regex: '(?i)premium.{0,20}(button|sku).{0,20}id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [discord, premium, sku, identifier]
+    
+  - id: discord-video-stream
+    name: Discord Video Stream Token
+    description: Screen share/stream token
+    regex: '(?i)stream.{0,20}token[:=]\s*[''"]?([A-Za-z0-9_\-]{40,})[''"]?'
+    confidence: 75
+    severity: medium
+    tags: [discord, stream, video, token]
+    
+  - id: discord-entitlement
+    name: Discord Entitlement ID
+    description: User premium entitlement identifier
+    regex: '(?i)entitlement.{0,20}id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 70
+    severity: low
+    tags: [discord, entitlement, premium, identifier]
+    
+  - id: discord-avatar-decoration
+    name: Discord Avatar Decoration ID
+    description: Profile decoration identifier
+    regex: '(?i)avatar.{0,10}decoration.{0,20}id[:=]\s*[''"]?([0-9]{17,20})[''"]?'
+    confidence: 65
+    severity: low
+    tags: [discord, avatar, decoration, identifier]

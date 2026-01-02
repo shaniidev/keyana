@@ -1,0 +1,901 @@
+# Google Cloud Platform Secret Detection Patterns
+# Author: github.com/shaniidev
+# Category: Cloud Infrastructure
+# Total Patterns: 100
+
+name: Google Cloud Platform Credentials & Secrets
+version: 1.0
+author: github.com/shaniidev
+category: cloud
+provider: Google Cloud Platform
+severity: critical
+updated: 2026-01-02
+
+patterns:
+  # ============================================================================
+  # GCP API KEYS & SERVICE ACCOUNTS (Patterns 1-25)
+  # ============================================================================
+  
+  - id: gcp-api-key
+    name: Google Cloud API Key
+    description: Generic Google Cloud API key (AIza prefix)
+    regex: '\bAIza[0-9A-Za-z\-_]{35}\b'
+    confidence: 95
+    severity: critical
+    entropy_check: false
+    min_length: 39
+    max_length: 39
+    tags: [gcp, google, api-key, credentials]
+    references:
+      - https://cloud.google.com/docs/authentication/api-keys
+    examples:
+      match:
+        - "AIzaSyD1234567890abcdefghijklmnopqrs"
+        - "AIzaSyAbc_Def-123456789012345678901"
+      no_match:
+        - "AIza123"
+        - "AIzaTest"
+  
+  - id: gcp-service-account-key
+    name: GCP Service Account Private Key
+    description: Google Cloud service account JSON key file
+    regex: '"private_key"\s*:\s*"-----BEGIN PRIVATE KEY-----\\n[^"]+\\n-----END PRIVATE KEY-----\\n"'
+    confidence: 99
+    severity: critical
+    tags: [gcp, service-account, private-key, json]
+    
+  - id: gcp-service-account-email
+    name: GCP Service Account Email
+    description: Service account email identifier
+    regex: '[a-z0-9\-]+@[a-z0-9\-]+\.iam\.gserviceaccount\.com'
+    confidence: 90
+    severity: medium
+    tags: [gcp, service-account, email, identifier]
+    
+  - id: gcp-oauth-client-id
+    name: Google OAuth Client ID
+    description: OAuth 2.0 client identifier
+    regex: '\b[0-9]+-[0-9A-Za-z_]{32}\.apps\.googleusercontent\.com\b'
+    confidence: 92
+    severity: high
+    tags: [gcp, oauth, client-id, authentication]
+    
+  - id: gcp-oauth-client-secret
+    name: Google OAuth Client Secret
+    description: OAuth 2.0 client secret
+    regex: '(?i)(client.{0,20}secret|oauth.{0,20}secret)[:=]\s*[''"]?(GOCSPX-[a-zA-Z0-9_-]{28})[''"]?'
+    confidence: 95
+    severity: critical
+    tags: [gcp, oauth, client-secret]
+    context_keywords: [client, secret, oauth]
+    
+  - id: gcp-oauth-refresh-token
+    name: Google OAuth Refresh Token
+    description: Long-lived OAuth refresh token
+    regex: '(?i)refresh.{0,20}token[:=]\s*[''"]?(1//[0-9A-Za-z\-_]{43,})[''"]?'
+    confidence: 90
+    severity: high
+    tags: [gcp, oauth, refresh-token]
+    context_keywords: [refresh, token]
+    
+  - id: gcp-oauth-access-token
+    name: Google OAuth Access Token
+    description: Short-lived OAuth access token
+    regex: 'ya29\.[0-9A-Za-z\-_]+'
+    confidence: 88
+    severity: high
+    tags: [gcp, oauth, access-token]
+    
+  - id: gcp-cloud-platform-api-key
+    name: Google Cloud Platform API Key (Explicit)
+    description: API key with explicit GCP context
+    regex: '(?i)(gcp|google.{0,20}cloud).{0,20}api.{0,20}key[:=]\s*[''"]?(AIza[0-9A-Za-z\-_]{35})[''"]?'
+    confidence: 97
+    severity: critical
+    tags: [gcp, api-key]
+    context_keywords: [gcp, google, cloud, api, key]
+    
+  - id: gcp-firebase-api-key
+    name: Firebase API Key (Web)
+    description: Firebase web application API key
+    regex: '(?i)firebase.{0,20}api.{0,20}key[:=]\s*[''"]?(AIza[0-9A-Za-z\-_]{35})[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [gcp, firebase, api-key, web]
+    context_keywords: [firebase, api, key]
+    
+  - id: gcp-firebase-database-url
+    name: Firebase Realtime Database URL
+    description: Firebase database project URL
+    regex: 'https://([a-z0-9\-]+)\.firebaseio\.com'
+    confidence: 85
+    severity: medium
+    tags: [gcp, firebase, database, url]
+    
+  - id: gcp-firebase-project-id
+    name: Firebase Project ID
+    description: Firebase project identifier
+    regex: '(?i)firebase.{0,20}project.{0,20}id[:=]\s*[''"]?([a-z0-9\-]{6,30})[''"]?'
+    confidence: 75
+    severity: low
+    tags: [gcp, firebase, project, identifier]
+    context_keywords: [firebase, project]
+    
+  - id: gcp-firebase-server-key
+    name: Firebase Cloud Messaging Server Key
+    description: FCM legacy server key
+    regex: '(?i)(fcm|firebase).{0,20}server.{0,20}key[:=]\s*[''"]?(AAAA[A-Za-z0-9_-]{7}:[A-Za-z0-9_-]{140})[''"]?'
+    confidence: 95
+    severity: critical
+    tags: [gcp, firebase, fcm, server-key]
+    context_keywords: [fcm, firebase, server, key]
+    
+  - id: gcp-firebase-sender-id
+    name: Firebase Cloud Messaging Sender ID
+    description: FCM sender/project number
+    regex: '(?i)(fcm|firebase).{0,20}sender.{0,20}id[:=]\s*[''"]?(\d{12})[''"]?'
+    confidence: 70
+    severity: low
+    tags: [gcp, firebase, fcm, sender-id]
+    context_keywords: [fcm, sender]
+    
+  - id: gcp-project-id
+    name: Google Cloud Project ID
+    description: GCP project identifier
+    regex: '(?i)(gcp|google.{0,20}cloud).{0,20}project.{0,20}id[:=]\s*[''"]?([a-z][a-z0-9\-]{5,29})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [gcp, project, identifier]
+    context_keywords: [gcp, project, id]
+    
+  - id: gcp-project-number
+    name: Google Cloud Project Number
+    description: Numeric GCP project identifier
+    regex: '(?i)(gcp|google.{0,20}cloud).{0,20}project.{0,20}(number|num)[:=]\s*[''"]?(\d{12})[''"]?'
+    confidence: 70
+    severity: low
+    tags: [gcp, project, number]
+    context_keywords: [gcp, project, number]
+    
+  - id: gcp-workload-identity
+    name: GCP Workload Identity Service Account
+    description: Workload identity for GKE
+    regex: '[a-z0-9\-]+@[a-z0-9\-]+\.iam\.gserviceaccount\.com'
+    confidence: 88
+    severity: medium
+    tags: [gcp, workload-identity, gke, service-account]
+    
+  - id: gcp-impersonation-token
+    name: GCP Service Account Impersonation Token
+    description: Token for impersonating service accounts
+    regex: '(?i)impersonat(e|ion).{0,20}token[:=]\s*[''"]?([A-Za-z0-9\-_=]{100,})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [gcp, impersonation, token]
+    context_keywords: [impersonat, token]
+    entropy_check: true
+    min_entropy: 4.5
+    
+  - id: gcp-application-credentials
+    name: GOOGLE_APPLICATION_CREDENTIALS Path
+    description: Path to service account key file
+    regex: '(?i)GOOGLE_APPLICATION_CREDENTIALS\s*[=:]\s*[''"]?([^\s''"]+\.json)[''"]?'
+    confidence: 80
+    severity: high
+    tags: [gcp, credentials, environment, path]
+    
+  - id: gcp-iam-policy-binding
+    name: GCP IAM Policy Binding
+    description: IAM policy with service account binding
+    regex: '"members":\s*\[[^\]]*"serviceAccount:([a-z0-9\-]+@[a-z0-9\-]+\.iam\.gserviceaccount\.com)"[^\]]*\]'
+    confidence: 75
+    severity: medium
+    tags: [gcp, iam, policy, service-account]
+    
+  - id: gcp-signed-url
+    name: GCP Signed URL (Cloud Storage)
+    description: Pre-signed URL for GCS objects
+    regex: 'https://storage\.googleapis\.com/[^\s]*\?[^\s]*X-Goog-Signature=[a-f0-9]{64,}'
+    confidence: 90
+    severity: high
+    tags: [gcp, gcs, signed-url, storage]
+    
+  - id: gcp-access-token-json
+    name: GCP Access Token in JSON
+    description: Access token in structured format
+    regex: '\{[^\}]*"access_token"\s*:\s*"(ya29\.[0-9A-Za-z\-_]+)"[^\}]*\}'
+    confidence: 92
+    severity: high
+    tags: [gcp, access-token, json]
+    
+  - id: gcp-id-token
+    name: Google Cloud ID Token (JWT)
+    description: OpenID Connect ID token
+    regex: 'eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+'
+    confidence: 75
+    severity: medium
+    tags: [gcp, id-token, jwt, oidc]
+    
+  - id: gcp-legacy-credentials
+    name: GCP Legacy P12 Key Reference
+    description: Reference to legacy .p12 key file
+    regex: '(?i)(gcp|google).{0,20}(key|credential).{0,20}[:=]\s*[''"]?([^\s''"]+\.p12)[''"]?'
+    confidence: 82
+    severity: high
+    tags: [gcp, legacy, p12, credentials]
+    context_keywords: [gcp, google, p12]
+    
+  - id: gcp-app-engine-api-key
+    name: Google App Engine API Key
+    description: App Engine application API key
+    regex: '(?i)(app.{0,10}engine|gae).{0,20}api.{0,20}key[:=]\s*[''"]?(AIza[0-9A-Za-z\-_]{35})[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [gcp, app-engine, api-key]
+    context_keywords: [app, engine, gae]
+    
+  # ============================================================================
+  # GOOGLE CLOUD STORAGE (Patterns 26-40)
+  # ============================================================================
+  
+  - id: gcs-bucket-name
+    name: Google Cloud Storage Bucket
+    description: GCS bucket identifier
+    regex: 'gs://([a-z0-9][a-z0-9\-_.]{1,61}[a-z0-9])'
+    confidence: 78
+    severity: low
+    tags: [gcp, gcs, bucket, storage]
+    
+  - id: gcs-hmac-access-id
+    name: GCS HM
+
+AC Access ID
+    description: HMAC key access ID for S3-compatible access
+    regex: 'GOOG[0-9A-Z]{60}'
+    confidence: 95
+    severity: critical
+    tags: [gcp, gcs, hmac, access-key]
+    
+  - id: gcs-hmac-secret
+    name: GCS HMAC Secret Key
+    description: HMAC secret for S3-compatible access
+    regex: '(?i)gcs.{0,20}hmac.{0,20}secret[:=]\s*[''"]?([A-Za-z0-9/+=]{40})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [gcp, gcs, hmac, secret-key]
+    context_keywords: [gcs, hmac, secret]
+    entropy_check: true
+    min_entropy: 4.5
+    
+  - id: gcs-service-account-hmac
+    name: GCS Service Account HMAC Key
+    description: Service account HMAC credentials
+    regex: '"accessId"\s*:\s*"(GOOG[0-9A-Z]{60})"'
+    confidence: 96
+    severity: critical
+    tags: [gcp, gcs, hmac, service-account]
+    
+  - id: gcs-object-url
+    name: GCS Object Public URL
+    description: Public Google Cloud Storage object URL
+    regex: 'https://storage\.googleapis\.com/([a-z0-9][a-z0-9\-_.]{1,61}[a-z0-9])/[^\s]+'
+    confidence: 75
+    severity: low
+    tags: [gcp, gcs, url, object]
+    
+  - id: gcs-cdn-url
+    name: GCS CDN (Cloud CDN) URL
+    description: Cloud CDN served GCS content
+    regex: 'https://storage\.cloud\.google\.com/([a-z0-9][a-z0-9\-_.]{1,61}[a-z0-9])/[^\s]+'
+    confidence: 72
+    severity: low
+    tags: [gcp, gcs, cdn, url]
+    
+  - id: gcp-filestore-instance
+    name: GCP Filestore Instance Name
+    description: Filestore NFS instance identifier
+    regex: '(?i)filestore.{0,20}instance[:=]\s*[''"]?([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)[''"]?'
+    confidence: 70
+    severity: medium
+    tags: [gcp, filestore, nfs, storage]
+    context_keywords: [filestore, instance]
+    
+  - id: gcp-persistent-disk
+    name: GCP Persistent Disk Name
+    description: Compute Engine persistent disk
+    regex: '(?i)(persistent.{0,10}disk|pd).{0,20}name[:=]\s*[''"]?([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)[''"]?'
+    confidence: 68
+    severity: low
+    tags: [gcp, compute, disk, storage]
+    context_keywords: [disk, persistent]
+    
+  - id: gcp-snapshot-name
+    name: GCP Snapshot Name
+    description: Persistent disk snapshot identifier
+    regex: '(?i)snapshot.{0,20}name[:=]\s*[''"]?([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)[''"]?'
+    confidence: 65
+    severity: low
+    tags: [gcp, snapshot, disk]
+    context_keywords: [snapshot, name]
+    
+  - id: gcp-image-family
+    name: GCP Compute Image Family
+    description: VM image family identifier
+    regex: '(?i)image.{0,20}family[:=]\s*[''"]?([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)[''"]?'
+    confidence: 62
+    severity: low
+    tags: [gcp, compute, image]
+    context_keywords: [image, family]
+    
+  - id: gcp-transfer-service
+    name: GCP Transfer Service Job
+    description: Storage Transfer Service job name
+    regex: 'transferJobs/([a-zA-Z0-9\-]+)'
+    confidence: 72
+    severity: low
+    tags: [gcp, transfer, storage]
+    
+  - id: gcs-bucket-iam
+    name: GCS Bucket IAM Member
+    description: Bucket-level IAM policy member
+    regex: '"entity"\s*:\s*"(user-|group-|serviceAccount:)[^"]+",\s*"bucket"\s*:\s*"([a-z0-9][a-z0-9\-_.]{1,61}[a-z0-9])"'
+    confidence: 75
+    severity: medium
+    tags: [gcp, gcs, iam, bucket]
+    
+  - id: gcs-rsync-credentials
+    name: GCS gsutil/rsync Config
+    description: gsutil credential configuration
+    regex: '(?i)gs_(\w+)_key_file\s*[:=]\s*[''"]?([^\s''"]+)[''"]?'
+    confidence: 78
+    severity: high
+    tags: [gcp, gcs, gsutil, credentials]
+    
+  - id: gcp-cloud-cdn-key
+    name: GCP Cloud CDN Signing Key
+    description: Cloud CDN URL signing key
+    regex: '(?i)cdn.{0,20}sign(ing)?.{0,20}key[:=]\s*[''"]?([A-Za-z0-9/+=]{32,})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [gcp, cdn, signing-key]
+    context_keywords: [cdn, sign, key]
+    entropy_check: true
+    min_entropy: 4.3
+    
+  - id: gcp-cloud-storage-json-key
+    name: GCS JSON Service Account Key
+    description: Complete GCS service account JSON
+    regex: '\{\s*"type"\s*:\s*"service_account"[^\}]+project_id[^\}]+private_key_id[^\}]+private_key[^\}]+client_email[^\}]+\}'
+    confidence: 98
+    severity: critical
+    tags: [gcp, gcs, service-account, json]
+    
+  # ============================================================================
+  # GOOGLE CLOUD DATABASES (Patterns 41-55)
+  # ============================================================================
+  
+  - id: gcp-cloud-sql-instance
+    name: Cloud SQL Instance Connection Name
+    description: Cloud SQL instance identifier
+    regex: '([a-z][a-z0-9\-]{4,28}[a-z0-9]):([a-z][a-z0-9\-]{0,29}):([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)'
+    confidence: 80
+    severity: high
+    tags: [gcp, cloud-sql, database, instance]
+    
+  - id: gcp-cloud-sql-password
+    name: Cloud SQL User Password
+    description: Database user password
+    regex: '(?i)(cloud.{0,10}sql|mysql|postgres).{0,20}password[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 82
+    severity: critical
+    tags: [gcp, cloud-sql, password, credentials]
+    context_keywords: [sql, cloud, password]
+    entropy_check: true
+    min_entropy: 3.5
+    
+  - id: gcp-cloud-sql-connection-string
+    name: Cloud SQL Connection String
+    description: Database connection URL with credentials
+    regex: '(mysql|postgresql)://([a-zA-Z0-9_]+):([^@\s]+)@([a-z0-9\-\.]+\.sql\.goog):(\d+)/([a-zA-Z0-9_]+)'
+    confidence: 95
+    severity: critical
+    tags: [gcp, cloud-sql, connection-string, credentials]
+    
+  - id: gcp-cloud-spanner-instance
+    name: Cloud Spanner Instance
+    description: Spanner database instance identifier
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/instances/([a-z]([a-z0-9\-]{0,28}[a-z0-9])?)'
+    confidence: 78
+    severity: medium
+    tags: [gcp, spanner, database, instance]
+    
+  - id: gcp-cloud-spanner-database
+    name: Cloud Spanner Database
+    description: Spanner database name
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/instances/([a-z]([a-z0-9\-]{0,28}[a-z0-9])?)/databases/([a-z]([a-z0-9\-_]{0,28}[a-z0-9])?)'
+    confidence: 80
+    severity: medium
+    tags: [gcp, spanner, database]
+    
+  - id: gcp-firestore-database
+    name: Firestore Database ID
+    description: Firestore NoSQL database identifier
+    regex: '(?i)firestore.{0,20}database[:=]\s*[''"]?(\(default\)|[a-z]([a-z0-9\-]{0,61}[a-z0-9])?)[''"]?'
+    confidence: 72
+    severity: medium
+    tags: [gcp, firestore, nosql, database]
+    context_keywords: [firestore, database]
+    
+  - id: gcp-firestore-api-key
+    name: Firestore API Key
+    description: Firestore database API key
+    regex: '(?i)firestore.{0,20}api.{0,20}key[:=]\s*[''"]?(AIza[0-9A-Za-z\-_]{35})[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [gcp, firestore, api-key]
+    context_keywords: [firestore, api]
+    
+  - id: gcp-bigtable-instance
+    name: Cloud Bigtable Instance
+    description: Bigtable NoSQL instance identifier
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/instances/([a-z]([a-z0-9\-]{0,28}[a-z0-9])?)'
+    confidence: 78
+    severity: medium
+    tags: [gcp, bigtable, nosql, instance]
+    
+  - id: gcp-bigtable-admin-key
+    name: Bigtable Admin Service Account
+    description: Bigtable administration credentials
+    regex: '"client_email"\s*:\s*"[^"]*bigtable[^"]*@[^"]+\.iam\.gserviceaccount\.com"'
+    confidence: 85
+    severity: high
+    tags: [gcp, bigtable, admin, service-account]
+    
+  - id: gcp-datastore-project
+    name: Datastore Project Identifier
+    description: Cloud Datastore project ID
+    regex: '(?i)datastore.{0,20}project[:=]\s*[''"]?([a-z][a-z0-9\-]{4,28}[a-z0-9])[''"]?'
+    confidence: 70
+    severity: medium
+    tags: [gcp, datastore, nosql, project]
+    context_keywords: [datastore, project]
+    
+  - id: gcp-redis-instance
+    name: Memorystore for Redis Instance
+    description: Redis instance connection string
+    regex: '([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}):6379'
+    confidence: 65
+    severity: medium
+    tags: [gcp, memorystore, redis, cache]
+    
+  - id: gcp-mongodb-atlas-gcp
+    name: MongoDB Atlas on GCP Connection
+    description: MongoDB Atlas GCP cluster connection
+    regex: 'mongodb(\+srv)?://([^:]+):([^@]+)@([a-z0-9\-]+\.gcp\.mongodb\.net)/([^\s?]+)'
+    confidence: 92
+    severity: critical
+    tags: [gcp, mongodb, atlas, database, credentials]
+    
+  - id: gcp-alloydb-cluster
+    name: AlloyDB Cluster
+    description: AlloyDB for PostgreSQL cluster
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/locations/([a-z0-9\-]+)/clusters/([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)'
+    confidence: 78
+    severity: medium
+    tags: [gcp, alloydb, postgresql, database]
+    
+  - id: gcp-database-migration-job
+    name: Database Migration Service Job
+    description: DMS migration job identifier
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/locations/([a-z0-9\-]+)/migrationJobs/([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)'
+    confidence: 72
+    severity: low
+    tags: [gcp, dms, migration, database]
+    
+  - id: gcp-datastream-connection
+    name: Datastream Connection Profile
+    description: Datastream CDC connection profile
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/locations/([a-z0-9\-]+)/connectionProfiles/([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)'
+    confidence: 75
+    severity: medium
+    tags: [gcp, datastream, cdc, connection]
+    
+  # ============================================================================
+  # GOOGLE CLOUD COMPUTE & KUBERNETES (Patterns 56-70)
+  # ============================================================================
+  
+  - id: gcp-compute-instance
+    name: Compute Engine Instance Name
+    description: VM instance identifier
+    regex: '(?i)(instance|vm).{0,20}name[:=]\s*[''"]?([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)[''"]?'
+    confidence: 65
+    severity: low
+    tags: [gcp, compute, instance, vm]
+    context_keywords: [instance, vm, compute]
+    
+  - id: gcp-compute-ssh-key
+    name: Compute Engine SSH Public Key
+    description: VM SSH public key metadata
+    regex: 'ssh-rsa\s+[A-Za-z0-9+/]+[=]{0,3}\s+([^\s]+)@([^\s]+)'
+    confidence: 75
+    severity: medium
+    tags: [gcp, compute, ssh, public-key]
+    
+  - id: gcp-instance-metadata-token
+    name: GCP Instance Metadata Token
+    description: Metadata service access token
+    regex: '(?i)metadata.{0,20}token[:=]\s*[''"]?(ya29\.[0-9A-Za-z\-_]+)[''"]?'
+    confidence: 90
+    severity: high
+    tags: [gcp, metadata, token, compute]
+    context_keywords: [metadata, token]
+    
+  - id: gcp-gke-cluster-name
+    name: GKE Cluster Name
+    description: Google Kubernetes Engine cluster
+    regex: '(?i)gke.{0,20}cluster[:=]\s*[''"]?([a-z]([a-z0-9\-]{0,38}[a-z0-9])?)[''"]?'
+    confidence: 72
+    severity: medium
+    tags: [gcp, gke, kubernetes, cluster]
+    context_keywords: [gke, cluster]
+    
+  - id: gcp-gke-cluster-endpoint
+    name: GKE Cluster Endpoint
+    description: Kubernetes API server endpoint
+    regex: 'https://([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})'
+    confidence: 60
+    severity: low
+    tags: [gcp, gke, kubernetes, endpoint]
+    
+  - id: gcp-gke-cluster-ca-cert
+    name: GKE Cluster CA Certificate
+    description: Kubernetes cluster certificate authority
+    regex: '(?i)(cluster.{0,10}ca|certificate.{0,10}authority).{0,20}data[:=]\s*[''"]?([A-Za-z0-9+/=]{100,})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [gcp, gke, kubernetes, certificate]
+    context_keywords: [cluster, ca, certificate]
+    
+  - id: gcp-gke-kubeconfig
+    name: GKE Kubeconfig Credentials
+    description: kubectl configuration with credentials
+    regex: 'apiVersion:\s*v1.*kind:\s*Config.*clusters:.*users:.*name:\s*gke_'
+    confidence: 88
+    severity: critical
+    tags: [gcp, gke, kubernetes, kubeconfig]
+    
+  - id: gcp-gke-service-account-token
+    name: GKE Service Account Token
+    description: Kubernetes service account token
+    regex: '(?i)(kubernetes|k8s).{0,20}(service.{0,10}account).{0,20}token[:=]\s*[''"]?(eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)[''"]?'
+    confidence: 90
+    severity: high
+    tags: [gcp, gke, kubernetes, service-account, token]
+    context_keywords: [kubernetes, service, account, token]
+    
+  - id: gcp-cloud-run-service
+    name: Cloud Run Service URL
+    description: Cloud Run service endpoint
+    regex: 'https://([a-z0-9\-]+)-([a-z0-9]+)-([a-z]{2}|[a-z]{2}-[a-z]+[0-9])\.a\.run\.app'
+    confidence: 85
+    severity: medium
+    tags: [gcp, cloud-run, serverless, url]
+    
+  - id: gcp-cloud-run-invoker-token
+    name: Cloud Run Invoker Token
+    description: Token for invoking Cloud Run services
+    regex: '(?i)cloud.{0,10}run.{0,20}(invoker|auth).{0,20}token[:=]\s*[''"]?(ya29\.[0-9A-Za-z\-_]+)[''"]?'
+    confidence: 92
+    severity: high
+    tags: [gcp, cloud-run, token, authentication]
+    context_keywords: [cloud, run, invoker, token]
+    
+  - id: gcp-cloud-functions-url
+    name: Cloud Functions HTTP Trigger URL
+    description: Cloud Function endpoint
+    regex: 'https://([a-z0-9\-]+)-([a-z0-9]+)-([a-z]{2}[0-9]?)\.cloudfunctions\.net/([a-zA-Z0-9\-_]+)'
+    confidence: 82
+    severity: medium
+    tags: [gcp, cloud-functions, serverless, url]
+    
+  - id: gcp-cloud-functions-identity-token
+    name: Cloud Functions Identity Token
+    description: Function invocation identity token
+    regex: '(?i)(function|gcf).{0,20}identity.{0,20}token[:=]\s*[''"]?(eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)[''"]?'
+    confidence: 88
+    severity: high
+    tags: [gcp, cloud-functions, token]
+    context_keywords: [function, identity, token]
+    
+  - id: gcp-container-registry-url
+    name: Google Container Registry URL
+    description: GCR image repository URL
+    regex: '(gcr\.io|([a-z]{2}|[a-z]{2}-[a-z]+[0-9])\.gcr\.io)/([a-z][a-z0-9\-]{4,28}[a-z0-9])/([a-zA-Z0-9\-_./]+)'
+    confidence: 78
+    severity: low
+    tags: [gcp, gcr, container, registry]
+    
+  - id: gcp-artifact-registry
+    name: Artifact Registry Repository
+    description: Artifact Registry repository URL
+    regex: '([a-z]{2}|[a-z]{2}-[a-z]+[0-9])-docker\.pkg\.dev/([a-z][a-z0-9\-]{4,28}[a-z0-9])/([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)'
+    confidence: 82
+    severity: medium
+    tags: [gcp, artifact-registry, container]
+    
+  - id: gcp-compute-startup-script
+    name: Compute Startup Script Metadata
+    description: VM startup script with potential secrets
+    regex: '(?i)startup.{0,10}script[:=]\s*[''"]?([^''"]{50,})[''"]?'
+    confidence: 70
+    severity: medium
+    tags: [gcp, compute, startup-script, metadata]
+    context_keywords: [startup, script]
+    entropy_check: true
+    min_entropy: 3.0
+    
+  # ============================================================================
+  # GOOGLE CLOUD NETWORKING & SECURITY (Patterns 71-85)
+  # ============================================================================
+  
+  - id: gcp-vpc-network
+    name: VPC Network Name
+    description: Virtual Private Cloud network identifier
+    regex: '(?i)vpc.{0,20}network[:=]\s*[''"]?([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)[''"]?'
+    confidence: 68
+    severity: low
+    tags: [gcp, vpc, network]
+    context_keywords: [vpc, network]
+    
+  - id: gcp-vpc-subnet
+    name: VPC Subnet Name
+    description: VPC subnet identifier
+    regex: '(?i)subnet(work)?[:=]\s*[''"]?([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)[''"]?'
+    confidence: 65
+    severity: low
+    tags: [gcp, vpc, subnet, network]
+    context_keywords: [subnet, subnetwork]
+    
+  - id: gcp-cloud-armor-policy
+    name: Cloud Armor Security Policy
+    description: DDoS protection policy identifier
+    regex: '(?i)armor.{0,20}policy[:=]\s*[''"]?([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)[''"]?'
+    confidence: 70
+    severity: medium
+    tags: [gcp, cloud-armor, security, ddos]
+    context_keywords: [armor, policy]
+    
+  - id: gcp-cloud-nat-gateway
+    name: Cloud NAT Gateway
+    description: NAT gateway identifier
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/regions/([a-z0-9\-]+)/routers/([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)/nats/([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)'
+    confidence: 75
+    severity: low
+    tags: [gcp, nat, network, gateway]
+    
+  - id: gcp-cloud-vpn-tunnel
+    name: Cloud VPN Tunnel
+    description: VPN tunnel identifier
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/regions/([a-z0-9\-]+)/vpnTunnels/([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)'
+    confidence: 75
+    severity: medium
+    tags: [gcp, vpn, tunnel, network]
+    
+  - id: gcp-cloud-vpn-preshared-key
+    name: Cloud VPN Pre-Shared Key
+    description: VPN IPsec pre-shared key
+    regex: '(?i)vpn.{0,20}(psk|preshared|pre.{0,5}shared).{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]{20,})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [gcp, vpn, psk, preshared-key]
+    context_keywords: [vpn, psk, preshared, key]
+    entropy_check: true
+    min_entropy: 4.2
+    
+  - id: gcp-interconnect-attachment
+    name: Cloud Interconnect Attachment
+    description: Dedicated/Partner Interconnect attachment
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/regions/([a-z0-9\-]+)/interconnectAttachments/([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)'
+    confidence: 78
+    severity: medium
+    tags: [gcp, interconnect, network]
+    
+  - id: gcp-load-balancer-ip
+    name: Cloud Load Balancer IP Address
+    description: Global/regional load balancer IP
+    regex: '(?i)(load.{0,10}balancer|lb).{0,20}ip[:=]\s*[''"]?([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})[''"]?'
+    confidence: 70
+    severity: low
+    tags: [gcp, load-balancer, ip, network]
+    context_keywords: [load, balancer, ip]
+    
+  - id: gcp-ssl-certificate
+    name: GCP SSL Certificate
+    description: Managed SSL/TLS certificate resource
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/global/sslCertificates/([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)'
+    confidence: 75
+    severity: medium
+    tags: [gcp, ssl, certificate, security]
+    
+  - id: gcp-ssl-private-key
+    name: SSL Certificate Private Key
+    description: TLS/SSL private key in PEM format
+    regex: '-----BEGIN PRIVATE KEY-----[\s\S]+-----END PRIVATE KEY-----'
+    confidence: 99
+    severity: critical
+    tags: [gcp, ssl, private-key, certificate]
+    
+  - id: gcp-kms-key-ring
+    name: Cloud KMS Key Ring
+    description: KMS cryptographic key ring
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/locations/([a-z0-9\-]+)/keyRings/([a-zA-Z0-9_-]+)'
+    confidence: 78
+    severity: medium
+    tags: [gcp, kms, encryption, keyring]
+    
+  - id: gcp-kms-crypto-key
+    name: Cloud KMS Crypto Key
+    description: KMS encryption key identifier
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/locations/([a-z0-9\-]+)/keyRings/([a-zA-Z0-9_-]+)/cryptoKeys/([a-zA-Z0-9_-]+)'
+    confidence: 80
+    severity: high
+    tags: [gcp, kms, encryption, cryptokey]
+    
+  - id: gcp-secret-manager-secret
+    name: Secret Manager Secret Name
+    description: Secret Manager secret resource
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9]|[0-9]+)/secrets/([a-zA-Z0-9_-]+)'
+    confidence: 82
+    severity: high
+    tags: [gcp, secret-manager, secrets]
+    
+  - id: gcp-secret-manager-version
+    name: Secret Manager Secret Version
+    description: Specific version of a secret
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9]|[0-9]+)/secrets/([a-zA-Z0-9_-]+)/versions/([0-9]+|latest)'
+    confidence: 85
+    severity: high
+    tags: [gcp, secret-manager, version]
+    
+  - id: gcp-certificate-authority
+    name: Certificate Authority Service CA
+    description: Private CA resource identifier
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/locations/([a-z0-9\-]+)/caPools/([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)/certificateAuthorities/([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)'
+    confidence: 80
+    severity: high
+    tags: [gcp, ca, certificate, pki]
+    
+  # ============================================================================
+  # GOOGLE CLOUD AI/ML & DATA (Patterns 86-100)
+  # ============================================================================
+  
+  - id: gcp-ai-platform-model
+    name: AI Platform Model
+    description: Vertex AI model resource
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9]|[0-9]+)/locations/([a-z0-9\-]+)/models/([0-9]+)'
+    confidence: 75
+    severity: medium
+    tags: [gcp, ai-platform, vertex-ai, ml]
+    
+  - id: gcp-ai-platform-endpoint
+    name: AI Platform Endpoint
+    description: Model serving endpoint
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9]|[0-9]+)/locations/([a-z0-9\-]+)/endpoints/([0-9]+)'
+    confidence: 78
+    severity: medium
+    tags: [gcp, ai-platform, endpoint, ml]
+    
+  - id: gcp-bigquery-dataset
+    name: BigQuery Dataset
+    description: BigQuery dataset identifier
+    regex: '(?i)bigquery.{0,20}dataset[:=]\s*[''"]?([a-z][a-z0-9_]{0,1023})[''"]?'
+    confidence: 72
+    severity: medium
+    tags: [gcp, bigquery, dataset, data]
+    context_keywords: [bigquery, dataset]
+    
+  - id: gcp-bigquery-table
+    name: BigQuery Table
+    description: BigQuery table reference
+    regex: '([a-z][a-z0-9\-]{4,28}[a-z0-9]):([a-z][a-z0-9_]{0,1023})\.([a-z][a-z0-9_]{0,1023})'
+    confidence: 75
+    severity: medium
+    tags: [gcp, bigquery, table, data]
+    
+  - id: gcp-bigquery-api-key
+    name: BigQuery API Key
+    description: API key for BigQuery access
+    regex: '(?i)bigquery.{0,20}api.{0,20}key[:=]\s*[''"]?(AIza[0-9A-Za-z\-_]{35})[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [gcp, bigquery, api-key]
+    context_keywords: [bigquery, api]
+    
+  - id: gcp-dataflow-job
+    name: Dataflow Pipeline Job
+    description: Dataflow streaming/batch job
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/locations/([a-z0-9\-]+)/jobs/([0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}_[0-9]{2}-[0-9]+)'
+    confidence: 80
+    severity: low
+    tags: [gcp, dataflow, pipeline, data]
+    
+  - id: gcp-dataproc-cluster
+    name: Dataproc Cluster
+    description: Managed Spark/Hadoop cluster
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/regions/([a-z0-9\-]+)/clusters/([a-z]([a-z0-9\-]{0,51}[a-z0-9])?)'
+    confidence: 78
+    severity: medium
+    tags: [gcp, dataproc, spark, hadoop]
+    
+  - id: gcp-composer-environment
+    name: Cloud Composer Environment
+    description: Managed Apache Airflow environment
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/locations/([a-z0-9\-]+)/environments/([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)'
+    confidence: 78
+    severity: medium
+    tags: [gcp, composer, airflow, workflow]
+    
+  - id: gcp-pub-sub-topic
+    name: Pub/Sub Topic
+    description: Messaging topic identifier
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/topics/([a-zA-Z]([a-zA-Z0-9\-_.~+%]{2,254}[a-zA-Z0-9])?)'
+    confidence: 75
+    severity: medium
+    tags: [gcp, pubsub, messaging, topic]
+    
+  - id: gcp-pub-sub-subscription
+    name: Pub/Sub Subscription
+    description: Messaging subscription identifier
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/subscriptions/([a-zA-Z]([a-zA-Z0-9\-_.~+%]{2,254}[a-zA-Z0-9])?)'
+    confidence: 75
+    severity: low
+    tags: [gcp, pubsub, messaging, subscription]
+    
+  - id: gcp-cloud-tasks-queue
+    name: Cloud Tasks Queue
+    description: Task queue identifier
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/locations/([a-z0-9\-]+)/queues/([a-zA-Z0-9\-]+)'
+    confidence: 75
+    severity: low
+    tags: [gcp, cloud-tasks, queue]
+    
+  - id: gcp-cloud-scheduler-job
+    name: Cloud Scheduler Job
+    description: Cron job scheduler identifier
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/locations/([a-z0-9\-]+)/jobs/([a-zA-Z0-9\-_]+)'
+    confidence: 72
+    severity: low
+    tags: [gcp, cloud-scheduler, cron, job]
+    
+  - id: gcp-workflow-definition
+    name: Workflows Definition
+    description: Serverless workflow identifier
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/locations/([a-z0-9\-]+)/workflows/([a-z]([a-z0-9\-]{0,61}[a-z0-9])?)'
+    confidence: 75
+    severity: medium
+    tags: [gcp, workflows, serverless]
+    
+  - id: gcp-logging-sink
+    name: Cloud Logging Sink
+    description: Log export destination
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/sinks/([a-zA-Z0-9\-_]+)'
+    confidence: 70
+    severity: low
+    tags: [gcp, logging, sink, export]
+    
+  - id: gcp-monitoring-alert-policy
+    name: Cloud Monitoring Alert Policy
+    description: Monitoring alert configuration
+    regex: 'projects/([a-z][a-z0-9\-]{4,28}[a-z0-9])/alertPolicies/([0-9]+)'
+    confidence: 72
+    severity: low
+    tags: [gcp, monitoring, alert, policy]
+    
+  - id: gcp-service-usage-api-key
+    name: Service Usage API Key
+    description: API for enabling/disabling services
+    regex: '(?i)service.{0,10}usage.{0,20}api.{0,20}key[:=]\s*[''"]?(AIza[0-9A-Za-z\-_]{35})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [gcp, service-usage, api-key]
+    context_keywords: [service, usage, api]

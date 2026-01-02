@@ -1,0 +1,868 @@
+# AWS Secret Detection Patterns
+# Author: github.com/shaniidev
+# Category: Cloud Infrastructure
+# Total Patterns: 100
+
+name: AWS Credentials & Secrets
+version: 1.0
+author: github.com/shaniidev
+category: cloud
+provider: Amazon Web Services
+severity: critical
+updated: 2026-01-02
+
+patterns:
+  # ============================================================================
+  # IAM CREDENTIALS (Patterns 1-25)
+  # ============================================================================
+  
+  - id: aws-access-key-id
+    name: AWS Access Key ID
+    description: Amazon Web Services IAM access key identifier (AKIA prefix)
+    regex: '\b(AKIA[0-9A-Z]{16})\b'
+    confidence: 98
+    severity: critical
+    entropy_check: false
+    min_length: 20
+    max_length: 20
+    tags: [aws, iam, access-key, credentials]
+    references:
+      - https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html
+    examples:
+      match:
+        - "AKIAIOSFODNN7EXAMPLE"
+        - "AKIAI44QH8DHBEXAMPLE"
+      no_match:
+        - "AKIA123"
+        - "akia_test_key"
+  
+  - id: aws-secret-access-key
+    name: AWS Secret Access Key
+    description: AWS secret key for API authentication (40 chars base64)
+    regex: '(?i)aws.{0,20}(secret|access).{0,20}[:=]\s*[''"]?([A-Za-z0-9/+=]{40})[''"]?'
+    confidence: 85
+    severity: critical
+    entropy_check: true
+    min_entropy: 4.5
+    min_length: 40
+    max_length: 40
+    tags: [aws, iam, secret-key, credentials]
+    context_keywords: [aws, amazon, secret, access]
+    
+  - id: aws-account-id
+    name: AWS Account ID
+    description: 12-digit AWS account identifier
+    regex: '(?i)aws.{0,20}account.{0,20}[:=]\s*[''"]?(\d{12})[''"]?'
+    confidence: 75
+    severity: medium
+    entropy_check: false
+    min_length: 12
+    max_length: 12
+    tags: [aws, account, identifier]
+    
+  - id: aws-session-token
+    name: AWS Session Token (STS)
+    description: Temporary AWS Security Token Service session token
+    regex: '(?i)(aws.{0,20}session.{0,20}token|x-amz-security-token)[:=]\s*[''"]?([A-Za-z0-9/+=]{100,})[''"]?'
+    confidence: 90
+    severity: high
+    entropy_check: true
+    min_entropy: 4.8
+    tags: [aws, sts, session, temporary]
+    
+  - id: aws-mws-auth-token
+    name: AWS MWS Auth Token
+    description: Amazon Marketplace Web Service authentication token
+    regex: 'amzn\.mws\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+    confidence: 95
+    severity: high
+    tags: [aws, mws, marketplace, token]
+    
+  - id: aws-arn-generic
+    name: AWS ARN (Amazon Resource Name)
+    description: Generic AWS resource identifier
+    regex: 'arn:aws:[a-z0-9\-]+:[a-z0-9\-]*:\d{12}:[a-zA-Z0-9\-_/]+'
+    confidence: 70
+    severity: low
+    tags: [aws, arn, resource]
+    
+  - id: aws-iam-unique-id
+    name: AWS IAM Unique ID
+    description: Unique identifier for IAM entities (AIDA, AROA, AGPA prefix)
+    regex: '\b(AIDA|AROA|AGPA)[A-Z0-9]{16}\b'
+    confidence: 85
+    severity: medium
+    tags: [aws, iam, identifier]
+    
+  - id: aws-cognito-identity-pool
+    name: AWS Cognito Identity Pool ID
+    description: Amazon Cognito identity pool identifier
+    regex: '[a-z]{2}-[a-z]+-\d:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
+    confidence: 80
+    severity: medium
+    tags: [aws, cognito, identity, pool]
+    
+  - id: aws-cognito-app-client
+    name: AWS Cognito App Client ID  
+    description: Cognito user pool app client identifier
+    regex: '(?i)cognito.{0,20}(client|app).{0,20}id[:=]\s*[''"]?([a-z0-9]{26})[''"]?'
+    confidence: 82
+    severity: medium
+    tags: [aws, cognito, client]
+    
+  - id: aws-temporary-access-key
+    name: AWS Temporary Access Key (ASIA prefix)
+    description: Temporary AWS credentials from STS
+    regex: '\b(ASIA[0-9A-Z]{16})\b'
+    confidence: 97
+    severity: high
+    tags: [aws, sts, temporary, credentials]
+    
+  - id: aws-root-user-key
+    name: AWS Root User Access Key
+    description: Root account access key (highly sensitive)
+    regex: '(?i)root.{0,20}aws.{0,20}(access|key)[:=]\s*[''"]?(AKIA[0-9A-Z]{16})[''"]?'
+    confidence: 99
+    severity: critical
+    tags: [aws, root, credentials]
+    
+  - id: aws-assumed-role-arn
+    name: AWS Assumed Role ARN
+    description: ARN for assumed IAM role
+    regex: 'arn:aws:sts::\d{12}:assumed-role/[a-zA-Z0-9\-_]+'
+    confidence: 75
+    severity: medium
+    tags: [aws, sts, role]
+    
+  - id: aws-federated-user
+    name: AWS Federated User ARN
+    description: Federated user session identifier
+    regex: 'arn:aws:sts::\d{12}:federated-user/[a-zA-Z0-9\-_]+'
+    confidence: 75
+    severity: medium
+    tags: [aws, sts, federated]
+    
+  - id: aws-kms-key-id
+    name: AWS KMS Key ID
+    description: Key Management Service key identifier
+    regex: '(?i)kms.{0,20}key.{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [aws, kms, encryption]
+    
+  - id: aws-kms-alias
+    name: AWS KMS Key Alias
+    description: KMS key alias ARN
+    regex: 'arn:aws:kms:[a-z0-9\-]+:\d{12}:alias/[a-zA-Z0-9\-_]+'
+    confidence: 78
+    severity: medium
+    tags: [aws, kms, alias]
+    
+  - id: aws-secret-manager-arn
+    name: AWS Secrets Manager ARN
+    description: Secrets Manager secret ARN
+    regex: 'arn:aws:secretsmanager:[a-z0-9\-]+:\d{12}:secret:[a-zA-Z0-9\-_/]+'
+    confidence: 80
+    severity: high
+    tags: [aws, secrets-manager]
+    
+  - id: aws-parameter-store-name
+    name: AWS Systems Manager Parameter
+    description: Parameter Store parameter name
+    regex: '(?i)ssm.{0,20}parameter[:=]\s*[''"]?(/[a-zA-Z0-9\-_/]+)[''"]?'
+    confidence: 70
+    severity: medium
+    tags: [aws, ssm, parameter-store]
+    
+  - id: aws-iot-certificate
+    name: AWS IoT Certificate ID
+    description: IoT device certificate identifier
+    regex: '(?i)iot.{0,20}cert(ificate)?[:=]\s*[''"]?([a-f0-9]{64})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [aws, iot, certificate]
+    
+  - id: aws-iot-policy
+    name: AWS IoT Policy ARN
+    description: IoT security policy ARN
+    regex: 'arn:aws:iot:[a-z0-9\-]+:\d{12}:policy/[a-zA-Z0-9\-_]+'
+    confidence: 75
+    severity: medium
+    tags: [aws, iot, policy]
+    
+  - id: aws-cloudformation-stack
+    name: AWS CloudFormation Stack ID
+    description: CloudFormation stack unique identifier
+    regex: 'arn:aws:cloudformation:[a-z0-9\-]+:\d{12}:stack/[a-zA-Z0-9\-_]+/[a-f0-9\-]+'
+    confidence: 75
+    severity: low
+    tags: [aws, cloudformation, stack]
+    
+  - id: aws-elastic-beanstalk-token
+    name: AWS Elastic Beanstalk Auth Token
+    description: Beanstalk deployment authentication
+    regex: '(?i)beanstalk.{0,20}(token|auth)[:=]\s*[''"]?([A-Za-z0-9/+=]{40,})[''"]?'
+    confidence: 80
+    severity: high
+    tags: [aws, beanstalk, token]
+    context_keywords: [beanstalk, elastic]
+    
+  - id: aws-amplify-app-id
+    name: AWS Amplify App ID
+    description: Amplify application identifier
+    regex: '(?i)amplify.{0,20}app.{0,20}id[:=]\s*[''"]?([a-z0-9]{13})[''"]?'
+    confidence: 80
+    severity: medium
+    tags: [aws, amplify, mobile]
+    
+  - id: aws-appsync-api-key
+    name: AWS AppSync API Key
+    description: AppSync GraphQL API key
+    regex: 'da2-[a-z0-9]{26}'
+    confidence: 95
+    severity: high
+    tags: [aws, appsync, graphql, api-key]
+    
+  - id: aws-device-farm-token
+    name: AWS Device Farm Access Token
+    description: Mobile device testing service token
+    regex: '(?i)devicefarm.{0,20}(token|access)[:=]\s*[''"]?([A-Za-z0-9/+=]{100,})[''"]?'
+    confidence: 82
+    severity: medium
+    tags: [aws, device-farm, mobile]
+    context_keywords: [devicefarm, device, farm]
+    
+  - id: aws-mobile-hub-project
+    name: AWS Mobile Hub Project ID
+    description: Mobile Hub project identifier
+    regex: '(?i)mobilehub.{0,20}project[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 78
+    severity: medium
+    tags: [aws, mobile-hub, project]
+    
+  # ============================================================================
+  # S3 & STORAGE (Patterns 26-40)
+  # ============================================================================
+  
+  - id: aws-s3-bucket-arn
+    name: AWS S3 Bucket ARN
+    description: S3 bucket Amazon Resource Name
+    regex: 'arn:aws:s3:::([a-z0-9\-\.]+)'
+    confidence: 80
+    severity: medium
+    tags: [aws, s3, bucket, storage]
+    
+  - id: aws-s3-access-point
+    name: AWS S3 Access Point ARN
+    description: S3 access point identifier
+    regex: 'arn:aws:s3:[a-z0-9\-]+:\d{12}:accesspoint/[a-z0-9\-]+'
+    confidence: 78
+    severity: medium
+    tags: [aws, s3, access-point]
+    
+  - id: aws-s3-presigned-url
+    name: AWS S3 Presigned URL
+    description: Temporary URL with embedded credentials
+    regex: 'https://[a-z0-9\-\.]+\.s3(\.[a-z0-9\-]+)?\.amazonaws\.com/[^\s]*\?[^\s]*X-Amz-Credential=[A-Z0-9]+%2F\d{8}%2F[a-z0-9\-]+%2Fs3%2Faws4_request[^\s]*'
+    confidence: 92
+    severity: high
+    tags: [aws, s3, presigned-url, credentials]
+    
+  - id: aws-glacier-vault
+    name: AWS Glacier Vault ARN
+    description: Glacier vault identifier
+    regex: 'arn:aws:glacier:[a-z0-9\-]+:\d{12}:vaults/[a-zA-Z0-9\-_]+'
+    confidence: 75
+    severity: low
+    tags: [aws, glacier, vault, storage]
+    
+  - id: aws-efs-file-system
+    name: AWS EFS File System ID
+    description: Elastic File System identifier
+    regex: 'fs-[a-f0-9]{8,16}'
+    confidence: 80
+    severity: medium
+    tags: [aws, efs, filesystem, storage]
+    
+  - id: aws-fsx-file-system
+    name: AWS FSx File System ID  
+    description: FSx for Windows/Lustre identifier
+    regex: 'fs-[a-f0-9]{17}'
+    confidence: 78
+    severity: medium
+    tags: [aws, fsx, filesystem]
+    
+  - id: aws-backup-vault
+    name: AWS Backup Vault ARN
+    description: Backup service vault ARN
+    regex: 'arn:aws:backup:[a-z0-9\-]+:\d{12}:backup-vault:[a-zA-Z0-9\-_]+'
+    confidence: 75
+    severity: medium
+    tags: [aws, backup, vault]
+    
+  - id: aws-storage-gateway
+    name: AWS Storage Gateway ARN
+    description: Storage Gateway resource ARN
+    regex: 'arn:aws:storagegateway:[a-z0-9\-]+:\d{12}:gateway/sgw-[A-F0-9]{8}'
+    confidence: 80
+    severity: medium
+    tags: [aws, storage-gateway]
+    
+  - id: aws-datasync-task
+    name: AWS DataSync Task ARN
+    description: DataSync transfer task ARN
+    regex: 'arn:aws:datasync:[a-z0-9\-]+:\d{12}:task/task-[a-f0-9]{17}'
+    confidence: 75
+    severity: low
+    tags: [aws, datasync, transfer]
+    
+  - id: aws-s3-bucket-policy
+    name: S3 Bucket in Policy Document
+    description: S3 bucket referenced in IAM policy
+    regex: '(?i)"Resource"\s*:\s*"arn:aws:s3:::([a-z0-9\-\.]+)(/\*)?\"'
+    confidence: 72
+    severity: low
+    tags: [aws, s3, policy]
+    
+  - id: aws-s3-encryption-key
+    name: S3 Server-Side Encryption Key
+    description: S3 SSE-C encryption key reference
+    regex: '(?i)x-amz-server-side-encryption-customer-key[:=]\s*[''"]?([A-Za-z0-9/+=]{44})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [aws, s3, encryption, sse]
+    
+  - id: aws-s3-object-lock
+    name: S3 Object Lock Token
+    description: S3 object lock bypass governance token
+    regex: '(?i)x-amz-bypass-governance-retention[:=]\s*[''"]?([A-Za-z0-9/+=]{40,})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [aws, s3, object-lock]
+    
+  - id: aws-s3-outpost
+    name: AWS S3 on Outposts ARN
+    description: S3 on Outposts bucket ARN
+    regex: 'arn:aws:s3-outposts:[a-z0-9\-]+:\d{12}:outpost/[a-z0-9\-]+/bucket/[a-z0-9\-]+'
+    confidence: 78
+    severity: medium
+    tags: [aws, s3, outposts]
+    
+  - id: aws-ebs-snapshot
+    name: AWS EBS Snapshot ID
+    description: Elastic Block Store snapshot identifier
+    regex: 'snap-[a-f0-9]{8,17}'
+    confidence: 75
+    severity: medium
+    tags: [aws, ebs, snapshot, storage]
+    
+  - id: aws-ebs-volume
+    name: AWS EBS Volume ID
+    description: EBS volume identifier
+    regex: 'vol-[a-f0-9]{8,17}'
+    confidence: 72
+    severity: low
+    tags: [aws, ebs, volume]
+    
+  # ============================================================================
+  # EC2 & COMPUTE (Patterns 41-55)
+  # ============================================================================
+  
+  - id: aws-ec2-instance-id
+    name: AWS EC2 Instance ID
+    description: EC2 virtual machine identifier
+    regex: 'i-[a-f0-9]{8,17}'
+    confidence: 70
+    severity: low
+    tags: [aws, ec2, instance, compute]
+    
+  - id: aws-ec2-key-pair
+    name: AWS EC2 Key Pair Name
+    description: EC2 SSH key pair identifier
+    regex: '(?i)ec2.{0,20}key.{0,20}(pair|name)[:=]\s*[''"]?([a-zA-Z0-9\-_]+)[''"]?'
+    confidence: 68
+    severity: medium
+    tags: [aws, ec2, keypair, ssh]
+    context_keywords: [ec2, key, pair]
+    
+  - id: aws-ec2-private-key
+    name: EC2 Private Key (PEM)
+    description: EC2 instance SSH private key
+    regex: '-----BEGIN RSA PRIVATE KEY-----[\s\S]+-----END RSA PRIVATE KEY-----'
+    confidence: 99
+    severity: critical
+    tags: [aws, ec2, private-key, ssh, pem]
+    
+  - id: aws-ec2-security-group
+    name: AWS EC2 Security Group ID
+    description: VPC security group identifier
+    regex: 'sg-[a-f0-9]{8,17}'
+    confidence: 68
+    severity: low
+    tags: [aws, ec2, security-group, vpc]
+    
+  - id: aws-ec2-elastic-ip
+    name: AWS Elastic IP Allocation ID
+    description: Elastic IP address allocation identifier
+    regex: 'eipalloc-[a-f0-9]{8,17}'
+    confidence: 72
+    severity: low
+    tags: [aws, ec2, elastic-ip]
+    
+  - id: aws-ec2-ami
+    name: AWS AMI (Amazon Machine Image) ID
+    description: EC2 machine image identifier
+    regex: 'ami-[a-f0-9]{8,17}'
+    confidence: 68
+    severity: low
+    tags: [aws, ec2, ami, image]
+    
+  - id: aws-lambda-function-arn
+    name: AWS Lambda Function ARN
+    description: Lambda serverless function ARN
+    regex: 'arn:aws:lambda:[a-z0-9\-]+:\d{12}:function:[a-zA-Z0-9\-_]+'
+    confidence: 78
+    severity: medium
+    tags: [aws, lambda, serverless]
+    
+  - id: aws-lambda-layer-arn
+    name: AWS Lambda Layer ARN
+    description: Lambda layer version ARN
+    regex: 'arn:aws:lambda:[a-z0-9\-]+:\d{12}:layer:[a-zA-Z0-9\-_]+:\d+'
+    confidence: 75
+    severity: low
+    tags: [aws, lambda, layer]
+    
+  - id: aws-lambda-invoke-url
+    name: AWS Lambda Function URL
+    description: Public Lambda function URL endpoint
+    regex: 'https://[a-z0-9]{12}\.lambda-url\.[a-z0-9\-]+\.on\.aws/?'
+    confidence: 88
+    severity: medium
+    tags: [aws, lambda, url, api]
+    
+  - id: aws-ecs-cluster
+    name: AWS ECS Cluster ARN
+    description: Elastic Container Service cluster ARN
+    regex: 'arn:aws:ecs:[a-z0-9\-]+:\d{12}:cluster/[a-zA-Z0-9\-_]+'
+    confidence: 75
+    severity: low
+    tags: [aws, ecs, container, cluster]
+    
+  - id: aws-ecs-task-definition
+    name: AWS ECS Task Definition ARN
+    description: ECS task definition ARN
+    regex: 'arn:aws:ecs:[a-z0-9\-]+:\d{12}:task-definition/[a-zA-Z0-9\-_]+:\d+'
+    confidence: 75
+    severity: low
+    tags: [aws, ecs, task]
+    
+  - id: aws-ecr-repository
+    name: AWS ECR Repository ARN
+    description: Elastic Container Registry repository
+    regex: 'arn:aws:ecr:[a-z0-9\-]+:\d{12}:repository/[a-zA-Z0-9\-_/]+'
+    confidence: 78
+    severity: medium
+    tags: [aws, ecr, container, registry]
+    
+  - id: aws-eks-cluster
+    name: AWS EKS Cluster ARN
+    description: Elastic Kubernetes Service cluster
+    regex: 'arn:aws:eks:[a-z0-9\-]+:\d{12}:cluster/[a-zA-Z0-9\-_]+'
+    confidence: 78
+    severity: medium
+    tags: [aws, eks, kubernetes, cluster]
+    
+  - id: aws-lightsail-instance
+    name: AWS Lightsail Instance ARN
+    description: Lightsail VPS instance ARN
+    regex: 'arn:aws:lightsail:[a-z0-9\-]+:\d{12}:Instance/[a-f0-9\-]+'
+    confidence: 75
+    severity: low
+    tags: [aws, lightsail, vps]
+    
+  - id: aws-batch-job-queue
+    name: AWS Batch Job Queue ARN
+    description: Batch computing job queue ARN
+    regex: 'arn:aws:batch:[a-z0-9\-]+:\d{12}:job-queue/[a-zA-Z0-9\-_]+'
+    confidence: 72
+    severity: low
+    tags: [aws, batch, compute]
+    
+  # ============================================================================
+  # DATABASES (Patterns 56-70)
+  # ============================================================================
+  
+  - id: aws-rds-instance-arn
+    name: AWS RDS Instance ARN
+    description: Relational Database Service instance ARN
+    regex: 'arn:aws:rds:[a-z0-9\-]+:\d{12}:db:[a-zA-Z0-9\-]+'
+    confidence: 78
+    severity: high
+    tags: [aws, rds, database]
+    
+  - id: aws-rds-connection-string
+    name: AWS RDS Connection String
+    description: RDS database connection URL with credentials
+    regex: '(?i)(mysql|postgres(ql)?|mariadb)://([a-zA-Z0-9_]+):([^@\s]+)@([a-z0-9\-]+\.rds\.amazonaws\.com):(\d+)/([a-zA-Z0-9_]+)'
+    confidence: 95
+    severity: critical
+    tags: [aws, rds, database, credentials, connection-string]
+    
+  - id: aws-rds-master-password
+    name: RDS Master User Password
+    description: Database master password in config
+    regex: '(?i)rds.{0,20}(master|root).{0,20}password[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [aws, rds, password, credentials]
+    context_keywords: [rds, master, password]
+    
+  - id: aws-dynamodb-table-arn
+    name: AWS DynamoDB Table ARN
+    description: DynamoDB NoSQL table ARN
+    regex: 'arn:aws:dynamodb:[a-z0-9\-]+:\d{12}:table/[a-zA-Z0-9\-_\.]+'
+    confidence: 75
+    severity: medium
+    tags: [aws, dynamodb, nosql, table]
+    
+  - id: aws-dynamodb-stream-arn
+    name: AWS DynamoDB Stream ARN
+    description: DynamoDB stream ARN for change data capture
+    regex: 'arn:aws:dynamodb:[a-z0-9\-]+:\d{12}:table/[a-zA-Z0-9\-_\.]+/stream/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}'
+    confidence: 80
+    severity: medium
+    tags: [aws, dynamodb, stream]
+    
+  - id: aws-redshift-cluster
+    name: AWS Redshift Cluster Endpoint
+    description: Redshift data warehouse cluster endpoint
+    regex: '([a-z0-9\-]+)\.([a-z0-9]+)\.redshift\.amazonaws\.com'
+    confidence: 85
+    severity: high
+    tags: [aws, redshift, datawarehouse, database]
+    
+  - id: aws-redshift-password
+    name: AWS Redshift Master Password
+    description: Redshift cluster master password
+    regex: '(?i)redshift.{0,20}(master|admin).{0,20}password[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [aws, redshift, password, credentials]
+    context_keywords: [redshift, master, password]
+    
+  - id: aws-elasticache-cluster
+    name: AWS ElastiCache Cluster Endpoint
+    description: ElastiCache Redis/Memcached endpoint
+    regex: '([a-z0-9\-]+)\.([a-z0-9]+)\.cache\.amazonaws\.com'
+    confidence: 82
+    severity: high
+    tags: [aws, elasticache, cache, redis, memcached]
+    
+  - id: aws-neptune-cluster
+    name: AWS Neptune Cluster Endpoint
+    description: Neptune graph database endpoint
+    regex: '([a-z0-9\-]+)\.cluster-([a-z0-9]+)\.neptune\.amazonaws\.com'
+    confidence: 85
+    severity: high
+    tags: [aws, neptune, graph-database]
+    
+  - id: aws-documentdb-cluster
+    name: AWS DocumentDB Cluster Endpoint
+    description: DocumentDB MongoDB-compatible endpoint
+    regex: '([a-z0-9\-]+)\.cluster-([a-z0-9]+)\.docdb\.amazonaws\.com'
+    confidence: 85
+    severity: high
+    tags: [aws, documentdb, mongodb, database]
+    
+  - id: aws-timestream-database
+    name: AWS Timestream Database ARN
+    description: Timestream time-series database ARN
+    regex: 'arn:aws:timestream:[a-z0-9\-]+:\d{12}:database/[a-zA-Z0-9\-_]+'
+    confidence: 75
+    severity: medium
+    tags: [aws, timestream, timeseries, database]
+    
+  - id: aws-qldb-ledger
+    name: AWS QLDB Ledger ARN
+    description: Quantum Ledger Database ARN
+    regex: 'arn:aws:qldb:[a-z0-9\-]+:\d{12}:ledger/[a-zA-Z0-9\-_]+'
+    confidence: 78
+    severity: medium
+    tags: [aws, qldb, blockchain, ledger]
+    
+  - id: aws-dms-endpoint
+    name: AWS DMS Endpoint ARN
+    description: Database Migration Service endpoint ARN
+    regex: 'arn:aws:dms:[a-z0-9\-]+:\d{12}:endpoint:[A-Z0-9]+'
+    confidence: 75
+    severity: medium
+    tags: [aws, dms, migration, database]
+    
+  - id: aws-glue-connection
+    name: AWS Glue Connection Name
+    description: Glue ETL database connection
+    regex: '(?i)glue.{0,20}connection[:=]\s*[''"]?([a-zA-Z0-9\-_]+)[''"]?'
+    confidence: 70
+    severity: medium
+    tags: [aws, glue, etl, database]
+    context_keywords: [glue, connection]
+    
+  - id: aws-database-credentials-json
+    name: AWS Database Credentials in JSON
+    description: Structured database credentials
+    regex: '\{[^\}]*"(host|endpoint)"\s*:\s*"[^"]*\.(rds|redshift|neptune|docdb|elasticache)\.amazonaws\.com"[^\}]*"(password|secret)"\s*:\s*"([^"]+)"[^\}]*\}'
+    confidence: 92
+    severity: critical
+    tags: [aws, database, credentials, json]
+    
+  # ============================================================================
+  # API GATEWAY & NETWORKING (Patterns 71-85)
+  # ============================================================================
+  
+  - id: aws-api-gateway-key
+    name: AWS API Gateway API Key
+    description: API Gateway managed API key
+    regex: '(?i)x-api-key[:=]\s*[''"]?([a-zA-Z0-9]{20,})[''"]?'
+    confidence: 75
+    severity: high
+    tags: [aws, api-gateway, api-key]
+    context_keywords: [gateway, api, key]
+    
+  - id: aws-api-gateway-id
+    name: AWS API Gateway REST API ID
+    description: API Gateway identifier
+    regex: '(?i)api.{0,20}gateway.{0,20}(id|api)[:=]\s*[''"]?([a-z0-9]{10})[''"]?'
+    confidence: 78
+    severity: medium
+    tags: [aws, api-gateway, identifier]
+    
+  - id: aws-api-gateway-url
+    name: AWS API Gateway Invoke URL
+    description: API Gateway endpoint URL
+    regex: 'https://[a-z0-9]+\.execute-api\.[a-z0-9\-]+\.amazonaws\.com/[a-zA-Z0-9\-_]+'
+    confidence: 85
+    severity: medium
+    tags: [aws, api-gateway, endpoint, url]
+    
+  - id: aws-cloudfront-keypair
+    name: AWS CloudFront Key Pair ID
+    description: CloudFront signed URL key pair
+    regex: '(?i)cloudfront.{0,20}key.{0,20}(pair|id)[:=]\s*[''"]?(APKA[A-Z0-9]{16})[''"]?'
+    confidence: 90
+    severity: high
+    tags: [aws, cloudfront, cdn, keypair]
+    
+  - id: aws-cloudfront-private-key
+    name: CloudFront Private Key
+    description: CloudFront signing private key
+    regex: '-----BEGIN RSA PRIVATE KEY-----[\s\S]+-----END RSA PRIVATE KEY-----'
+    confidence: 99
+    severity: critical
+    tags: [aws, cloudfront, private-key]
+    
+  - id: aws-route53-hosted-zone
+    name: AWS Route53 Hosted Zone ID
+    description: DNS hosted zone identifier
+    regex: '(?i)hosted.{0,20}zone.{0,20}id[:=]\s*[''"]?(Z[A-Z0-9]{12,})[''"]?'
+    confidence: 78
+    severity: low
+    tags: [aws, route53, dns, zone]
+    
+  - id: aws-vpc-id
+    name: AWS VPC ID
+    description: Virtual Private Cloud identifier
+    regex: 'vpc-[a-f0-9]{8,17}'
+    confidence: 68
+    severity: low
+    tags: [aws, vpc, network]
+    
+  - id: aws-subnet-id
+    name: AWS Subnet ID
+    description: VPC subnet identifier
+    regex: 'subnet-[a-f0-9]{8,17}'
+    confidence: 65
+    severity: low
+    tags: [aws, vpc, subnet, network]
+    
+  - id: aws-elastic-load-balancer
+    name: AWS ELB ARN
+    description: Elastic Load Balancer ARN
+    regex: 'arn:aws:elasticloadbalancing:[a-z0-9\-]+:\d{12}:loadbalancer/(app|net|gwy)/[a-zA-Z0-9\-]+/[a-f0-9]{16}'
+    confidence: 78
+    severity: medium
+    tags: [aws, elb, load-balancer, network]
+    
+  - id: aws-direct-connect
+    name: AWS Direct Connect Connection ID
+    description: Direct Connect dedicated connection
+    regex: 'dxcon-[a-f0-9]{8}'
+    confidence: 75
+    severity: medium
+    tags: [aws, direct-connect, network]
+    
+  - id: aws-transit-gateway
+    name: AWS Transit Gateway ID
+    description: Transit Gateway identifier
+    regex: 'tgw-[a-f0-9]{8,17}'
+    confidence: 72
+    severity: low
+    tags: [aws, transit-gateway, network]
+    
+  - id: aws-vpc-peering
+    name: AWS VPC Peering Connection ID
+    description: VPC peering connection identifier
+    regex: 'pcx-[a-f0-9]{8,17}'
+    confidence: 70
+    severity: low
+    tags: [aws, vpc, peering, network]
+    
+  - id: aws-nat-gateway
+    name: AWS NAT Gateway ID
+    description: NAT Gateway identifier
+    regex: 'nat-[a-f0-9]{17}'
+    confidence: 72
+    severity: low
+    tags: [aws, nat, gateway, network]
+    
+  - id: aws-internet-gateway
+    name: AWS Internet Gateway ID
+    description: Internet Gateway identifier
+    regex: 'igw-[a-f0-9]{8,17}'
+    confidence: 68
+    severity: low
+    tags: [aws, igw, gateway, network]
+    
+  - id: aws-vpn-gateway
+    name: AWS VPN Gateway ID
+    description: Virtual Private Gateway identifier
+    regex: 'vgw-[a-f0-9]{8,17}'
+    confidence: 70
+    severity: medium
+    tags: [aws, vpn, gateway, network]
+    
+  # ============================================================================
+  # SPECIALIZED SERVICES (Patterns 86-100)
+  # ============================================================================
+  
+  - id: aws-sns-topic-arn
+    name: AWS SNS Topic ARN
+    description: Simple Notification Service topic ARN
+    regex: 'arn:aws:sns:[a-z0-9\-]+:\d{12}:[a-zA-Z0-9\-_]+'
+    confidence: 75
+    severity: medium
+    tags: [aws, sns, notification, messaging]
+    
+  - id: aws-sqs-queue-url
+    name: AWS SQS Queue URL
+    description: Simple Queue Service queue URL
+    regex: 'https://sqs\.[a-z0-9\-]+\.amazonaws\.com/\d{12}/[a-zA-Z0-9\-_]+'
+    confidence: 82
+    severity: medium
+    tags: [aws, sqs, queue, messaging]
+    
+  - id: aws-kinesis-stream-arn
+    name: AWS Kinesis Stream ARN
+    description: Kinesis data stream ARN
+    regex: 'arn:aws:kinesis:[a-z0-9\-]+:\d{12}:stream/[a-zA-Z0-9\-_\.]+'
+    confidence: 78
+    severity: medium
+    tags: [aws, kinesis, streaming, data]
+    
+  - id: aws-eventbridge-rule
+    name: AWS EventBridge Rule ARN
+    description: EventBridge event rule ARN
+    regex: 'arn:aws:events:[a-z0-9\-]+:\d{12}:rule/[a-zA-Z0-9\-_/]+'
+    confidence: 75
+    severity: low
+    tags: [aws, eventbridge, events]
+    
+  - id: aws-step-functions-arn
+    name: AWS Step Functions State Machine ARN
+    description: Step Functions workflow ARN
+    regex: 'arn:aws:states:[a-z0-9\-]+:\d{12}:stateMachine:[a-zA-Z0-9\-_]+'
+    confidence: 78
+    severity: medium
+    tags: [aws, step-functions, workflow]
+    
+  - id: aws-cloudwatch-log-group
+    name: AWS CloudWatch Log Group ARN
+    description: CloudWatch Logs log group ARN
+    regex: 'arn:aws:logs:[a-z0-9\-]+:\d{12}:log-group:[a-zA-Z0-9\-_/\.]+'
+    confidence: 72
+    severity: low
+    tags: [aws, cloudwatch, logs]
+    
+  - id: aws-xray-encryption-key
+    name: AWS X-Ray Encryption Key
+    description: X-Ray tracing encryption key
+    regex: '(?i)xray.{0,20}(encryption|key)[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 80
+    severity: high
+    tags: [aws, xray, tracing, encryption]
+    
+  - id: aws-sagemaker-notebook
+    name: AWS SageMaker Notebook Instance ARN
+    description: SageMaker ML notebook ARN
+    regex: 'arn:aws:sagemaker:[a-z0-9\-]+:\d{12}:notebook-instance/[a-zA-Z0-9\-]+'
+    confidence: 75
+    severity: medium
+    tags: [aws, sagemaker, ml, notebook]
+    
+  - id: aws-sagemaker-api-key
+    name: SageMaker API Key
+    description: SageMaker runtime API key
+    regex: '(?i)sagemaker.{0,20}api.{0,20}key[:=]\s*[''"]?([A-Za-z0-9/+=]{40,})[''"]?'
+    confidence: 82
+    severity: high
+    tags: [aws, sagemaker, ml, api-key]
+    context_keywords: [sagemaker, api, key]
+    
+  - id: aws-comprehend-endpoint
+    name: AWS Comprehend Endpoint ARN
+    description: Comprehend NLP endpoint ARN
+    regex: 'arn:aws:comprehend:[a-z0-9\-]+:\d{12}:document-classifier-endpoint/[a-zA-Z0-9\-]+'
+    confidence: 75
+    severity: medium
+    tags: [aws, comprehend, nlp, ml]
+    
+  - id: aws-rekognition-collection
+    name: AWS Rekognition Collection ID
+    description: Rekognition face collection ID
+    regex: '(?i)rekognition.{0,20}collection[:=]\s*[''"]?([a-zA-Z0-9\-_\.]{1,255})[''"]?'
+    confidence: 72
+    severity: medium
+    tags: [aws, rekognition, ml, vision]
+    context_keywords: [rekognition, collection]
+    
+  - id: aws-textract-job
+    name: AWS Textract Job ID
+    description: Textract document analysis job ID
+    regex: '(?i)textract.{0,20}job.{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 75
+    severity: low
+    tags: [aws, textract, ml, ocr]
+    
+  - id: aws-polly-lexicon
+    name: AWS Polly Lexicon ARN
+    description: Polly text-to-speech lexicon ARN
+    regex: 'arn:aws:polly:[a-z0-9\-]+:\d{12}:lexicon/[a-zA-Z0-9\-_]+'
+    confidence: 70
+    severity: low
+    tags: [aws, polly, tts, ml]
+    
+  - id: aws-connect-instance
+    name: AWS Connect Instance ARN
+    description: Connect contact center instance ARN
+    regex: 'arn:aws:connect:[a-z0-9\-]+:\d{12}:instance/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
+    confidence: 78
+    severity: medium
+    tags: [aws, connect, contact-center]
+    
+  - id: aws-chime-meeting-id
+    name: AWS Chime Meeting ID
+    description: Chime video meeting identifier
+    regex: '(?i)chime.{0,20}meeting.{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 75
+    severity: low
+    tags: [aws, chime, meeting, video]

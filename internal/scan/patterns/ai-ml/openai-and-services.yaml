@@ -1,0 +1,451 @@
+# OpenAI/AI Services Secret Detection Patterns
+# Author: github.com/shaniidev
+# Category: AI/ML Services
+# Total Patterns: 50
+
+name: AI/ML Service Credentials & Secrets
+version: 1.0
+author: github.com/shaniidev
+category: ai-ml
+provider: OpenAI and Others
+severity: critical
+updated: 2026-01-02
+
+patterns:
+  # OpenAI Patterns
+  - id: openai-api-key
+    name: OpenAI API Key
+    description: OpenAI GPT/ChatGPT API key
+    regex: '\bsk-[a-zA-Z0-9]{20}T3BlbkFJ[a-zA-Z0-9]{20}\b'
+    confidence: 99
+    severity: critical
+    tags: [openai, gpt, chatgpt, api-key, ai]
+    
+  - id: openai-api-key-legacy
+    name: OpenAI API Key (Legacy Format)
+    description: Older format OpenAI key
+    regex: '\bsk-[a-zA-Z0-9]{48}\b'
+    confidence: 95
+    severity: critical
+    tags: [openai, gpt, api-key, legacy, ai]
+    
+  - id: openai-api-key-context
+    name: OpenAI API Key (Context)
+    description: OpenAI key with explicit context
+    regex: '(?i)openai.{0,20}(api|secret).{0,20}key[:=]\s*[''"]?(sk-[a-zA-Z0-9]{20,})[''"]?'
+    confidence: 98
+    severity: critical
+    tags: [openai, api-key, ai]
+    context_keywords: [openai, api, key]
+    
+  - id: openai-org-id
+    name: OpenAI Organization ID
+    description: Organization identifier
+    regex: '(?i)openai.{0,20}org(anization)?.{0,20}id[:=]\s*[''"]?(org-[a-zA-Z0-9]{24})[''"]?'
+    confidence: 82
+    severity: medium
+    tags: [openai, organization, identifier]
+    context_keywords: [openai, org, id]
+    
+  - id: openai-project-key
+    name: OpenAI Project API Key
+    description: Project-scoped API key
+    regex: '\bsk-proj-[a-zA-Z0-9\-_]{80,}\b'
+    confidence: 98
+    severity: critical
+    tags: [openai, project, api-key]
+    
+  - id: openai-service-account
+    name: OpenAI Service Account Key
+    description: Service account API key
+    regex: '\bsk-svcacct-[a-zA-Z0-9\-_]{80,}\b'
+    confidence: 98
+    severity: critical
+    tags: [openai, service-account, api-key]
+
+  # Anthropic/Claude Patterns
+  - id: anthropic-api-key
+    name: Anthropic API Key
+    description: Claude AI API key
+    regex: '\bsk-ant-api03-[a-zA-Z0-9\-_]{93}\b'
+    confidence: 99
+    severity: critical
+    tags: [anthropic, claude, api-key, ai]
+    
+  - id: anthropic-api-key-context
+    name: Anthropic API Key (Context)
+    description: Anthropic/Claude key with context
+    regex: '(?i)(anthropic|claude).{0,20}api.{0,20}key[:=]\s*[''"]?(sk-ant-[a-zA-Z0-9\-_]+)[''"]?'
+    confidence: 98
+    severity: critical
+    tags: [anthropic, claude, api-key, ai]
+    context_keywords: [anthropic, claude, api]
+    
+  # Google AI/Gemini Patterns
+  - id: google-ai-api-key
+    name: Google AI (Gemini) API Key
+    description: Google Gemini/PaLM API key
+    regex: '(?i)(gemini|palm|google.{0,5}ai).{0,20}api.{0,20}key[:=]\s*[''"]?(AIza[0-9A-Za-z\-_]{35})[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [google, gemini, palm, api-key, ai]
+    context_keywords: [gemini, palm, google, ai, api]
+    
+  - id: google-vertex-ai-key
+    name: Google Vertex AI Key
+    description: Vertex AI platform credentials
+    regex: '(?i)vertex.{0,10}ai.{0,20}(api|key)[:=]\s*[''"]?([a-zA-Z0-9_\-]{50,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [google, vertex-ai, api-key]
+    context_keywords: [vertex, ai, api, key]
+    
+  # Cohere Patterns
+  - id: cohere-api-key
+    name: Cohere API Key
+    description: Cohere NLP API key
+    regex: '(?i)cohere.{0,20}api.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9]{40})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [cohere, nlp, api-key, ai]
+    context_keywords: [cohere, api, key]
+    
+  - id: cohere-token
+    name: Cohere API Token
+    description: Cohere access token
+    regex: '\b[a-zA-Z0-9]{40}\b'
+    confidence: 65
+    severity: medium
+    tags: [cohere, token, ai]
+    context_keywords: [cohere, token]
+    
+  # Hugging Face Patterns
+  - id: huggingface-api-token
+    name: Hugging Face API Token
+    description: Hugging Face Hub access token
+    regex: '\bhf_[a-zA-Z0-9]{34}\b'
+    confidence: 98
+    severity: critical
+    tags: [huggingface, api-token, ai, ml]
+    
+  - id: huggingface-token-context
+    name: Hugging Face Token (Context)
+    description: HF token with explicit context
+    regex: '(?i)(huggingface|hugging.{0,5}face|hf).{0,20}(api|token|key)[:=]\s*[''"]?(hf_[a-zA-Z0-9]{34})[''"]?'
+    confidence: 99
+    severity: critical
+    tags: [huggingface, api-token, ai]
+    context_keywords: [huggingface, hf, token]
+    
+  - id: huggingface-inference-endpoint
+    name: Hugging Face Inference Endpoint
+    description: Custom inference endpoint URL
+    regex: 'https://[a-z0-9\-]+\.us-east-1\.aws\.endpoints\.huggingface\.cloud/[^\s]*'
+    confidence: 85
+    severity: medium
+    tags: [huggingface, inference, endpoint]
+    
+  # Replicate Patterns
+  - id: replicate-api-token
+    name: Replicate API Token
+    description: Replicate.com API token
+    regex: '\br8_[a-zA-Z0-9]{40}\b'
+    confidence: 96
+    severity: critical
+    tags: [replicate, api-token, ai]
+    
+  - id: replicate-token-context
+    name: Replicate Token (Context)
+    description: Replicate token with context
+    regex: '(?i)replicate.{0,20}(api|token)[:=]\s*[''"]?(r8_[a-zA-Z0-9]{40})[''"]?'
+    confidence: 98
+    severity: critical
+    tags: [replicate, api-token, ai]
+    context_keywords: [replicate, api, token]
+    
+  # Stability AI Patterns
+  - id: stability-ai-key
+    name: Stability AI API Key
+    description: Stability AI (Stable Diffusion) key
+    regex: '\bsk-[a-zA-Z0-9]{48}\b'
+    confidence: 85
+    severity: critical
+    tags: [stability-ai, stable-diffusion, api-key, ai]
+    
+  - id: stability-ai-context
+    name: Stability AI Key (Context)
+    description: Stability key with context
+    regex: '(?i)(stability|stable.{0,5}diffusion).{0,20}(api|key)[:=]\s*[''"]?(sk-[a-zA-Z0-9]+)[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [stability-ai, stable-diffusion, api-key]
+    context_keywords: [stability, stable, diffusion, api]
+    
+  # Midjourney Patterns
+  - id: midjourney-token
+    name: Midjourney Auth Token
+    description: Midjourney Discord bot token
+    regex: '(?i)midjourney.{0,20}(token|auth)[:=]\s*[''"]?([a-zA-Z0-9_\-]{50,})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [midjourney, token, ai, image]
+    context_keywords: [midjourney, token]
+    
+  # DeepAI Patterns
+  - id: deepai-api-key
+    name: DeepAI API Key
+    description: DeepAI image/text API key
+    regex: '(?i)deepai.{0,20}api.{0,20}key[:=]\s*[''"]?([a-f0-9\-]{36})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [deepai, api-key, ai]
+    context_keywords: [deepai, api, key]
+    
+  # AI21 Labs Patterns
+  - id: ai21-api-key
+    name: AI21 Labs API Key
+    description: AI21 Jurassic/J2 API key
+    regex: '(?i)ai21.{0,20}api.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9]{40,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [ai21, jurassic, api-key, ai]
+    context_keywords: [ai21, jurassic, api]
+    
+  # Mistral AI Patterns
+  - id: mistral-api-key
+    name: Mistral AI API Key
+    description: Mistral AI model API key
+    regex: '(?i)mistral.{0,20}api.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9]{32})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [mistral, api-key, ai]
+    context_keywords: [mistral, api, key]
+    
+  # Perplexity Patterns
+  - id: perplexity-api-key
+    name: Perplexity API Key
+    description: Perplexity AI search API key
+    regex: '\bpplx-[a-f0-9]{48}\b'
+    confidence: 96
+    severity: critical
+    tags: [perplexity, api-key, ai, search]
+    
+  - id: perplexity-key-context
+    name: Perplexity Key (Context)
+    description: Perplexity key with context
+    regex: '(?i)perplexity.{0,20}api.{0,20}key[:=]\s*[''"]?(pplx-[a-f0-9]{48})[''"]?'
+    confidence: 98
+    severity: critical
+    tags: [perplexity, api-key, ai]
+    context_keywords: [perplexity, api]
+    
+  # Groq Patterns
+  - id: groq-api-key
+    name: Groq API Key
+    description: Groq LPU API key
+    regex: '\bgsk_[a-zA-Z0-9]{52}\b'
+    confidence: 96
+    severity: critical
+    tags: [groq, lpu, api-key, ai]
+    
+  - id: groq-key-context
+    name: Groq Key (Context)
+    description: Groq key with context
+    regex: '(?i)groq.{0,20}api.{0,20}key[:=]\s*[''"]?(gsk_[a-zA-Z0-9]{52})[''"]?'
+    confidence: 98
+    severity: critical
+    tags: [groq, api-key, ai]
+    context_keywords: [groq, api, key]
+    
+  # Together AI Patterns
+  - id: together-api-key
+    name: Together AI API Key
+    description: Together.ai inference API key
+    regex: '(?i)together.{0,20}api.{0,20}key[:=]\s*[''"]?([a-f0-9]{64})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [together, api-key, ai, inference]
+    context_keywords: [together, api, key]
+    
+  # Anyscale Patterns
+  - id: anyscale-api-key
+    name: Anyscale API Key
+    description: Anyscale Endpoints API key
+    regex: '(?i)anyscale.{0,20}api.{0,20}key[:=]\s*[''"]?(esecret_[a-zA-Z0-9]{40,})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [anyscale, endpoints, api-key, ai]
+    context_keywords: [anyscale, api, key]
+    
+  # Fireworks AI Patterns
+  - id: fireworks-api-key
+    name: Fireworks AI API Key
+    description: Fireworks.ai inference key
+    regex: '\bfw_[a-zA-Z0-9]{32,}\b'
+    confidence: 94
+    severity: critical
+    tags: [fireworks, api-key, ai, inference]
+    
+  # Databricks Patterns
+  - id: databricks-token
+    name: Databricks Personal Access Token
+    description: Databricks workspace PAT
+    regex: '\bdapi[a-f0-9]{32}\b'
+    confidence: 96
+    severity: critical
+    tags: [databricks, pat, token, ai, ml]
+    
+  - id: databricks-token-context
+    name: Databricks Token (Context)
+    description: Databricks token with context
+    regex: '(?i)databricks.{0,20}(token|pat)[:=]\s*[''"]?(dapi[a-f0-9]{32})[''"]?'
+    confidence: 98
+    severity: critical
+    tags: [databricks, token, ai, ml]
+    context_keywords: [databricks, token, pat]
+    
+  # Weights & Biases Patterns
+  - id: wandb-api-key
+    name: Weights & Biases API Key
+    description: W&B experiment tracking key
+    regex: '(?i)(wandb|weights.{0,5}biases).{0,20}api.{0,20}key[:=]\s*[''"]?([a-f0-9]{40})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [wandb, experiment-tracking, api-key, ml]
+    context_keywords: [wandb, weights, biases, api]
+    
+  # Neptune.ai Patterns
+  - id: neptune-api-token
+    name: Neptune.ai API Token
+    description: Neptune experiment tracking token
+    regex: '(?i)neptune.{0,20}api.{0,20}token[:=]\s*[''"]?(eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+)[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [neptune, experiment-tracking, api-token, ml]
+    context_keywords: [neptune, api, token]
+    
+  # Roboflow Patterns
+  - id: roboflow-api-key
+    name: Roboflow API Key
+    description: Roboflow computer vision API
+    regex: '(?i)roboflow.{0,20}api.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9]{20,})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [roboflow, computer-vision, api-key, ml]
+    context_keywords: [roboflow, api, key]
+    
+  # Clarifai Patterns
+  - id: clarifai-api-key
+    name: Clarifai API Key
+    description: Clarifai vision/NLP API key
+    regex: '(?i)clarifai.{0,20}api.{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [clarifai, vision, api-key, ml]
+    context_keywords: [clarifai, api, key]
+    
+  # Scale AI Patterns
+  - id: scale-api-key
+    name: Scale AI API Key
+    description: Scale data labeling API key
+    regex: '\blive_[a-f0-9]{32}\b'
+    confidence: 88
+    severity: high
+    tags: [scale, data-labeling, api-key, ml]
+    
+  # Pinecone Patterns
+  - id: pinecone-api-key
+    name: Pinecone API Key
+    description: Pinecone vector database key
+    regex: '(?i)pinecone.{0,20}api.{0,20}key[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [pinecone, vector-db, api-key, ai]
+    context_keywords: [pinecone, api, key]
+    
+  # Weaviate Patterns
+  - id: weaviate-api-key
+    name: Weaviate API Key
+    description: Weaviate vector database key
+    regex: '(?i)weaviate.{0,20}api.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9]{32,})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [weaviate, vector-db, api-key, ai]
+    context_keywords: [weaviate, api, key]
+    
+  # Qdrant Patterns
+  - id: qdrant-api-key
+    name: Qdrant API Key
+    description: Qdrant vector database key
+    regex: '(?i)qdrant.{0,20}api.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9_\-]{32,})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [qdrant, vector-db, api-key, ai]
+    context_keywords: [qdrant, api, key]
+    
+  # Chroma Patterns
+  - id: chroma-api-key
+    name: Chroma API Key
+    description: ChromaDB cloud API key
+    regex: '(?i)chroma.{0,20}api.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9_\-]{32,})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [chroma, vector-db, api-key, ai]
+    context_keywords: [chroma, api, key]
+    
+  # LangChain/LangSmith Patterns
+  - id: langchain-api-key
+    name: LangChain API Key
+    description: LangChain Hub/LangSmith key
+    regex: '\bls__[a-f0-9]{32}\b'
+    confidence: 94
+    severity: high
+    tags: [langchain, langsmith, api-key, ai]
+    
+  - id: langsmith-key-context
+    name: LangSmith Key (Context)
+    description: LangSmith key with context
+    regex: '(?i)(langchain|langsmith).{0,20}api.{0,20}key[:=]\s*[''"]?(ls__[a-f0-9]{32})[''"]?'
+    confidence: 96
+    severity: high
+    tags: [langchain, langsmith, api-key]
+    context_keywords: [langchain, langsmith, api]
+    
+  # Llama Patterns
+  - id: llama-api-token
+    name: Llama API Token
+    description: Llama cloud inference token
+    regex: '\bLA-[a-f0-9]{64}\b'
+    confidence: 90
+    severity: critical
+    tags: [llama, api-token, ai]
+    
+  # RunwayML Patterns
+  - id: runway-api-key
+    name: RunwayML API Key
+    description: Runway video/image generation key
+    regex: '(?i)runway.{0,20}api.{0,20}(key|secret)[:=]\s*[''"]?([a-zA-Z0-9_\-]{40,})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [runway, video-generation, api-key, ai]
+    context_keywords: [runway, api, key]
+    
+  # ElevenLabs Patterns
+  - id: elevenlabs-api-key
+    name: ElevenLabs API Key
+    description: ElevenLabs text-to-speech key
+    regex: '(?i)(elevenlabs|eleven.{0,5}labs).{0,20}api.{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 92
+    severity: high
+    tags: [elevenlabs, tts, api-key, ai]
+    context_keywords: [elevenlabs, eleven, labs, api]
+    
+  # AssemblyAI Patterns
+  - id: assemblyai-api-key
+    name: AssemblyAI API Key
+    description: AssemblyAI speech-to-text key
+    regex: '(?i)assemblyai.{0,20}api.{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 90
+    severity: high
+    tags: [assemblyai, stt, api-key, ai]
+    context_keywords: [assemblyai, assembly, api]

@@ -1,0 +1,406 @@
+# Twilio Secret Detection Patterns
+# Author: github.com/shaniidev
+# Category: Communication
+# Total Patterns: 50
+
+name: Twilio Credentials & Secrets
+version: 1.0
+author: github.com/shaniidev
+category: communication
+provider: Twilio
+severity: critical
+updated: 2026-01-02
+
+patterns:
+  - id: twilio-account-sid
+    name: Twilio Account SID
+    description: Twilio account identifier
+    regex: '\bAC[a-f0-9]{32}\b'
+    confidence: 96
+    severity: high
+    tags: [twilio, account-sid, identifier]
+    
+  - id: twilio-auth-token
+    name: Twilio Auth Token
+    description: Account authentication token
+    regex: '(?i)twilio.{0,20}auth.{0,20}token[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 98
+    severity: critical
+    tags: [twilio, auth-token, credentials]
+    context_keywords: [twilio, auth, token]
+    
+  - id: twilio-api-key
+    name: Twilio API Key SID
+    description: Standard API key identifier
+    regex: '\bSK[a-f0-9]{32}\b'
+    confidence: 96
+    severity: critical
+    tags: [twilio, api-key, identifier]
+    
+  - id: twilio-api-secret
+    name: Twilio API Key Secret
+    description: API key secret value
+    regex: '(?i)twilio.{0,20}api.{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9]{32})[''"]?'
+    confidence: 98
+    severity: critical
+    tags: [twilio, api-secret, credentials]
+    context_keywords: [twilio, api, secret]
+    
+  - id: twilio-messaging-service-sid
+    name: Twilio Messaging Service SID
+    description: Messaging service identifier
+    regex: '\bMG[a-f0-9]{32}\b'
+    confidence: 90
+    severity: medium
+    tags: [twilio, messaging, service-sid]
+    
+  - id: twilio-phone-number-sid
+    name: Twilio Phone Number SID
+    description: Phone number resource SID
+    regex: '\bPN[a-f0-9]{32}\b'
+    confidence: 85
+    severity: low
+    tags: [twilio, phone-number, sid]
+    
+  - id: twilio-call-sid
+    name: Twilio Call SID
+    description: Voice call identifier
+    regex: '\bCA[a-f0-9]{32}\b'
+    confidence: 78
+    severity: low
+    tags: [twilio, call, voice, sid]
+    
+  - id: twilio-message-sid
+    name: Twilio Message SID
+    description: SMS/MMS message identifier
+    regex: '\b(SM|MM)[a-f0-9]{32}\b'
+    confidence: 82
+    severity: low
+    tags: [twilio, message, sms, mms, sid]
+    
+  - id: twilio-application-sid
+    name: Twilio Application SID
+    description: TwiML application identifier
+    regex: '\bAP[a-f0-9]{32}\b'
+    confidence: 85
+    severity: medium
+    tags: [twilio, application, twiml, sid]
+    
+  - id: twilio-queue-sid
+    name: Twilio Queue SID
+    description: Voice queue identifier
+    regex: '\bQU[a-f0-9]{32}\b'
+    confidence: 78
+    severity: low
+    tags: [twilio, queue, voice, sid]
+    
+  - id: twilio-recording-sid
+    name: Twilio Recording SID
+    description: Call/message recording identifier
+    regex: '\bRE[a-f0-9]{32}\b'
+    confidence: 80
+    severity: medium
+    tags: [twilio, recording, sid]
+    
+  - id: twilio-conference-sid
+    name: Twilio Conference SID
+    description: Conference call identifier
+    regex: '\bCF[a-f0-9]{32}\b'
+    confidence: 78
+    severity: low
+    tags: [twilio, conference, voice, sid]
+    
+  - id: twilio-flow-sid
+    name: Twilio Studio Flow SID
+    description: Studio flow identifier
+    regex: '\bFW[a-f0-9]{32}\b'
+    confidence: 82
+    severity: medium
+    tags: [twilio, studio, flow, sid]
+    
+  - id: twilio-execution-sid
+    name: Twilio Flow Execution SID
+    description: Studio execution identifier
+    regex: '\bFN[a-f0-9]{32}\b'
+    confidence: 75
+    severity: low
+    tags: [twilio, studio, execution, sid]
+    
+  - id: twilio-service-sid
+    name: Twilio Service SID (Generic)
+    description: Generic service identifier
+    regex: '\bIS[a-f0-9]{32}\b'
+    confidence: 80
+    severity: medium
+    tags: [twilio, service, sid]
+    
+  - id: twilio-sync-service-sid
+    name: Twilio Sync Service SID
+    description: Sync service identifier
+    regex: '(?i)sync.{0,20}service.{0,20}sid[:=]\s*[''"]?(IS[a-f0-9]{32})[''"]?'
+    confidence: 85
+    severity: medium
+    tags: [twilio, sync, service, sid]
+    context_keywords: [sync, service, sid]
+    
+  - id: twilio-chat-service-sid
+    name: Twilio Chat/Conversations Service SID
+    description: Chat service identifier
+    regex: '(?i)(chat|conversations).{0,20}service.{0,20}sid[:=]\s*[''"]?(IS[a-f0-9]{32})[''"]?'
+    confidence: 85
+    severity: medium
+    tags: [twilio, chat, conversations, sid]
+    context_keywords: [chat, conversations, service]
+    
+  - id: twilio-verify-service-sid
+    name: Twilio Verify Service SID
+    description: Verification service identifier
+    regex: '\bVA[a-f0-9]{32}\b'
+    confidence: 88
+    severity: high
+    tags: [twilio, verify, 2fa, sid]
+    
+  - id: twilio-channel-sid
+    name: Twilio Channel SID
+    description: Chat channel identifier
+    regex: '\bCH[a-f0-9]{32}\b'
+    confidence: 78
+    severity: low
+    tags: [twilio, channel, chat, sid]
+    
+  - id: twilio-identity-sid
+    name: Twilio Identity SID
+    description: User identity identifier
+    regex: '\bRI[a-f0-9]{32}\b'
+    confidence: 75
+    severity: low
+    tags: [twilio, identity, user, sid]
+    
+  - id: twilio-worker-sid
+    name: Twilio TaskRouter Worker SID
+    description: TaskRouter worker identifier
+    regex: '\bWK[a-f0-9]{32}\b'
+    confidence: 78
+    severity: low
+    tags: [twilio, taskrouter, worker, sid]
+    
+  - id: twilio-workspace-sid
+    name: Twilio TaskRouter Workspace SID
+    description: TaskRouter workspace identifier
+    regex: '\bWS[a-f0-9]{32}\b'
+    confidence: 82
+    severity: medium
+    tags: [twilio, taskrouter, workspace, sid]
+    
+  - id: twilio-workflow-sid
+    name: Twilio TaskRouter Workflow SID
+    description: TaskRouter workflow identifier
+    regex: '\bWW[a-f0-9]{32}\b'
+    confidence: 78
+    severity: low
+    tags: [twilio, taskrouter, workflow, sid]
+    
+  - id: twilio-task-sid
+    name: Twilio TaskRouter Task SID
+    description: Task identifier
+    regex: '\bWT[a-f0-9]{32}\b'
+    confidence: 75
+    severity: low
+    tags: [twilio, taskrouter, task, sid]
+    
+  - id: twilio-reservation-sid
+    name: Twilio TaskRouter Reservation SID
+    description: Reservation identifier
+    regex: '\bWR[a-f0-9]{32}\b'
+    confidence: 72
+    severity: low
+    tags: [twilio, taskrouter, reservation, sid]
+    
+  - id: twilio-activity-sid
+    name: Twilio TaskRouter Activity SID
+    description: Worker activity identifier
+    regex: '\bWA[a-f0-9]{32}\b'
+    confidence: 72
+    severity: low
+    tags: [twilio, taskrouter, activity, sid]
+    
+  - id: twilio-event-type-sid
+    name: Twilio Event Type SID
+    description: Event streams type identifier
+    regex: '\bET[a-f0-9]{32}\b'
+    confidence: 70
+    severity: low
+    tags: [twilio, events, type, sid]
+    
+  - id: twilio-sink-sid
+    name: Twilio Event Sink SID
+    description: Event streams sink identifier
+    regex: '\bDG[a-f0-9]{32}\b'
+    confidence: 72
+    severity: low
+    tags: [twilio, events, sink, sid]
+    
+  - id: twilio-subscription-sid
+    name: Twilio Event Subscription SID
+    description: Event subscription identifier
+    regex: '\bDF[a-f0-9]{32}\b'
+    confidence: 72
+    severity: low
+    tags: [twilio, events, subscription, sid]
+    
+  - id: twilio-video-room-sid
+    name: Twilio Video Room SID
+    description: Video room identifier
+    regex: '\bRM[a-f0-9]{32}\b'
+    confidence: 82
+    severity: medium
+    tags: [twilio, video, room, sid]
+    
+  - id: twilio-participant-sid
+    name: Twilio Participant SID
+    description: Room/conference participant identifier
+    regex: '\bPA[a-f0-9]{32}\b'
+    confidence: 75
+    severity: low
+    tags: [twilio, participant, video, sid]
+    
+  - id: twilio-composition-sid
+    name: Twilio Video Composition SID
+    description: Video composition identifier
+    regex: '\bCJ[a-f0-9]{32}\b'
+    confidence: 75
+    severity: low
+    tags: [twilio, video, composition, sid]
+    
+  - id: twilio-flex-flow-sid
+    name: Twilio Flex Flow SID
+    description: Flex contact center flow
+    regex: '\bFO[a-f0-9]{32}\b'
+    confidence: 82
+    severity: medium
+    tags: [twilio, flex, flow, sid]
+    
+  - id: twilio-flex-channel-sid
+    name: Twilio Flex Channel SID
+    description: Flex channel identifier
+    regex: '(?i)flex.{0,20}channel.{0,20}sid[:=]\s*[''"]?(CH[a-f0-9]{32})[''"]?'
+    confidence: 80
+    severity: low
+    tags: [twilio, flex, channel, sid]
+    context_keywords: [flex, channel, sid]
+    
+  - id: twilio-proxy-service-sid
+    name: Twilio Proxy Service SID
+    description: Proxy service identifier
+    regex: '\bKS[a-f0-9]{32}\b'
+    confidence: 80
+    severity: medium
+    tags: [twilio, proxy, service, sid]
+    
+  - id: twilio-proxy-session-sid
+    name: Twilio Proxy Session SID
+    description: Proxy session identifier
+    regex: '\bKC[a-f0-9]{32}\b'
+    confidence: 75
+    severity: low
+    tags: [twilio, proxy, session, sid]
+    
+  - id: twilio-autopilot-assistant
+    name: Twilio Autopilot Assistant SID
+    description: Autopilot bot identifier
+    regex: '\bUA[a-f0-9]{32}\b'
+    confidence: 80
+    severity: medium
+    tags: [twilio, autopilot, assistant, sid]
+    
+  - id: twilio-autopilot-task
+    name: Twilio Autopilot Task SID
+    description: Autopilot task identifier
+    regex: '\bUD[a-f0-9]{32}\b'
+    confidence: 75
+    severity: low
+    tags: [twilio, autopilot, task, sid]
+    
+  - id: twilio-notify-service-sid
+    name: Twilio Notify Service SID
+    description: Push notification service
+    regex: '(?i)notify.{0,20}service.{0,20}sid[:=]\s*[''"]?(IS[a-f0-9]{32})[''"]?'
+    confidence: 82
+    severity: medium
+    tags: [twilio, notify, push, sid]
+    context_keywords: [notify, service, sid]
+    
+  - id: twilio-push-credential-sid
+    name: Twilio Push Credential SID
+    description: Push notification credentials
+    regex: '\bCR[a-f0-9]{32}\b'
+    confidence: 85
+    severity: high
+    tags: [twilio, push, credential, sid]
+    
+  - id: twilio-access-token
+    name: Twilio Access Token (JWT)
+    description: Short-lived access token
+    regex: '(?i)twilio.{0,20}access.{0,20}token[:=]\s*[''"]?(eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)[''"]?'
+    confidence: 92
+    severity: high
+    tags: [twilio, access-token, jwt]
+    context_keywords: [twilio, access, token]
+    
+  - id: twilio-subaccount-sid
+    name: Twilio Subaccount SID
+    description: Subaccount identifier
+    regex: '(?i)sub.{0,5}account.{0,20}sid[:=]\s*[''"]?(AC[a-f0-9]{32})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [twilio, subaccount, sid]
+    context_keywords: [subaccount, sid]
+    
+  - id: twilio-rest-api-url
+    name: Twilio REST API with Credentials
+    description: API URL with embedded auth
+    regex: 'https://(AC[a-f0-9]{32}):([a-f0-9]{32})@api\.twilio\.com'
+    confidence: 99
+    severity: critical
+    tags: [twilio, api, credentials, url]
+    
+  - id: twilio-address-sid
+    name: Twilio Address SID
+    description: Regulatory address identifier
+    regex: '\bAD[a-f0-9]{32}\b'
+    confidence: 72
+    severity: low
+    tags: [twilio, address, regulatory, sid]
+    
+  - id: twilio-bundle-sid
+    name: Twilio Regulatory Bundle SID
+    description: Compliance bundle identifier
+    regex: '\bBU[a-f0-9]{32}\b'
+    confidence: 72
+    severity: low
+    tags: [twilio, bundle, regulatory, sid]
+    
+  - id: twilio-sendgrid-api-key
+    name: SendGrid API Key (Twilio)
+    description: Twilio SendGrid email API key
+    regex: '\bSG\.[a-zA-Z0-9_-]{22}\.[a-zA-Z0-9_-]{43}\b'
+    confidence: 99
+    severity: critical
+    tags: [twilio, sendgrid, email, api-key]
+    
+  - id: twilio-segment-write-key
+    name: Segment Write Key (Twilio)
+    description: Twilio Segment analytics key
+    regex: '(?i)segment.{0,20}write.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9]{32})[''"]?'
+    confidence: 90
+    severity: high
+    tags: [twilio, segment, analytics, write-key]
+    context_keywords: [segment, write, key]
+    
+  - id: twilio-env-credentials
+    name: Twilio Environment Credentials
+    description: Credentials in environment variables
+    regex: '(?i)TWILIO_(ACCOUNT_SID|AUTH_TOKEN|API_KEY|API_SECRET)\s*[:=]\s*[''"]?([a-zA-Z0-9]{32})[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [twilio, environment, credentials]

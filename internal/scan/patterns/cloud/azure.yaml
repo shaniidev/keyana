@@ -1,0 +1,888 @@
+# Microsoft Azure Secret Detection Patterns
+# Author: github.com/shaniidev
+# Category: Cloud Infrastructure
+# Total Patterns: 100
+
+name: Microsoft Azure Credentials & Secrets
+version: 1.0
+author: github.com/shaniidev
+category: cloud
+provider: Microsoft Azure
+severity: critical
+updated: 2026-01-02
+
+patterns:
+  # ============================================================================
+  # AZURE AUTHENTICATION & CREDENTIALS (Patterns 1-20)
+  # ============================================================================
+  
+  - id: azure-subscription-id
+    name: Azure Subscription ID
+    description: Azure subscription GUID identifier
+    regex: '(?i)(azure|az).{0,20}subscription.{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 75
+    severity: medium
+    tags: [azure, subscription, identifier]
+    context_keywords: [azure, subscription, id]
+    
+  - id: azure-tenant-id
+    name: Azure Tenant ID (Directory ID)
+    description: Azure AD tenant GUID
+    regex: '(?i)(azure|az).{0,20}tenant.{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 78
+    severity: medium
+    tags: [azure, tenant, azure-ad, identifier]
+    context_keywords: [azure, tenant, directory]
+    
+  - id: azure-client-id
+    name: Azure Client ID (Application ID)
+    description: Azure AD app registration client ID
+    regex: '(?i)(azure|az).{0,20}client.{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 80
+    severity: high
+    tags: [azure, client-id, app-registration, azure-ad]
+    context_keywords: [azure, client, id, application]
+    
+  - id: azure-client-secret
+    name: Azure Client Secret
+    description: Azure AD application secret value
+    regex: '(?i)(azure|az).{0,20}client.{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9_\-\.~]{34,40})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [azure, client-secret, credentials, azure-ad]
+    context_keywords: [azure, client, secret]
+    entropy_check: true
+    min_entropy: 4.2
+    
+  - id: azure-access-key-storage
+    name: Azure Storage Account Access Key
+    description: Storage account primary/secondary key
+    regex: '(?i)(azure|storage).{0,20}(access|account).{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/]{88})[''"]?'
+    confidence: 95
+    severity: critical
+    tags: [azure, storage, access-key, credentials]
+    context_keywords: [azure, storage, access, key]
+    
+  - id: azure-connection-string-storage
+    name: Azure Storage Connection String
+    description: Complete storage account connection string
+    regex: 'DefaultEndpointsProtocol=https;AccountName=([a-z0-9]+);AccountKey=([A-Za-z0-9+/=]{88});EndpointSuffix=core\.windows\.net'
+    confidence: 98
+    severity: critical
+    tags: [azure, storage, connection-string, credentials]
+    
+  - id: azure-sas-token
+    name: Azure SAS (Shared Access Signature) Token
+    description: Storage SAS token for delegated access
+    regex: '\?sv=\d{4}-\d{2}-\d{2}&[^\s]*sig=[A-Za-z0-9%]+[^\s]*'
+    confidence: 88
+    severity: high
+    tags: [azure, storage, sas, token]
+    
+  - id: azure-management-certificate
+    name: Azure Management Certificate
+    description: Classic management certificate thumbprint
+    regex: '(?i)(azure|management).{0,20}cert(ificate)?.{0,20}thumbprint[:=]\s*[''"]?([A-F0-9]{40})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [azure, management, certificate]
+    context_keywords: [azure, management, certificate, thumbprint]
+    
+  - id: azure-service-principal-password
+    name: Azure Service Principal Password
+    description: Service principal authentication password
+    regex: '(?i)(service.{0,10}principal|sp).{0,20}password[:=]\s*[''"]?([a-zA-Z0-9_\-\.~]{34,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [azure, service-principal, password, credentials]
+    context_keywords: [service, principal, password]
+    entropy_check: true
+    min_entropy: 4.0
+    
+  - id: azure-managed-identity-client-id
+    name: Azure Managed Identity Client ID
+    description: System/user-assigned managed identity
+    regex: '(?i)managed.{0,10}identity.{0,20}client.{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 80
+    severity: medium
+    tags: [azure, managed-identity, client-id]
+    context_keywords: [managed, identity, client]
+    
+  - id: azure-devops-pat
+    name: Azure DevOps Personal Access Token
+    description: Azure DevOps PAT for authentication
+    regex: '(?i)(azure.{0,10}devops|ado).{0,20}(pat|token|personal.{0,10}access)[:=]\s*[''"]?([a-z0-9]{52})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [azure, devops, pat, token, credentials]
+    context_keywords: [azure, devops, pat, token]
+    
+  - id: azure-devops-org-url
+    name: Azure DevOps Organization URL
+    description: DevOps organization identifier
+    regex: 'https://dev\.azure\.com/([a-zA-Z0-9\-]+)'
+    confidence: 72
+    severity: low
+    tags: [azure, devops, organization, url]
+    
+  - id: azure-api-management-key
+    name: Azure API Management Subscription Key
+    description: APIM subscription key
+    regex: '(?i)(apim|api.{0,10}management).{0,20}(subscription|ocp.{0,10}apim).{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 90
+    severity: high
+    tags: [azure, apim, api-management, subscription-key]
+    context_keywords: [apim, api, management, subscription]
+    
+  - id: azure-batch-account-key
+    name: Azure Batch Account Key
+    description: Batch service account key
+    regex: '(?i)batch.{0,20}account.{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]{88})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [azure, batch, account-key]
+    context_keywords: [batch, account, key]
+    
+  - id: azure-event-hub-connection-string
+    name: Azure Event Hub Connection String
+    description: Event Hub namespace connection string
+    regex: 'Endpoint=sb://([a-z0-9\-]+)\.servicebus\.windows\.net/;SharedAccessKeyName=([a-zA-Z0-9]+);SharedAccessKey=([A-Za-z0-9+/=]+)'
+    confidence: 96
+    severity: critical
+    tags: [azure, eventhub, connection-string, credentials]
+    
+  - id: azure-service-bus-connection-string
+    name: Azure Service Bus Connection String
+    description: Service Bus namespace connection string
+    regex: 'Endpoint=sb://([a-z0-9\-]+)\.servicebus\.windows\.net/;SharedAccessKeyName=([a-zA-Z0-9]+);SharedAccessKey=([A-Za-z0-9+/=]+);EntityPath=([a-zA-Z0-9\-_]+)'
+    confidence: 96
+    severity: critical
+    tags: [azure, servicebus, connection-string, credentials]
+    
+  - id: azure-iot-hub-connection-string
+    name: Azure IoT Hub Connection String
+    description: IoT Hub device/service connection string
+    regex: 'HostName=([a-z0-9\-]+)\.azure-devices\.net;(DeviceId|SharedAccessKeyName)=([^;]+);SharedAccessKey=([A-Za-z0-9+/=]+)'
+    confidence: 96
+    severity: critical
+    tags: [azure, iothub, iot, connection-string, credentials]
+    
+  - id: azure-notification-hub-connection
+    name: Azure Notification Hub Connection String
+    description: Notification Hub access connection
+    regex: 'Endpoint=sb://([a-z0-9\-]+)\.servicebus\.windows\.net/;SharedAccessKeyName=([a-zA-Z0-9]+);SharedAccessKey=([A-Za-z0-9+/=]+)'
+    confidence: 92
+    severity: high
+    tags: [azure, notification-hub, connection-string]
+    
+  - id: azure-redis-cache-key
+    name: Azure Cache for Redis Access Key
+    description: Redis cache primary/secondary key
+    regex: '(?i)(redis|cache).{0,20}(access|primary|secondary).{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]{43,88})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [azure, redis, cache, access-key]
+    context_keywords: [redis, cache, key]
+    
+  # ============================================================================
+  # AZURE DATABASES (Patterns 21-40)
+  # ============================================================================
+  
+  - id: azure-sql-connection-string
+    name: Azure SQL Database Connection String
+    description: SQL Database connection with credentials
+    regex: 'Server=tcp:([a-z0-9\-]+)\.database\.windows\.net,1433;[^;]*User ID=([^;]+);Password=([^;]+);'
+    confidence: 96
+    severity: critical
+    tags: [azure, sql, database, connection-string, credentials]
+    
+  - id: azure-cosmos-db-key
+    name: Azure Cosmos DB Master Key
+    description: Cosmos DB primary/secondary master key
+    regex: '(?i)(cosmos|cosmosdb|documentdb).{0,20}(master|primary|secondary).{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]{88})[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [azure, cosmosdb, database, master-key, credentials]
+    context_keywords: [cosmos, cosmosdb, documentdb, key]
+    
+  - id: azure-cosmos-db-connection-string
+    name: Azure Cosmos DB Connection String
+    description: Complete Cosmos DB connection string
+    regex: 'AccountEndpoint=https://([a-z0-9\-]+)\.documents\.azure\.com:443/;AccountKey=([A-Za-z0-9+/=]{88});'
+    confidence: 98
+    severity: critical
+    tags: [azure, cosmosdb, connection-string, credentials]
+    
+  - id: azure-mysql-connection-string
+    name: Azure Database for MySQL Connection
+    description: MySQL connection string
+    regex: 'Server=([a-z0-9\-]+)\.mysql\.database\.azure\.com;[^;]*Uid=([^;@]+)@([^;]+);Pwd=([^;]+);'
+    confidence: 95
+    severity: critical
+    tags: [azure, mysql, database, connection-string, credentials]
+    
+  - id: azure-postgresql-connection-string
+    name: Azure Database for PostgreSQL Connection
+    description: PostgreSQL connection string
+    regex: 'Host=([a-z0-9\-]+)\.postgres\.database\.azure\.com;[^;]*Username=([^;@]+)@([^;]+);Password=([^;]+);'
+    confidence: 95
+    severity: critical
+    tags: [azure, postgresql, database, connection-string, credentials]
+    
+  - id: azure-mariadb-connection-string
+    name: Azure Database for MariaDB Connection
+    description: MariaDB connection string
+    regex: 'Server=([a-z0-9\-]+)\.mariadb\.database\.azure\.com;[^;]*User Id=([^;@]+)@([^;]+);Password=([^;]+);'
+    confidence: 95
+    severity: critical
+    tags: [azure, mariadb, database, connection-string, credentials]
+    
+  - id: azure-synapse-analytics-key
+    name: Azure Synapse Analytics Access Key
+    description: Synapse workspace access key
+    regex: '(?i)(synapse|sql.{0,10}pool).{0,20}(access|admin).{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]{88})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [azure, synapse, analytics, access-key]
+    context_keywords: [synapse, sql, pool, key]
+    
+  - id: azure-data-lake-key
+    name: Azure Data Lake Storage Key
+    description: Data Lake Gen1/Gen2 access key
+    regex: '(?i)data.{0,10}lake.{0,20}(access|account).{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]{88})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [azure, datalake, storage, access-key]
+    context_keywords: [data, lake, key]
+    
+  - id: azure-table-storage-key
+    name: Azure Table Storage Key
+    description: Table storage account key
+    regex: '(?i)table.{0,20}storage.{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]{88})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [azure, table-storage, key]
+    context_keywords: [table, storage, key]
+    
+  - id: azure-queue-storage-connection
+    name: Azure Queue Storage Connection String
+    description: Queue storage connection string
+    regex: 'DefaultEndpointsProtocol=https;AccountName=([a-z0-9]+);AccountKey=([A-Za-z0-9+/=]{88});QueueEndpoint='
+    confidence: 92
+    severity: high
+    tags: [azure, queue, storage, connection-string]
+    
+  - id: azure-blob-sas-url
+    name: Azure Blob Storage SAS URL
+    description: Blob with SAS token URL
+    regex: 'https://([a-z0-9]+)\.blob\.core\.windows\.net/[^\s]*\?sv=\d{4}-\d{2}-\d{2}&sig=[A-Za-z0-9%]+'
+    confidence: 92
+    severity: high
+    tags: [azure, blob, storage, sas, url]
+    
+  - id: azure-file-share-connection
+    name: Azure File Share Connection String
+    description: File share storage connection
+    regex: 'DefaultEndpointsProtocol=https;AccountName=([a-z0-9]+);AccountKey=([A-Za-z0-9+/=]{88});FileEndpoint='
+    confidence: 92
+    severity: high
+    tags: [azure, file-share, storage, connection-string]
+    
+  - id: azure-data-factory-linked-service
+    name: Azure Data Factory Linked Service Key
+    description: ADF linked service connection key
+    regex: '(?i)(data.{0,10}factory|adf).{0,20}(linked|connection).{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]{44,})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [azure, datafactory, adf, linked-service, key]
+    context_keywords: [data, factory, adf, linked, key]
+    
+  - id: azure-databricks-token
+    name: Azure Databricks Personal Access Token
+    description: Databricks workspace PAT
+    regex: '(?i)databricks.{0,20}(token|pat)[:=]\s*[''"]?(dapi[a-f0-9]{32})[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [azure, databricks, pat, token, credentials]
+    context_keywords: [databricks, token, pat]
+    
+  - id: azure-search-admin-key
+    name: Azure Cognitive Search Admin Key
+    description: Search service admin API key
+    regex: '(?i)(search|cognitive.{0,10}search).{0,20}admin.{0,20}key[:=]\s*[''"]?([A-F0-9]{32})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [azure, search, cognitive-search, admin-key]
+    context_keywords: [search, cognitive, admin, key]
+    
+  - id: azure-search-query-key
+    name: Azure Cognitive Search Query Key
+    description: Search service query API key
+    regex: '(?i)(search|cognitive.{0,10}search).{0,20}query.{0,20}key[:=]\s*[''"]?([A-F0-9]{32})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [azure, search, cognitive-search, query-key]
+    context_keywords: [search, cognitive, query, key]
+    
+  - id: azure-stream-analytics-key
+    name: Azure Stream Analytics Function Key
+    description: Stream Analytics job function key
+    regex: '(?i)stream.{0,10}analytics.{0,20}(function|job).{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]{44,})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [azure, stream-analytics, function-key]
+    context_keywords: [stream, analytics, function, key]
+    
+  - id: azure-analysis-services-key
+    name: Azure Analysis Services Admin Key
+    description: Analysis Services admin credentials
+    regex: '(?i)analysis.{0,10}services.{0,20}(admin|password)[:=]\s*[''"]?([^\s''"]{12,})[''"]?'
+    confidence: 80
+    severity: critical
+    tags: [azure, analysis-services, admin, credentials]
+    context_keywords: [analysis, services, admin]
+    
+  - id: azure-time-series-insights-key
+    name: Azure Time Series Insights Access Key
+    description: TSI environment access key
+    regex: '(?i)(time.{0,10}series|tsi).{0,20}access.{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]{44,})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [azure, time-series, tsi, access-key]
+    context_keywords: [time, series, tsi, key]
+    
+  # ============================================================================
+  # AZURE AI & COGNITIVE SERVICES (Patterns 41-55)
+  # ============================================================================
+  
+  - id: azure-cognitive-services-key
+    name: Azure Cognitive Services API Key
+    description: Cognitive Services subscription key
+    regex: '(?i)(cognitive|cs).{0,20}(services|api).{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [azure, cognitive-services, api-key]
+    context_keywords: [cognitive, services, api, key]
+    
+  - id: azure-computer-vision-key
+    name: Azure Computer Vision API Key
+    description: Computer Vision service key
+    regex: '(?i)(computer.{0,10}vision|vision).{0,20}(api|subscription).{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [azure, computer-vision, api-key, ai]
+    context_keywords: [computer, vision, api, key]
+    
+  - id: azure-face-api-key
+    name: Azure Face API Key
+    description: Face detection service key
+    regex: '(?i)face.{0,20}(api|subscription).{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [azure, face-api, api-key, ai]
+    context_keywords: [face, api, key]
+    
+  - id: azure-luis-authoring-key
+    name: Azure LUIS Authoring Key
+    description: Language Understanding authoring key
+    regex: '(?i)luis.{0,20}authoring.{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [azure, luis, authoring-key, ai]
+    context_keywords: [luis, authoring, key]
+    
+  - id: azure-luis-endpoint-key
+    name: Azure LUIS Prediction/Endpoint Key
+    description: LUIS runtime prediction key
+    regex: '(?i)luis.{0,20}(endpoint|prediction).{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 92
+    severity: high
+    tags: [azure, luis, endpoint-key, ai]
+    context_keywords: [luis, endpoint, prediction, key]
+    
+  - id: azure-text-analytics-key
+    name: Azure Text Analytics API Key
+    description: Text Analytics service key
+    regex: '(?i)text.{0,10}analytics.{0,20}(api|subscription).{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [azure, text-analytics, api-key, ai]
+    context_keywords: [text, analytics, api, key]
+    
+  - id: azure-translator-key
+    name: Azure Translator API Key
+    description: Translator Text service key
+    regex: '(?i)translator.{0,20}(api|subscription).{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [azure, translator, api-key, ai]
+    context_keywords: [translator, api, key]
+    
+  - id: azure-speech-services-key
+    name: Azure Speech Services API Key
+    description: Speech-to-text/text-to-speech key
+    regex: '(?i)speech.{0,20}(api|subscription|services).{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [azure, speech, api-key, ai]
+    context_keywords: [speech, api, services, key]
+    
+  - id: azure-bot-service-app-password
+    name: Azure Bot Service App Password
+    description: Bot Framework app password
+    regex: '(?i)bot.{0,20}(app|service).{0,20}password[:=]\s*[''"]?([a-zA-Z0-9_\-\.~]{16,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [azure, bot-service, password, credentials]
+    context_keywords: [bot, app, password]
+    
+  - id: azure-qna-maker-key
+    name: Azure QnA Maker Subscription Key
+    description: QnA Maker service key
+    regex: '(?i)qna.{0,10}maker.{0,20}(subscription|api).{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [azure, qna-maker, api-key, ai]
+    context_keywords: [qna, maker, key]
+    
+  - id: azure-custom-vision-training-key
+    name: Azure Custom Vision Training Key
+    description: Custom Vision training API key
+    regex: '(?i)custom.{0,10}vision.{0,20}training.{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [azure, custom-vision, training-key, ai]
+    context_keywords: [custom, vision, training, key]
+    
+  - id: azure-custom-vision-prediction-key
+    name: Azure Custom Vision Prediction Key
+    description: Custom Vision prediction API key
+    regex: '(?i)custom.{0,10}vision.{0,20}prediction.{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 92
+    severity: high
+    tags: [azure, custom-vision, prediction-key, ai]
+    context_keywords: [custom, vision, prediction, key]
+    
+  - id: azure-form-recognizer-key
+    name: Azure Form Recognizer API Key
+    description: Form/Document AI service key
+    regex: '(?i)form.{0,10}recognizer.{0,20}(api|subscription).{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [azure, form-recognizer, api-key, ai]
+    context_keywords: [form, recognizer, api, key]
+    
+  - id: azure-content-moderator-key
+    name: Azure Content Moderator API Key
+    description: Content moderation service key
+    regex: '(?i)content.{0,10}moderator.{0,20}(api|subscription).{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 92
+    severity: high
+    tags: [azure, content-moderator, api-key, ai]
+    context_keywords: [content, moderator, api, key]
+    
+  - id: azure-personalizer-key
+    name: Azure Personalizer API Key
+    description: Personalization service key
+    regex: '(?i)personalizer.{0,20}(api|subscription).{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 90
+    severity: high
+    tags: [azure, personalizer, api-key, ai]
+    context_keywords: [personalizer, api, key]
+    
+  # ============================================================================
+  # AZURE COMPUTE & CONTAINERS (Patterns 56-70)
+  # ============================================================================
+  
+  - id: azure-vm-admin-password
+    name: Azure VM Administrator Password
+    description: Virtual machine admin credentials
+    regex: '(?i)(vm|virtual.{0,10}machine).{0,20}admin.{0,20}password[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 85
+    severity: critical
+    tags: [azure, vm, admin, password, credentials]
+    context_keywords: [vm, virtual, machine, admin, password]
+    
+  - id: azure-function-app-key
+    name: Azure Function App Host Key
+    description: Function App master/host key
+    regex: '(?i)(function|func).{0,20}(app|host).{0,20}key[:=]\s*[''"]?([a-zA-Z0-9_\-]{40,60})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [azure, function-app, host-key, serverless]
+    context_keywords: [function, func, app, key]
+    
+  - id: azure-web-app-publish-password
+    name: Azure Web App Publish Password
+    description: App Service publish profile password
+    regex: '(?i)(web.{0,10}app|app.{0,10}service).{0,20}publish.{0,20}password[:=]\s*[''"]?([^\s''"]{20,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [azure, webapp, app-service, publish, password]
+    context_keywords: [web, app, service, publish, password]
+    
+  - id: azure-container-registry-password
+    name: Azure Container Registry Admin Password
+    description: ACR admin credentials
+    regex: '(?i)(acr|container.{0,10}registry).{0,20}(admin|password)[:=]\s*[''"]?([a-zA-Z0-9+/=]{40,})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [azure, acr, container-registry, password]
+    context_keywords: [acr, container, registry, admin, password]
+    
+  - id: azure-aks-service-principal
+    name: Azure AKS Service Principal Secret
+    description: AKS cluster service principal
+    regex: '(?i)aks.{0,20}service.{0,10}principal.{0,20}(secret|password|client.{0,10}secret)[:=]\s*[''"]?([a-zA-Z0-9_\-\.~]{34,})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [azure, aks, kubernetes, service-principal, secret]
+    context_keywords: [aks, service, principal, secret]
+    
+  - id: azure-kubernetes-config
+    name: Azure Kubernetes Kubeconfig
+    description: AKS cluster kubeconfig with credentials
+    regex: 'apiVersion:\s*v1.*kind:\s*Config.*clusters:.*name:\s*[a-z0-9\-]+\.azmk8s\.io'
+    confidence: 90
+    severity: critical
+    tags: [azure, aks, kubernetes, kubeconfig]
+    
+  - id: azure-app-insights-instrumentation-key
+    name: Azure Application Insights Instrumentation Key
+    description: App Insights telemetry key
+    regex: '(?i)(app.{0,10}insights|instrumentation).{0,20}key[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 92
+    severity: high
+    tags: [azure, app-insights, instrumentation-key, monitoring]
+    context_keywords: [app, insights, instrumentation, key]
+    
+  - id: azure-app-insights-api-key
+    name: Azure Application Insights API Key
+    description: App Insights data access API key
+    regex: '(?i)app.{0,10}insights.{0,20}api.{0,20}key[:=]\s*[''"]?([a-z0-9]{40})[''"]?'
+    confidence: 90
+    severity: high
+    tags: [azure, app-insights, api-key, monitoring]
+    context_keywords: [app, insights, api, key]
+    
+  - id: azure-logic-apps-trigger-url
+    name: Azure Logic Apps Trigger URL
+    description: Logic App HTTP trigger with SAS
+    regex: 'https://[a-z0-9\-]+\.logic\.azure\.com:443/workflows/[a-f0-9\-]+/triggers/[a-zA-Z0-9_\-]+/paths/invoke\?[^\s]*sig=[A-Za-z0-9%]+'
+    confidence: 94
+    severity: high
+    tags: [azure, logic-apps, trigger, url, sas]
+    
+  - id: azure-automation-account-key
+    name: Azure Automation Account Runbook Key
+    description: Automation account webhook/runbook key
+    regex: '(?i)automation.{0,20}(account|webhook|runbook).{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]{88})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [azure, automation, runbook, webhook, key]
+    context_keywords: [automation, account, runbook, webhook]
+    
+  - id: azure-container-instances-env
+    name: Azure Container Instances Environment Variable
+    description: ACI secure environment variable
+    regex: '(?i)(aci|container.{0,10}instance).{0,20}(env|secure.{0,10}env).{0,20}[:=]\s*[''"]?([^\s''"]{20,})[''"]?'
+    confidence: 75
+    severity: medium
+    tags: [azure, aci, container-instances, environment]
+    context_keywords: [aci, container, instance, env]
+    
+  - id: azure-app-configuration-key
+    name: Azure App Configuration Connection String
+    description: App Configuration store connection
+    regex: 'Endpoint=https://([a-z0-9\-]+)\.azconfig\.io;Id=([^;]+);Secret=([A-Za-z0-9+/=]+)'
+    confidence: 96
+    severity: critical
+    tags: [azure, app-configuration, connection-string]
+    
+  - id: azure-signalr-connection-string
+    name: Azure SignalR Service Connection String
+    description: SignalR real-time messaging connection
+    regex: 'Endpoint=https://([a-z0-9\-]+)\.service\.signalr\.net;AccessKey=([A-Za-z0-9+/=]{88,});'
+    confidence: 96
+    severity: critical
+    tags: [azure, signalr, connection-string, realtime]
+    
+  - id: azure-cdn-profile-key
+    name: Azure CDN Custom Domain Validation Key
+    description: CDN custom domain validation
+    regex: '(?i)cdn.{0,20}(custom.{0,10}domain|validation).{0,20}key[:=]\s*[''"]?([a-f0-9]{64})[''"]?'
+    confidence: 80
+    severity: medium
+    tags: [azure, cdn, validation, key]
+    context_keywords: [cdn, custom, domain, validation]
+    
+  - id: azure-frontdoor-secret
+    name: Azure Front Door WAF Secret
+    description: Front Door custom rule secret
+    regex: '(?i)front.{0,10}door.{0,20}(waf|secret)[:=]\s*[''"]?([A-Za-z0-9+/=]{40,})[''"]?'
+    confidence: 82
+    severity: high
+    tags: [azure, frontdoor, waf, secret]
+    context_keywords: [front, door, waf, secret]
+    
+  # ============================================================================
+  # AZURE SECURITY & IDENTITY (Patterns 71-85)
+  # ============================================================================
+  
+  - id: azure-key-vault-secret-url
+    name: Azure Key Vault Secret URL
+    description: Key Vault secret identifier URL
+    regex: 'https://([a-z0-9\-]+)\.vault\.azure\.net/secrets/([a-zA-Z0-9\-]+)(/[a-f0-9]{32})?'
+    confidence: 85
+    severity: high
+    tags: [azure, keyvault, secret, url]
+    
+  - id: azure-key-vault-key-url
+    name: Azure Key Vault Key URL
+    description: Key Vault encryption key identifier
+    regex: 'https://([a-z0-9\-]+)\.vault\.azure\.net/keys/([a-zA-Z0-9\-]+)(/[a-f0-9]{32})?'
+    confidence: 82
+    severity: high
+    tags: [azure, keyvault, key, url]
+    
+  - id: azure-key-vault-certificate-url
+    name: Azure Key Vault Certificate URL
+    description: Key Vault certificate identifier
+    regex: 'https://([a-z0-9\-]+)\.vault\.azure\.net/certificates/([a-zA-Z0-9\-]+)(/[a-f0-9]{32})?'
+    confidence: 80
+    severity: medium
+    tags: [azure, keyvault, certificate, url]
+    
+  - id: azure-ad-b2c-client-secret
+    name: Azure AD B2C Client Secret
+    description: B2C application client secret
+    regex: '(?i)(b2c|ad.{0,10}b2c).{0,20}client.{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9_\-\.~]{34,})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [azure, ad-b2c, client-secret, identity]
+    context_keywords: [b2c, client, secret]
+    
+  - id: azure-ad-graph-api-key
+    name: Azure AD Graph API Key
+    description: Graph API application key
+    regex: '(?i)(graph|ad.{0,10}graph).{0,20}api.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9_\-\.~]{34,})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [azure, ad, graph, api-key]
+    context_keywords: [graph, api, key]
+    
+  - id: azure-mfa-phone-app-secret
+    name: Azure MFA Phone App Secret
+    description: Multi-factor authentication app secret
+    regex: '(?i)mfa.{0,20}(phone|app).{0,20}secret[:=]\s*[''"]?([A-Z2-7]{32})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [azure, mfa, totp, secret]
+    context_keywords: [mfa, phone, app, secret]
+    
+  - id: azure-security-center-api-key
+    name: Azure Security Center API Key
+    description: Security Center automation key
+    regex: '(?i)security.{0,10}center.{0,20}api.{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [azure, security-center, api-key]
+    context_keywords: [security, center, api, key]
+    
+  - id: azure-sentinel-workspace-id
+    name: Azure Sentinel Workspace ID
+    description: Sentinel SIEM workspace identifier
+    regex: '(?i)sentinel.{0,20}workspace.{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 80
+    severity: medium
+    tags: [azure, sentinel, workspace, siem]
+    context_keywords: [sentinel, workspace, id]
+    
+  - id: azure-sentinel-workspace-key
+    name: Azure Sentinel Workspace Key
+    description: Sentinel data collection key
+    regex: '(?i)sentinel.{0,20}workspace.{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]{88})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [azure, sentinel, workspace-key, siem]
+    context_keywords: [sentinel, workspace, key]
+    
+  - id: azure-defender-api-key
+    name: Azure Defender API Key
+    description: Defender for Cloud API key
+    regex: '(?i)(defender|security).{0,20}api.{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [azure, defender, security, api-key]
+    context_keywords: [defender, security, api, key]
+    
+  - id: azure-information-protection-key
+    name: Azure Information Protection Key
+    description: AIP classification/protection key
+    regex: '(?i)(aip|information.{0,10}protection).{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]{44,})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [azure, aip, information-protection, key]
+    context_keywords: [aip, information, protection, key]
+    
+  - id: azure-ddos-protection-plan
+    name: Azure DDoS Protection Plan ID
+    description: DDoS protection resource ID
+    regex: '/subscriptions/([a-f0-9\-]{36})/resourceGroups/([a-zA-Z0-9\-_]+)/providers/Microsoft\.Network/ddosProtectionPlans/([a-zA-Z0-9\-_]+)'
+    confidence: 75
+    severity: low
+    tags: [azure, ddos, protection, resource-id]
+    
+  - id: azure-firewall-policy
+    name: Azure Firewall Policy ID
+    description: Firewall policy resource identifier
+    regex: '/subscriptions/([a-f0-9\-]{36})/resourceGroups/([a-zA-Z0-9\-_]+)/providers/Microsoft\.Network/firewallPolicies/([a-zA-Z0-9\-_]+)'
+    confidence: 72
+    severity: low
+    tags: [azure, firewall, policy, resource-id]
+    
+  - id: azure-private-link-service
+    name: Azure Private Link Service Connection
+    description: Private Link service resource
+    regex: '/subscriptions/([a-f0-9\-]{36})/resourceGroups/([a-zA-Z0-9\-_]+)/providers/Microsoft\.Network/privateLinkServices/([a-zA-Z0-9\-_]+)'
+    confidence: 75
+    severity: medium
+    tags: [azure, private-link, network]
+    
+  # ============================================================================
+  # AZURE MEDIA & COMMUNICATION (Patterns 86-100)
+  # ============================================================================
+  
+  - id: azure-media-services-key
+    name: Azure Media Services API Key
+    description: Media Services account key
+    regex: '(?i)(media.{0,10}services|ams).{0,20}(api|account).{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]{88})[''"]?'
+    confidence: 90
+    severity: high
+    tags: [azure, media-services, ams, api-key]
+    context_keywords: [media, services, ams, key]
+    
+  - id: azure-communication-services-connection
+    name: Azure Communication Services Connection String
+    description: ACS messaging/calling connection
+    regex: 'endpoint=https://([a-z0-9\-]+)\.communication\.azure\.com/;accesskey=([A-Za-z0-9+/=]{88})'
+    confidence: 96
+    severity: critical
+    tags: [azure, communication-services, connection-string]
+    
+  - id: azure-maps-subscription-key
+    name: Azure Maps Subscription Key
+    description: Maps API subscription key
+    regex: '(?i)(azure.{0,10})?maps.{0,20}(subscription|api).{0,20}key[:=]\s*[''"]?([a-zA-Z0-9\-_]{40,})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [azure, maps, subscription-key]
+    context_keywords: [maps, subscription, api, key]
+    
+  - id: azure-spatial-anchors-key
+    name: Azure Spatial Anchors Account Key
+    description: Mixed reality spatial anchors key
+    regex: '(?i)spatial.{0,10}anchors.{0,20}account.{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]{88})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [azure, spatial-anchors, mixed-reality, key]
+    context_keywords: [spatial, anchors, account, key]
+    
+  - id: azure-remote-rendering-key
+    name: Azure Remote Rendering Account Key
+    description: Mixed reality remote rendering key
+    regex: '(?i)remote.{0,10}rendering.{0,20}account.{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]{88})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [azure, remote-rendering, mixed-reality, key]
+    context_keywords: [remote, rendering, account, key]
+    
+  - id: azure-bing-search-key
+    name: Bing Search API Key
+    description: Bing Web/Image/Video search key
+    regex: '(?i)bing.{0,20}(search|api).{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 92
+    severity: high
+    tags: [azure, bing, search, api-key]
+    context_keywords: [bing, search, api, key]
+    
+  - id: azure-bing-spell-check-key
+    name: Bing Spell Check API Key
+    description: Spell check service key
+    regex: '(?i)bing.{0,20}spell.{0,10}check.{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 90
+    severity: medium
+    tags: [azure, bing, spell-check, api-key]
+    context_keywords: [bing, spell, check, key]
+    
+  - id: azure-bing-autosuggest-key
+    name: Bing Autosuggest API Key
+    description: Autosuggest service key
+    regex: '(?i)bing.{0,20}autosuggest.{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 90
+    severity: medium
+    tags: [azure, bing, autosuggest, api-key]
+    context_keywords: [bing, autosuggest, key]
+    
+  - id: azure-bing-entity-search-key
+    name: Bing Entity Search API Key
+    description: Entity search service key
+    regex: '(?i)bing.{0,20}entity.{0,10}search.{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 90
+    severity: medium
+    tags: [azure, bing, entity-search, api-key]
+    context_keywords: [bing, entity, search, key]
+    
+  - id: azure-bing-custom-search-key
+    name: Bing Custom Search API Key
+    description: Custom search instance key
+    regex: '(?i)bing.{0,20}custom.{0,10}search.{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 90
+    severity: high
+    tags: [azure, bing, custom-search, api-key]
+    context_keywords: [bing, custom, search, key]
+    
+  - id: azure-immersive-reader-key
+    name: Azure Immersive Reader Subscription Key
+    description: Immersive Reader cognitive service
+    regex: '(?i)immersive.{0,10}reader.{0,20}(subscription|api).{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 90
+    severity: high
+    tags: [azure, immersive-reader, cognitive, api-key]
+    context_keywords: [immersive, reader, key]
+    
+  - id: azure-anomaly-detector-key
+    name: Azure Anomaly Detector API Key
+    description: Anomaly detection service key
+    regex: '(?i)anomaly.{0,10}detector.{0,20}(api|subscription).{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 90
+    severity: high
+    tags: [azure, anomaly-detector, api-key, ai]
+    context_keywords: [anomaly, detector, api, key]
+    
+  - id: azure-metrics-advisor-key
+    name: Azure Metrics Advisor API Key
+    description: Metrics monitoring/alerting key
+    regex: '(?i)metrics.{0,10}advisor.{0,20}(api|subscription).{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [azure, metrics-advisor, api-key]
+    context_keywords: [metrics, advisor, api, key]
+    
+  - id: azure-video-indexer-key
+    name: Azure Video Indexer API Key
+    description: Video analytics service key
+    regex: '(?i)video.{0,10}indexer.{0,20}(api|subscription).{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 90
+    severity: high
+    tags: [azure, video-indexer, api-key, ai]
+    context_keywords: [video, indexer, api, key]
+    
+  - id: azure-health-bot-secret
+    name: Azure Health Bot Secret
+    description: Health Bot service secret
+    regex: '(?i)health.{0,10}bot.{0,20}(secret|app.{0,10}secret)[:=]\s*[''"]?([a-zA-Z0-9_\-\.~]{34,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [azure, health-bot, secret]
+    context_keywords: [health, bot, secret]

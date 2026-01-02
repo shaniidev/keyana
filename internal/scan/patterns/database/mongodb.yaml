@@ -1,0 +1,435 @@
+# MongoDB Secret Detection Patterns
+# Author: github.com/shaniidev
+# Category: Database
+# Total Patterns: 50
+
+name: MongoDB Credentials & Secrets
+version: 1.0
+author: github.com/shaniidev
+category: database
+provider: MongoDB
+severity: critical
+updated: 2026-01-02
+
+patterns:
+  - id: mongodb-connection-string
+    name: MongoDB Connection String
+    description: MongoDB connection URI with credentials
+    regex: 'mongodb(\+srv)?://([^:]+):([^@]+)@([a-zA-Z0-9.\-]+)(:\d+)?/([a-zA-Z0-9_\-]+)?(\?[^\s]*)?'
+    confidence: 96
+    severity: critical
+    tags: [mongodb, connection-string, credentials]
+    
+  - id: mongodb-atlas-connection
+    name: MongoDB Atlas Connection String
+    description: Atlas cluster connection with credentials
+    regex: 'mongodb\+srv://([^:]+):([^@]+)@([a-z0-9\-]+)\.([a-z0-9]+)\.mongodb\.net/([a-zA-Z0-9_\-]+)?'
+    confidence: 98
+    severity: critical
+    tags: [mongodb, atlas, cloud, connection-string, credentials]
+    
+  - id: mongodb-atlas-api-public-key
+    name: MongoDB Atlas API Public Key
+    description: Atlas programmatic API public key
+    regex: '(?i)(atlas|mongodb).{0,20}(public|api).{0,20}key[:=]\s*[''"]?([a-z]{8})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [mongodb, atlas, api, public-key]
+    context_keywords: [atlas, mongodb, public, api, key]
+    
+  - id: mongodb-atlas-api-private-key
+    name: MongoDB Atlas API Private Key
+    description: Atlas programmatic API private key
+    regex: '(?i)(atlas|mongodb).{0,20}(private|secret).{0,20}key[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [mongodb, atlas, api, private-key, credentials]
+    context_keywords: [atlas, mongodb, private, secret, key]
+    
+  - id: mongodb-username-password
+    name: MongoDB Username and Password
+    description: Credentials in configuration
+    regex: '(?i)mongodb.{0,20}(user|username)[:=]\s*[''"]?([a-zA-Z0-9_]+)[''"]?\s*[,;\n].*password[:=]\s*[''"]?([^\s''"]+)[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [mongodb, credentials, username, password]
+    context_keywords: [mongodb, user, password]
+    
+  - id: mongodb-admin-password
+    name: MongoDB Admin Password
+    description: Administrative user password
+    regex: '(?i)mongo.{0,20}admin.{0,20}password[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [mongodb, admin, password, credentials]
+    context_keywords: [mongo, admin, password]
+    
+  - id: mongodb-root-password
+    name: MongoDB Root Password
+    description: Root user password
+    regex: '(?i)MONGO(DB)?_ROOT_PASSWORD\s*[:=]\s*[''"]?([^\s''"]+)[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [mongodb, root, password, environment]
+    
+  - id: mongodb-initdb-password
+    name: MongoDB Init Password
+    description: Initial database password
+    regex: '(?i)MONGO(DB)?_INITDB_ROOT_PASSWORD\s*[:=]\s*[''"]?([^\s''"]+)[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [mongodb, init, root, password]
+    
+  - id: mongodb-replica-key
+    name: MongoDB Replica Set Key
+    description: Replica set authentication keyfile
+    regex: '(?i)replica.{0,10}(set|key).{0,20}(key|file)[:=]\s*[''"]?([^\s''"]+)[''"]?'
+    confidence: 85
+    severity: high
+    tags: [mongodb, replica-set, key]
+    context_keywords: [replica, key]
+    
+  - id: mongodb-x509-certificate
+    name: MongoDB X.509 Certificate
+    description: Client certificate authentication
+    regex: '(?i)mongo.{0,20}(ssl|tls).{0,20}cert(ificate)?[:=]\s*[''"]?([^\s''"]+\.pem)[''"]?'
+    confidence: 82
+    severity: high
+    tags: [mongodb, x509, certificate, ssl, tls]
+    context_keywords: [mongo, ssl, tls, cert]
+    
+  - id: mongodb-ca-file
+    name: MongoDB CA Certificate File
+    description: Certificate Authority file path
+    regex: '(?i)mongo.{0,20}(ca|ssl.{0,5}ca).{0,20}(file|path)[:=]\s*[''"]?([^\s''"]+\.pem)[''"]?'
+    confidence: 78
+    severity: medium
+    tags: [mongodb, ca, certificate, ssl]
+    context_keywords: [mongo, ca, ssl]
+    
+  - id: mongodb-cluster-id
+    name: MongoDB Atlas Cluster ID
+    description: Atlas cluster identifier
+    regex: '(?i)atlas.{0,20}cluster.{0,20}id[:=]\s*[''"]?([a-f0-9]{24})[''"]?'
+    confidence: 78
+    severity: low
+    tags: [mongodb, atlas, cluster, identifier]
+    context_keywords: [atlas, cluster, id]
+    
+  - id: mongodb-project-id
+    name: MongoDB Atlas Project ID
+    description: Atlas project (group) identifier
+    regex: '(?i)atlas.{0,20}(project|group).{0,20}id[:=]\s*[''"]?([a-f0-9]{24})[''"]?'
+    confidence: 80
+    severity: medium
+    tags: [mongodb, atlas, project, identifier]
+    context_keywords: [atlas, project, group, id]
+    
+  - id: mongodb-org-id
+    name: MongoDB Atlas Organization ID
+    description: Atlas organization identifier
+    regex: '(?i)atlas.{0,20}org(anization)?.{0,20}id[:=]\s*[''"]?([a-f0-9]{24})[''"]?'
+    confidence: 78
+    severity: low
+    tags: [mongodb, atlas, organization, identifier]
+    context_keywords: [atlas, org, id]
+    
+  - id: mongodb-ldap-password
+    name: MongoDB LDAP Bind Password
+    description: LDAP authentication password
+    regex: '(?i)mongo.{0,20}ldap.{0,20}(bind)?password[:=]\s*[''"]?([^\s''"]+)[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [mongodb, ldap, password, authentication]
+    context_keywords: [mongo, ldap, password]
+    
+  - id: mongodb-kerberos-principal
+    name: MongoDB Kerberos Principal
+    description: Kerberos authentication principal
+    regex: '(?i)mongo.{0,20}kerberos.{0,20}principal[:=]\s*[''"]?([^@\s]+@[^\s''"]+)[''"]?'
+    confidence: 80
+    severity: medium
+    tags: [mongodb, kerberos, principal, authentication]
+    context_keywords: [mongo, kerberos, principal]
+    
+  - id: mongodb-encryption-key
+    name: MongoDB Field-Level Encryption Key
+    description: Client-side field encryption key
+    regex: '(?i)(fle|field.{0,5}level.{0,5}encryption|kms).{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]{44,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [mongodb, fle, encryption, key]
+    context_keywords: [fle, encryption, key]
+    
+  - id: mongodb-kms-provider-key
+    name: MongoDB KMS Provider Key
+    description: Key management service provider credentials
+    regex: '(?i)kms.{0,20}provider.{0,20}(key|secret)[:=]\s*[''"]?([A-Za-z0-9+/=]{44,})[''"]?'
+    confidence: 86
+    severity: critical
+    tags: [mongodb, kms, encryption, key]
+    context_keywords: [kms, provider, key]
+    
+  - id: mongodb-data-api-key
+    name: MongoDB Atlas Data API Key
+    description: Data API access key
+    regex: '(?i)(data.{0,5}api|atlas.{0,10}api).{0,20}key[:=]\s*[''"]?([a-zA-Z0-9]{32,})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [mongodb, atlas, data-api, key]
+    context_keywords: [data, api, atlas, key]
+    
+  - id: mongodb-app-services-secret
+    name: MongoDB App Services Secret
+    description: Atlas App Services (Realm) secret
+    regex: '(?i)(realm|app.{0,5}services).{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9_\-]{32,})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [mongodb, realm, app-services, secret]
+    context_keywords: [realm, app, services, secret]
+    
+  - id: mongodb-realm-app-id
+    name: MongoDB Realm App ID
+    description: Realm application identifier
+    regex: '(?i)realm.{0,20}app.{0,20}id[:=]\s*[''"]?([a-z0-9\-]+-[a-z]{5})[''"]?'
+    confidence: 78
+    severity: low
+    tags: [mongodb, realm, app, identifier]
+    context_keywords: [realm, app, id]
+    
+  - id: mongodb-realm-api-key  
+    name: MongoDB Realm API Key
+    description: Realm SDK API key
+    regex: '(?i)realm.{0,20}api.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9]{32,})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [mongodb, realm, api-key]
+    context_keywords: [realm, api, key]
+    
+  - id: mongodb-charts-token
+    name: MongoDB Charts Embedding Token
+    description: Charts embedding authentication
+    regex: '(?i)(charts|embed).{0,20}token[:=]\s*[''"]?([a-zA-Z0-9_\-]{50,})[''"]?'
+    confidence: 82
+    severity: medium
+    tags: [mongodb, charts, embedding, token]
+    context_keywords: [charts, embed, token]
+    
+  - id: mongodb-trigger-secret
+    name: MongoDB Atlas Triggers Secret
+    description: Database triggers secret value
+    regex: '(?i)trigger.{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9_\-]{20,})[''"]?'
+    confidence: 80
+    severity: high
+    tags: [mongodb, atlas, triggers, secret]
+    context_keywords: [trigger, secret]
+    
+  - id: mongodb-sync-secret
+    name: MongoDB Device Sync Secret
+    description: Realm Device Sync secret
+    regex: '(?i)(device.{0,5})?sync.{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9_\-]{20,})[''"]?'
+    confidence: 78
+    severity: high
+    tags: [mongodb, realm, sync, secret]
+    context_keywords: [sync, secret]
+    
+  - id: mongodb-stitch-api-key
+    name: MongoDB Stitch API Key (Legacy)
+    description: Legacy Stitch API key
+    regex: '(?i)stitch.{0,20}api.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9]{32,})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [mongodb, stitch, legacy, api-key]
+    context_keywords: [stitch, api, key]
+    
+  - id: mongodb-localhost-connection
+    name: MongoDB Localhost Connection
+    description: Local development connection
+    regex: 'mongodb://([^:]+):([^@]+)@(localhost|127\.0\.0\.1)(:\d+)?/[a-zA-Z0-9_\-]+'
+    confidence: 78
+    severity: medium
+    tags: [mongodb, localhost, development, connection]
+    
+  - id: mongodb-docker-env
+    name: MongoDB Docker Environment
+    description: Credentials in Docker environment
+    regex: '(?i)MONGO(DB)?_(USER|PASS|PASSWORD|USERNAME)\s*[:=]\s*[''"]?([^\s''"]+)[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [mongodb, docker, environment, credentials]
+    
+  - id: mongodb-compass-connection
+    name: MongoDB Compass Connection
+    description: Compass GUI saved connection
+    regex: '(?i)compass.{0,20}connection[:=]\s*[''"]?(mongodb(\+srv)?://[^\s''"]+)[''"]?'
+    confidence: 85
+    severity: high
+    tags: [mongodb, compass, gui, connection]
+    context_keywords: [compass, connection]
+    
+  - id: mongodb-shell-config
+    name: MongoDB Shell Configuration
+    description: mongosh configuration with credentials
+    regex: '(?i)mongosh.{0,20}(uri|connection)[:=]\s*[''"]?(mongodb(\+srv)?://[^\s''"]+)[''"]?'
+    confidence: 85
+    severity: high
+    tags: [mongodb, shell, mongosh, config]
+    context_keywords: [mongosh, uri]
+    
+  - id: mongodb-audit-log-config
+    name: MongoDB Audit Log Configuration
+    description: Audit configuration with credentials
+    regex: '(?i)audit.{0,20}destination[:=]\s*[''"]?[^\s''"]+[''"]?\s*.*password[:=]\s*[''"]?([^\s''"]+)[''"]?'
+    confidence: 78
+    severity: high
+    tags: [mongodb, audit, log, credentials]
+    context_keywords: [audit, destination, password]
+    
+  - id: mongodb-encryption-at-rest-key
+    name: MongoDB Encryption at Rest Key
+    description: Data-at-rest encryption key
+    regex: '(?i)(encryption.{0,5}at.{0,5}rest|ear).{0,20}key[:=]\s*[''"]?([A-Fa-f0-9]{32,})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [mongodb, encryption, at-rest, key]
+    context_keywords: [encryption, at, rest, key]
+    
+  - id: mongodb-aws-iam-credentials
+    name: MongoDB AWS IAM Credentials
+    description: AWS IAM for Atlas authentication
+    regex: '(?i)aws.{0,20}(access.{0,5}key|secret)[:=]\s*[''"]?([A-Z0-9]{20}|[A-Za-z0-9+/=]{40})[''"]?'
+    confidence: 85
+    severity: critical
+    tags: [mongodb, aws, iam, credentials]
+    context_keywords: [aws, access, secret]
+    
+  - id: mongodb-azure-credentials
+    name: MongoDB Azure Credentials
+    description: Azure for Atlas authentication
+    regex: '(?i)azure.{0,20}(subscription|tenant|client).{0,20}(id|secret)[:=]\s*[''"]?([a-f0-9\-]{36}|[a-zA-Z0-9_\-]{40})[''"]?'
+    confidence: 82
+    severity: high
+    tags: [mongodb, azure, credentials]
+    context_keywords: [azure, subscription, tenant, client]
+    
+  - id: mongodb-gcp-service-account
+    name: MongoDB GCP Service Account
+    description: GCP for Atlas authentication
+    regex: '(?i)gcp.{0,20}service.{0,20}account[:=]\s*[''"]?([a-z0-9\-]+@[a-z0-9\-]+\.iam\.gserviceaccount\.com)[''"]?'
+    confidence: 85
+    severity: high
+    tags: [mongodb, gcp, service-account]
+    context_keywords: [gcp, service, account]
+    
+  - id: mongodb-peering-connection-id
+    name: MongoDB VPC Peering Connection
+    description: Atlas VPC peering identifier
+    regex: '(?i)(peering|vpc).{0,20}connection.{0,20}id[:=]\s*[''"]?([a-f0-9]{24})[''"]?'
+    confidence: 75
+    severity: low
+    tags: [mongodb, atlas, vpc, peering]
+    context_keywords: [peering, vpc, connection]
+    
+  - id: mongodb-private-endpoint
+    name: MongoDB Private Endpoint ID
+    description: Atlas private endpoint identifier
+    regex: '(?i)private.{0,5}endpoint.{0,20}id[:=]\s*[''"]?([a-f0-9]{24})[''"]?'
+    confidence: 75
+    severity: low
+    tags: [mongodb, atlas, private-endpoint]
+    context_keywords: [private, endpoint, id]
+    
+  - id: mongodb-backup-snapshot
+    name: MongoDB Backup Snapshot ID
+    description: Cloud backup snapshot identifier
+    regex: '(?i)(backup|snapshot).{0,20}id[:=]\s*[''"]?([a-f0-9]{24})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [mongodb, atlas, backup, snapshot]
+    context_keywords: [backup, snapshot, id]
+    
+  - id: mongodb-ops-manager-api-key
+    name: MongoDB Ops Manager API Key
+    description: Ops Manager agent API key
+    regex: '(?i)ops.{0,5}manager.{0,20}api.{0,20}key[:=]\s*[''"]?([a-f0-9]{40})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [mongodb, ops-manager, api-key]
+    context_keywords: [ops, manager, api, key]
+    
+  - id: mongodb-cloud-manager-key
+    name: MongoDB Cloud Manager Agent Key
+    description: Cloud Manager automation agent key
+    regex: '(?i)cloud.{0,5}manager.{0,20}(agent|automation).{0,20}key[:=]\s*[''"]?([a-f0-9]{40})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [mongodb, cloud-manager, agent, key]
+    context_keywords: [cloud, manager, agent, key]
+    
+  - id: mongodb-agent-api-key
+    name: MongoDB Agent API Key
+    description: Monitoring/backup agent API key
+    regex: '(?i)mongo.{0,20}agent.{0,20}api.{0,20}key[:=]\s*[''"]?([a-f0-9]{40})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [mongodb, agent, api-key]
+    context_keywords: [mongo, agent, api, key]
+    
+  - id: mongodb-pymongo-config
+    name: PyMongo Connection Configuration
+    description: Python MongoDB driver with credentials
+    regex: 'MongoClient\s*\(\s*[''"]?(mongodb(\+srv)?://[^''"]+)[''"]?\s*\)'
+    confidence: 90
+    severity: critical
+    tags: [mongodb, pymongo, python, connection]
+    
+  - id: mongodb-mongoose-connection
+    name: Mongoose Connection String
+    description: Node.js Mongoose driver connection
+    regex: 'mongoose\.connect\s*\(\s*[''"]?(mongodb(\+srv)?://[^''"]+)[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [mongodb, mongoose, nodejs, connection]
+    
+  - id: mongodb-driver-java
+    name: MongoDB Java Driver Connection
+    description: Java driver connection string
+    regex: 'MongoClients\.create\s*\(\s*[''"]?(mongodb(\+srv)?://[^''"]+)[''"]?\s*\)'
+    confidence: 88
+    severity: critical
+    tags: [mongodb, java, driver, connection]
+    
+  - id: mongodb-driver-csharp
+    name: MongoDB C# Driver Connection
+    description: .NET driver connection
+    regex: 'new\s+MongoClient\s*\(\s*[''"]?(mongodb(\+srv)?://[^''"]+)[''"]?\s*\)'
+    confidence: 88
+    severity: critical
+    tags: [mongodb, csharp, dotnet, connection]
+    
+  - id: mongodb-searchindex-key
+    name: MongoDB Atlas Search Index Key
+    description: Atlas Search API key
+    regex: '(?i)search.{0,5}index.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9_\-]{32,})[''"]?'
+    confidence: 80
+    severity: medium
+    tags: [mongodb, atlas, search, index, key]
+    context_keywords: [search, index, key]
+    
+  - id: mongodb-vector-search-key
+    name: MongoDB Vector Search Key
+    description: Atlas Vector Search API key
+    regex: '(?i)vector.{0,5}search.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9_\-]{32,})[''"]?'
+    confidence: 80
+    severity: medium
+    tags: [mongodb, atlas, vector-search, key]
+    context_keywords: [vector, search, key]
+    
+  - id: mongodb-graphql-api-key
+    name: MongoDB GraphQL API Key
+    description: Atlas GraphQL endpoint key
+    regex: '(?i)(graphql|gql).{0,20}api.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9_\-]{32,})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [mongodb, atlas, graphql, api-key]
+    context_keywords: [graphql, gql, api, key]

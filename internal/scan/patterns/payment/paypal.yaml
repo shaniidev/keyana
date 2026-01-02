@@ -1,0 +1,428 @@
+# PayPal Payment Secret Detection Patterns
+# Author: github.com/shaniidev
+# Category: Payment Gateway
+# Total Patterns: 50
+
+name: PayPal Payment Credentials & Secrets
+version: 1.0
+author: github.com/shaniidev
+category: payment
+provider: PayPal
+severity: critical
+updated: 2026-01-02
+
+patterns:
+  - id: paypal-client-id
+    name: PayPal Client ID
+    description: PayPal REST API client identifier
+    regex: '(?i)paypal.{0,20}client.{0,20}id[:=]\s*[''"]?(A[a-zA-Z0-9_-]{79})[''"]?'
+    confidence: 95
+    severity: high
+    tags: [paypal, client-id, oauth, credentials]
+    context_keywords: [paypal, client, id]
+    
+  - id: paypal-client-secret
+    name: PayPal Client Secret
+    description: PayPal REST API client secret
+    regex: '(?i)paypal.{0,20}client.{0,20}secret[:=]\s*[''"]?(E[a-zA-Z0-9_-]{79})[''"]?'
+    confidence: 98
+    severity: critical
+    tags: [paypal, client-secret, oauth, credentials]
+    context_keywords: [paypal, client, secret]
+    entropy_check: true
+    min_entropy: 4.5
+    
+  - id: paypal-access-token
+    name: PayPal Access Token
+    description: OAuth 2.0 access token
+    regex: '(?i)paypal.{0,20}access.{0,20}token[:=]\s*[''"]?(A21AA[a-zA-Z0-9_-]{64,})[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [paypal, access-token, oauth]
+    context_keywords: [paypal, access, token]
+    
+  - id: paypal-refresh-token
+    name: PayPal Refresh Token
+    description: OAuth 2.0 refresh token for new access tokens
+    regex: '(?i)paypal.{0,20}refresh.{0,20}token[:=]\s*[''"]?(R[a-zA-Z0-9_-]{79,})[''"]?'
+    confidence: 95
+    severity: critical
+    tags: [paypal, refresh-token, oauth]
+    context_keywords: [paypal, refresh, token]
+    
+  - id: paypal-braintree-token
+    name: PayPal Braintree Access Token
+    description: Braintree gateway access token (PayPal owned)
+    regex: 'access_token\$[a-z]+\$[a-z0-9]+\$[a-f0-9]{32}'
+    confidence: 96
+    severity: critical
+    tags: [paypal, braintree, access-token]
+    
+  - id: paypal-braintree-merchant-id
+    name: PayPal Braintree Merchant ID
+    description: Braintree merchant account identifier
+    regex: '(?i)braintree.{0,20}merchant.{0,20}id[:=]\s*[''"]?([a-z0-9]{16})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [paypal, braintree, merchant-id]
+    context_keywords: [braintree, merchant, id]
+    
+  - id: paypal-braintree-public-key
+    name: PayPal Braintree Public Key
+    description: Braintree public API key
+    regex: '(?i)braintree.{0,20}public.{0,20}key[:=]\s*[''"]?([a-z0-9]{16})[''"]?'
+    confidence: 88
+    severity: medium
+    tags: [paypal, braintree, public-key]
+    context_keywords: [braintree, public, key]
+    
+  - id: paypal-braintree-private-key
+    name: PayPal Braintree Private Key
+    description: Braintree private API key
+    regex: '(?i)braintree.{0,20}private.{0,20}key[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 98
+    severity: critical
+    tags: [paypal, braintree, private-key, credentials]
+    context_keywords: [braintree, private, key]
+    
+  - id: paypal-webhook-id
+    name: PayPal Webhook ID
+    description: Webhook notification identifier
+    regex: '(?i)paypal.{0,20}webhook.{0,20}id[:=]\s*[''"]?([0-9A-Z]{17})[''"]?'
+    confidence: 82
+    severity: medium
+    tags: [paypal, webhook, identifier]
+    context_keywords: [paypal, webhook, id]
+    
+  - id: paypal-payer-id
+    name: PayPal Payer ID
+    description: PayPal customer payer identifier
+    regex: '(?i)paypal.{0,20}payer.{0,20}id[:=]\s*[''"]?([A-Z0-9]{13})[''"]?'
+    confidence: 78
+    severity: low
+    tags: [paypal, payer, customer, identifier]
+    context_keywords: [paypal, payer, id]
+    
+  - id: paypal-transaction-id
+    name: PayPal Transaction ID
+    description: Payment transaction identifier
+    regex: '(?i)paypal.{0,20}transaction.{0,20}id[:=]\s*[''"]?([0-9A-Z]{17})[''"]?'
+    confidence: 75
+    severity: low
+    tags: [paypal, transaction, identifier]
+    context_keywords: [paypal, transaction, id]
+    
+  - id: paypal-order-id
+    name: PayPal Order ID
+    description: Order/checkout identifier
+    regex: '(?i)paypal.{0,20}order.{0,20}id[:=]\s*[''"]?([0-9A-Z]{17})[''"]?'
+    confidence: 75
+    severity: low
+    tags: [paypal, order, identifier]
+    context_keywords: [paypal, order, id]
+    
+  - id: paypal-capture-id
+    name: PayPal Capture ID
+    description: Payment capture identifier
+    regex: '(?i)paypal.{0,20}capture.{0,20}id[:=]\s*[''"]?([0-9A-Z]{17})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [paypal, capture, identifier]
+    context_keywords: [paypal, capture, id]
+    
+  - id: paypal-authorization-id
+    name: PayPal Authorization ID
+    description: Payment authorization identifier
+    regex: '(?i)paypal.{0,20}authorization.{0,20}id[:=]\s*[''"]?([0-9A-Z]{17})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [paypal, authorization, identifier]
+    
+  - id: paypal-billing-agreement-id
+    name: PayPal Billing Agreement ID
+    description: Recurring billing agreement identifier
+    regex: '\bB-[A-Z0-9]{17}\b'
+    confidence: 85
+    severity: medium
+    tags: [paypal, billing-agreement, recurring]
+    
+  - id: paypal-subscription-id
+    name: PayPal Subscription ID
+    description: Subscription plan identifier
+    regex: '\bP-[A-Z0-9]{26}\b'
+    confidence: 82
+    severity: medium
+    tags: [paypal, subscription, recurring]
+    
+  - id: paypal-plan-id
+    name: PayPal Plan ID
+    description: Billing plan identifier
+    regex: '(?i)paypal.{0,20}plan.{0,20}id[:=]\s*[''"]?(P-[A-Z0-9]{26})[''"]?'
+    confidence: 80
+    severity: low
+    tags: [paypal, plan, billing, identifier]
+    
+  - id: paypal-invoice-id
+    name: PayPal Invoice ID
+    description: Invoice identifier
+    regex: '\bINV2-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}\b'
+    confidence: 82
+    severity: low
+    tags: [paypal, invoice, identifier]
+    
+  - id: paypal-dispute-id
+    name: PayPal Dispute ID
+    description: Chargeback dispute identifier
+    regex: '\bPP-D-[A-Z0-9]{17}\b'
+    confidence: 80
+    severity: medium
+    tags: [paypal, dispute, chargeback]
+    
+  - id: paypal-refund-id
+    name: PayPal Refund ID
+    description: Refund transaction identifier
+    regex: '(?i)paypal.{0,20}refund.{0,20}id[:=]\s*[''"]?([0-9A-Z]{17})[''"]?'
+    confidence: 75
+    severity: low
+    tags: [paypal, refund, identifier]
+    
+  - id: paypal-batch-id
+    name: PayPal Payout Batch ID
+    description: Mass payout batch identifier
+    regex: '(?i)paypal.{0,20}(batch|payout).{0,20}id[:=]\s*[''"]?([A-Z0-9]{20,30})[''"]?'
+    confidence: 78
+    severity: medium
+    tags: [paypal, payout, batch, identifier]
+    
+  - id: paypal-identity-token
+    name: PayPal Identity Token (PDT)
+    description: Payment Data Transfer identity token
+    regex: '(?i)paypal.{0,20}(identity|pdt).{0,20}token[:=]\s*[''"]?([a-zA-Z0-9_-]{50,})[''"]?'
+    confidence: 90
+    severity: high
+    tags: [paypal, identity-token, pdt]
+    context_keywords: [paypal, identity, pdt, token]
+    
+  - id: paypal-ipn-verification
+    name: PayPal IPN Verification Token
+    description: Instant Payment Notification verification
+    regex: '(?i)paypal.{0,20}ipn.{0,20}(token|secret)[:=]\s*[''"]?([a-zA-Z0-9_-]{20,})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [paypal, ipn, verification, token]
+    context_keywords: [paypal, ipn, token]
+    
+  - id: paypal-nvp-api-password
+    name: PayPal NVP API Password
+    description: Legacy Name-Value Pair API password
+    regex: '(?i)paypal.{0,20}api.{0,20}password[:=]\s*[''"]?([a-zA-Z0-9]{16,})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [paypal, nvp, api, password, legacy]
+    context_keywords: [paypal, api, password]
+    
+  - id: paypal-nvp-api-signature
+    name: PayPal NVP API Signature
+    description: Legacy API signature for authentication
+    regex: '(?i)paypal.{0,20}api.{0,20}signature[:=]\s*[''"]?([a-zA-Z0-9.]{50,})[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [paypal, nvp, api, signature, legacy]
+    context_keywords: [paypal, api, signature]
+    
+  - id: paypal-nvp-api-username
+    name: PayPal NVP API Username
+    description: Legacy API username
+    regex: '(?i)paypal.{0,20}api.{0,20}username[:=]\s*[''"]?([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+)[''"]?'
+    confidence: 85
+    severity: high
+    tags: [paypal, nvp, api, username, legacy]
+    context_keywords: [paypal, api, username]
+    
+  - id: paypal-sandbox-credentials
+    name: PayPal Sandbox Credentials
+    description: Sandbox/test environment credentials
+    regex: '(?i)(sandbox|test).{0,10}paypal.{0,20}(client|secret|password)[:=]\s*[''"]?([a-zA-Z0-9_-]{20,})[''"]?'
+    confidence: 78
+    severity: medium
+    tags: [paypal, sandbox, test, credentials]
+    context_keywords: [sandbox, test, paypal]
+    
+  - id: paypal-merchant-id
+    name: PayPal Merchant ID
+    description: Merchant account identifier
+    regex: '(?i)paypal.{0,20}merchant.{0,20}id[:=]\s*[''"]?([A-Z0-9]{13})[''"]?'
+    confidence: 82
+    severity: medium
+    tags: [paypal, merchant, identifier]
+    context_keywords: [paypal, merchant, id]
+    
+  - id: paypal-facilitator-access-token
+    name: PayPal Facilitator Access Token
+    description: Partner/facilitator access token
+    regex: '(?i)facilitator.{0,20}access.{0,20}token[:=]\s*[''"]?(A[a-zA-Z0-9_-]{79,})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [paypal, facilitator, partner, access-token]
+    context_keywords: [facilitator, access, token]
+    
+  - id: paypal-partner-referral-id
+    name: PayPal Partner Referral ID
+    description: Partner referral tracking identifier
+    regex: '(?i)paypal.{0,20}referral.{0,20}id[:=]\s*[''"]?([A-Z0-9]{20,})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [paypal, partner, referral, identifier]
+    
+  - id: paypal-tracking-id
+    name: PayPal Tracking ID
+    description: Custom tracking reference
+    regex: '(?i)paypal.{0,20}tracking.{0,20}id[:=]\s*[''"]?([a-zA-Z0-9_-]{10,50})[''"]?'
+    confidence: 68
+    severity: low
+    tags: [paypal, tracking, identifier]
+    
+  - id: paypal-bn-code
+    name: PayPal BN Code (Partner Attribution)
+    description: Partner attribution/referral code
+    regex: '(?i)bn.{0,10}code[:=]\s*[''"]?([A-Za-z0-9_]{10,30}_[A-Za-z0-9_]+)[''"]?'
+    confidence: 72
+    severity: low
+    tags: [paypal, bn-code, partner, attribution]
+    context_keywords: [bn, code, partner]
+    
+  - id: paypal-zettle-api-key
+    name: PayPal Zettle API Key
+    description: Zettle POS system API key (PayPal owned)
+    regex: '(?i)zettle.{0,20}api.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9_-]{32,})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [paypal, zettle, pos, api-key]
+    context_keywords: [zettle, api, key]
+    
+  - id: paypal-zettle-client-id
+    name: PayPal Zettle Client ID
+    description: Zettle OAuth client identifier
+    regex: '(?i)zettle.{0,20}client.{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [paypal, zettle, client-id]
+    context_keywords: [zettle, client, id]
+    
+  - id: paypal-hyperwallet-token
+    name: PayPal Hyperwallet Token
+    description: Hyperwallet payout service token (PayPal owned)
+    regex: '(?i)hyperwallet.{0,20}(api|token)[:=]\s*[''"]?([a-zA-Z0-9_-]{32,})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [paypal, hyperwallet, payout, token]
+    context_keywords: [hyperwallet, api, token]
+    
+  - id: paypal-simility-api-key
+    name: PayPal Simility API Key
+    description: Simility fraud prevention key (PayPal owned)
+    regex: '(?i)simility.{0,20}api.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9_-]{32,})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [paypal, simility, fraud, api-key]
+    context_keywords: [simility, api, key]
+    
+  - id: paypal-venmo-access-token
+    name: Venmo Access Token
+    description: Venmo API access token (PayPal owned)
+    regex: '(?i)venmo.{0,20}access.{0,20}token[:=]\s*[''"]?([a-zA-Z0-9_-]{40,})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [paypal, venmo, access-token]
+    context_keywords: [venmo, access, token]
+    
+  - id: paypal-honey-api-key
+    name: Honey API Key
+    description: Honey browser extension API (PayPal owned)
+    regex: '(?i)honey.{0,20}api.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9_-]{32,})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [paypal, honey, api-key]
+    context_keywords: [honey, api, key]
+    
+  - id: paypal-checkout-js-client
+    name: PayPal Checkout.js Client ID
+    description: Client-side JS SDK client ID
+    regex: '(?i)(paypal|checkout).{0,20}client.{0,10}id[:=]\s*[''"]?(A[a-zA-Z0-9\-_]{79})[''"]?'
+    confidence: 92
+    severity: high
+    tags: [paypal, checkout-js, client-id, frontend]
+    
+  - id: paypal-smart-button-client
+    name: PayPal Smart Button Client ID
+    description: Smart Payment Button client configuration
+    regex: 'data-client-id\s*=\s*[''"]?(A[a-zA-Z0-9\-_]{79})[''"]?'
+    confidence: 90
+    severity: high
+    tags: [paypal, smart-button, client-id, frontend]
+    
+  - id: paypal-express-checkout-token
+    name: PayPal Express Checkout Token
+    description: Legacy Express Checkout token
+    regex: '\bEC-[A-Z0-9]{17}\b'
+    confidence: 85
+    severity: medium
+    tags: [paypal, express-checkout, token, legacy]
+    
+  - id: paypal-classic-api-credential
+    name: PayPal Classic API Credential Set
+    description: Complete classic API credential (user:pass:sig)
+    regex: '(?i)paypal.*api.*(user|name)[:=].*api.*password[:=].*api.*signature[:=]'
+    confidence: 96
+    severity: critical
+    tags: [paypal, classic, api, credentials]
+    
+  - id: paypal-rest-api-endpoint
+    name: PayPal REST API Endpoint with Auth
+    description: API call with embedded authorization
+    regex: 'https://api(-m)?\.paypal\.com/v[12]/[^\s]*\s.*Authorization:\s*(Bearer|Basic)\s+[^\s]+'
+    confidence: 88
+    severity: high
+    tags: [paypal, rest-api, authorization]
+    
+  - id: paypal-sandbox-account-email
+    name: PayPal Sandbox Account Email
+    description: Sandbox test account email
+    regex: '(?i)sandbox[^\s]*@(business\.|personal\.)?sandbox\.paypal\.com'
+    confidence: 75
+    severity: medium
+    tags: [paypal, sandbox, test-account, email]
+    
+  - id: paypal-product-id
+    name: PayPal Product ID
+    description: Catalog product identifier
+    regex: '\bPROD-[A-Z0-9]{17}\b'
+    confidence: 78
+    severity: low
+    tags: [paypal, product, catalog, identifier]
+    
+  - id: paypal-catalog-product
+    name: PayPal Catalog Subscription Product
+    description: Subscription catalog product
+    regex: '(?i)paypal.{0,20}product.{0,20}id[:=]\s*[''"]?(PROD-[A-Z0-9]{17})[''"]?'
+    confidence: 75
+    severity: low
+    tags: [paypal, catalog, subscription, product]
+    
+  - id: paypal-vault-token
+    name: PayPal Vault Payment Token
+    description: Saved payment method vault token
+    regex: '(?i)paypal.{0,20}vault.{0,20}token[:=]\s*[''"]?([a-zA-Z0-9_-]{20,})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [paypal, vault, payment-token, saved-payment]
+    context_keywords: [paypal, vault, token]
+    
+  - id: paypal-3ds-authentication
+    name: PayPal 3DS Authentication Value
+    description: 3D Secure authentication data
+    regex: '(?i)(cavv|xid|eci|authentication_value)[:=]\s*[''"]?([A-Za-z0-9+/=]{20,})[''"]?'
+    confidence: 80
+    severity: medium
+    tags: [paypal, 3ds, authentication, security]
+    context_keywords: [cavv, xid, eci, 3ds]

@@ -1,0 +1,398 @@
+# MySQL & PostgreSQL Secret Detection Patterns
+# Author: github.com/shaniidev
+# Category: Database
+# Total Patterns: 50
+
+name: MySQL & PostgreSQL Credentials & Secrets
+version: 1.0
+author: github.com/shaniidev
+category: database
+provider: MySQL and PostgreSQL
+severity: critical
+updated: 2026-01-02
+
+patterns:
+  # MySQL Patterns
+  - id: mysql-connection-string
+    name: MySQL Connection String
+    description: MySQL connection URI with credentials
+    regex: 'mysql://([^:]+):([^@]+)@([a-zA-Z0-9.\-]+)(:\d+)?/([a-zA-Z0-9_]+)'
+    confidence: 96
+    severity: critical
+    tags: [mysql, connection-string, credentials]
+    
+  - id: mysql-jdbc-url
+    name: MySQL JDBC Connection URL
+    description: Java JDBC connection with credentials
+    regex: 'jdbc:mysql://([a-zA-Z0-9.\-]+)(:\d+)?/([a-zA-Z0-9_]+)\?user=([^&]+)&password=([^&\s]+)'
+    confidence: 96
+    severity: critical
+    tags: [mysql, jdbc, java, credentials]
+    
+  - id: mysql-root-password
+    name: MySQL Root Password
+    description: Root user password
+    regex: '(?i)mysql.{0,10}root.{0,20}password[:=]\s*[''"]?([^\s''"]{6,})[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [mysql, root, password, credentials]
+    context_keywords: [mysql, root, password]
+    
+  - id: mysql-password
+    name: MySQL User Password
+    description: Database user password
+    regex: '(?i)mysql.{0,20}password[:=]\s*[''"]?([^\s''"]{6,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [mysql, password, credentials]
+    context_keywords: [mysql, password]
+    
+  - id: mysql-user-password-env
+    name: MySQL Password (Environment)
+    description: MySQL password in environment
+    regex: '(?i)MYSQL_(ROOT_)?PASSWORD\s*[:=]\s*[''"]?([^\s''"]+)[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [mysql, environment, password]
+    
+  - id: mysql-dsn
+    name: MySQL DSN (Go/PHP)
+    description: Data Source Name with credentials
+    regex: '(?i)([a-zA-Z0-9_]+):([^@]+)@(tcp|unix)\(([^)]+)\)/([a-zA-Z0-9_]+)'
+    confidence: 92
+    severity: critical
+    tags: [mysql, dsn, go, php, credentials]
+    
+  - id: mysql-host-password
+    name: MySQL Connection Parameters
+    description: Host and password configuration
+    regex: '(?i)host[:=]\s*[''"]?([^''"]+)[''"]?\s+.*password[:=]\s*[''"]?([^\s''"]+)[''"]?'
+    confidence: 85
+    severity: critical
+    tags: [mysql, host, password, configuration]
+    
+  - id: mysql-config-cnf
+    name: MySQL Config File Password
+    description: Password in .my.cnf or similar
+    regex: '(?i)\[client\][\s\S]*password\s*=\s*([^\s\n]+)'
+    confidence: 92
+    severity: critical
+    tags: [mysql, config, cnf, password]
+    
+  - id: mysql-docker-env
+    name: MySQL Docker Environment
+    description: Docker compose/run MySQL credentials
+    regex: '(?i)MYSQL_(DATABASE|USER|PASSWORD|ROOT_PASSWORD)\s*[:=]\s*[''"]?([^\s''"]+)[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [mysql, docker, environment, credentials]
+    
+  - id: mysql-replication-password
+    name: MySQL Replication Password
+    description: Master-slave replication credentials
+    regex: '(?i)(replication|slave).{0,20}password[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [mysql, replication, password]
+    context_keywords: [replication, slave, password]
+    
+  - id: mysql-admin-password
+    name: MySQL Admin Password
+    description: Administrative user password
+    regex: '(?i)mysql.{0,20}admin.{0,20}password[:=]\s*[''"]?([^\s''"]{6,})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [mysql, admin, password]
+    context_keywords: [mysql, admin, password]
+    
+  - id: mysql-ssl-key
+    name: MySQL SSL Key Path
+    description: SSL/TLS key file for MySQL
+    regex: '(?i)mysql.{0,20}ssl.{0,20}key[:=]\s*[''"]?([^\s''"]+\.(pem|key))[''"]?'
+    confidence: 80
+    severity: high
+    tags: [mysql, ssl, key, path]
+    context_keywords: [mysql, ssl, key]
+    
+  - id: mysql-ssl-cert
+    name: MySQL SSL Certificate Path
+    description: SSL/TLS certificate for MySQL
+    regex: '(?i)mysql.{0,20}ssl.{0,20}cert[:=]\s*[''"]?([^\s''"]+\.(pem|crt))[''"]?'
+    confidence: 78
+    severity: medium
+    tags: [mysql, ssl, certificate, path]
+    context_keywords: [mysql, ssl, cert]
+    
+  # MariaDB Patterns
+  - id: mariadb-connection-string
+    name: MariaDB Connection String
+    description: MariaDB connection URI
+    regex: 'mariadb://([^:]+):([^@]+)@([a-zA-Z0-9.\-]+)(:\d+)?/([a-zA-Z0-9_]+)'
+    confidence: 96
+    severity: critical
+    tags: [mariadb, connection-string, credentials]
+    
+  - id: mariadb-password-env
+    name: MariaDB Password (Environment)
+    description: MariaDB password in environment
+    regex: '(?i)MARIADB_(ROOT_)?PASSWORD\s*[:=]\s*[''"]?([^\s''"]+)[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [mariadb, environment, password]
+    
+  # PostgreSQL Patterns
+  - id: postgresql-connection-string
+    name: PostgreSQL Connection String
+    description: PostgreSQL connection URI with credentials
+    regex: 'postgres(ql)?://([^:]+):([^@]+)@([a-zA-Z0-9.\-]+)(:\d+)?/([a-zA-Z0-9_]+)'
+    confidence: 96
+    severity: critical
+    tags: [postgresql, postgres, connection-string, credentials]
+    
+  - id: postgresql-jdbc-url
+    name: PostgreSQL JDBC Connection URL
+    description: Java JDBC PostgreSQL connection
+    regex: 'jdbc:postgresql://([a-zA-Z0-9.\-]+)(:\d+)?/([a-zA-Z0-9_]+)\?user=([^&]+)&password=([^&\s]+)'
+    confidence: 96
+    severity: critical
+    tags: [postgresql, jdbc, java, credentials]
+    
+  - id: postgresql-password
+    name: PostgreSQL Password
+    description: Database user password
+    regex: '(?i)(postgres|pg).{0,20}password[:=]\s*[''"]?([^\s''"]{6,})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [postgresql, postgres, password, credentials]
+    context_keywords: [postgres, pg, password]
+    
+  - id: postgresql-password-env
+    name: PostgreSQL Password (Environment)
+    description: PostgreSQL password environment variable
+    regex: '(?i)(POSTGRES(QL)?_PASSWORD|PGPASSWORD)\s*[:=]\s*[''"]?([^\s''"]+)[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [postgresql, environment, password]
+    
+  - id: postgresql-superuser-password
+    name: PostgreSQL Superuser Password
+    description: Superuser/admin credentials
+    regex: '(?i)(pg|postgres).{0,20}superuser.{0,20}password[:=]\s*[''"]?([^\s''"]{6,})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [postgresql, superuser, admin, password]
+    context_keywords: [postgres, superuser, password]
+    
+  - id: postgresql-pgpass
+    name: PostgreSQL .pgpass Entry
+    description: Credentials in .pgpass file
+    regex: '([^:]+):(\d+):([^:]+):([^:]+):(.+)'
+    confidence: 85
+    severity: critical
+    tags: [postgresql, pgpass, credentials]
+    
+  - id: postgresql-docker-env
+    name: PostgreSQL Docker Environment
+    description: Docker PostgreSQL credentials
+    regex: '(?i)POSTGRES(QL)?_(DB|USER|PASSWORD)\s*[:=]\s*[''"]?([^\s''"]+)[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [postgresql, docker, environment, credentials]
+    
+  - id: postgresql-libpq-connstring
+    name: PostgreSQL libpq Connection String
+    description: libpq format connection parameters
+    regex: 'host=([^\s]+)\s+.*password=([^\s]+)'
+    confidence: 88
+    severity: critical
+    tags: [postgresql, libpq, connection-string, credentials]
+    
+  - id: postgresql-ssl-key
+    name: PostgreSQL SSL Key
+    description: SSL private key for pg connection
+    regex: '(?i)(postgres|pg).{0,20}ssl.{0,20}key[:=]\s*[''"]?([^\s''"]+\.(pem|key))[''"]?'
+    confidence: 82
+    severity: high
+    tags: [postgresql, ssl, key, path]
+    context_keywords: [postgres, ssl, key]
+    
+  - id: postgresql-ssl-cert
+    name: PostgreSQL SSL Certificate
+    description: SSL certificate for pg connection
+    regex: '(?i)(postgres|pg).{0,20}ssl.{0,20}cert[:=]\s*[''"]?([^\s''"]+\.(pem|crt))[''"]?'
+    confidence: 80
+    severity: medium
+    tags: [postgresql, ssl, certificate, path]
+    context_keywords: [postgres, ssl, cert]
+    
+  - id: postgresql-replication-slot
+    name: PostgreSQL Replication Credentials
+    description: Streaming replication password
+    regex: '(?i)replication.{0,20}password[:=]\s*[''"]?([^\s''"]{6,})[''"]?'
+    confidence: 86
+    severity: critical
+    tags: [postgresql, replication, password]
+    context_keywords: [replication, password]
+    
+  # Database ORM/Driver Patterns
+  - id: sequelize-config
+    name: Sequelize Database Config
+    description: Node.js Sequelize ORM credentials
+    regex: '(?i)(username|user):\s*[''"]([^''"]+)[''"].*password:\s*[''"]([^''"]+)[''"]'
+    confidence: 85
+    severity: critical
+    tags: [sequelize, nodejs, orm, credentials]
+    
+  - id: sqlalchemy-url
+    name: SQLAlchemy Database URL
+    description: Python SQLAlchemy connection
+    regex: '(mysql|postgresql)(\+[a-z]+)?://([^:]+):([^@]+)@([^/]+)/([^\s]+)'
+    confidence: 92
+    severity: critical
+    tags: [sqlalchemy, python, orm, credentials]
+    
+  - id: django-database-password
+    name: Django Database Password
+    description: Django settings database credentials
+    regex: '(?i)[''"]PASSWORD[''"]:\s*[''"]([^''"]+)[''"]'
+    confidence: 85
+    severity: critical
+    tags: [django, python, database, password]
+    
+  - id: rails-database-yml
+    name: Rails database.yml Password
+    description: Ruby on Rails database config
+    regex: '(?i)password:\s*[''"]?([^\s''"#]+)[''"]?'
+    confidence: 80
+    severity: critical
+    tags: [rails, ruby, database, password]
+    
+  - id: laravel-database-password
+    name: Laravel Database Password
+    description: PHP Laravel .env database credentials
+    regex: '(?i)DB_PASSWORD\s*=\s*[''"]?([^\s''"]+)[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [laravel, php, database, password]
+    
+  - id: spring-datasource-password
+    name: Spring Boot DataSource Password
+    description: Spring Boot application.properties
+    regex: 'spring\.datasource\.password\s*=\s*([^\s]+)'
+    confidence: 92
+    severity: critical
+    tags: [spring, java, datasource, password]
+    
+  - id: hibernate-connection-password
+    name: Hibernate Connection Password
+    description: Hibernate configuration password
+    regex: 'hibernate\.connection\.password[''"]?\s*[=:>]\s*[''"]?([^\s''"<]+)[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [hibernate, java, database, password]
+    
+  - id: dotnet-connection-string
+    name: .NET Connection String
+    description: .NET SQL connection string
+    regex: '(?i)Server=([^;]+);.*Password=([^;]+);'
+    confidence: 90
+    severity: critical
+    tags: [dotnet, csharp, sql, connection-string]
+    
+  - id: dapper-connection
+    name: Dapper/ADO.NET Connection
+    description: .NET database connection
+    regex: '(?i)new\s+SqlConnection\s*\(\s*[''"]([^''"]+Password=[^''"]+)[''"]'
+    confidence: 88
+    severity: critical
+    tags: [dotnet, dapper, sql, connection-string]
+    
+  # Cloud Database Patterns
+  - id: aws-rds-password
+    name: AWS RDS Database Password
+    description: Amazon RDS credentials
+    regex: '(?i)rds.{0,20}(master|admin)?password[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [aws, rds, database, password]
+    context_keywords: [rds, master, admin, password]
+    
+  - id: aws-aurora-password
+    name: AWS Aurora Database Password
+    description: Aurora cluster credentials
+    regex: '(?i)aurora.{0,20}(master|admin)?password[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [aws, aurora, database, password]
+    context_keywords: [aurora, master, password]
+    
+  - id: gcp-cloud-sql-password
+    name: Google Cloud SQL Password
+    description: Cloud SQL instance password
+    regex: '(?i)cloud.{0,5}sql.{0,20}password[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [gcp, cloud-sql, database, password]
+    context_keywords: [cloud, sql, password]
+    
+  - id: azure-sql-password
+    name: Azure SQL Database Password
+    description: Azure SQL credentials
+    regex: '(?i)azure.{0,10}sql.{0,20}(admin)?password[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [azure, sql, database, password]
+    context_keywords: [azure, sql, password]
+    
+  - id: planetscale-password
+    name: PlanetScale Database Password
+    description: PlanetScale serverless MySQL
+    regex: '(?i)planetscale.{0,20}password[:=]\s*[''"]?(pscale_pw_[a-zA-Z0-9_]+)[''"]?'
+    confidence: 95
+    severity: critical
+    tags: [planetscale, mysql, serverless, password]
+    context_keywords: [planetscale, password]
+    
+  - id: neon-connection-string
+    name: Neon PostgreSQL Connection
+    description: Neon serverless PostgreSQL
+    regex: 'postgres://[^:]+:[^@]+@[a-z0-9\-]+\.neon\.tech(:[0-9]+)?/[a-zA-Z0-9_]+'
+    confidence: 96
+    severity: critical
+    tags: [neon, postgresql, serverless, connection-string]
+    
+  - id: supabase-db-password
+    name: Supabase Database Password
+    description: Supabase PostgreSQL password
+    regex: '(?i)supabase.{0,20}(db|database).{0,20}password[:=]\s*[''"]?([^\s''"]{6,})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [supabase, postgresql, password]
+    context_keywords: [supabase, db, password]
+    
+  - id: cockroachdb-password
+    name: CockroachDB Password
+    description: CockroachDB cluster password
+    regex: '(?i)cockroach(db)?.{0,20}password[:=]\s*[''"]?([^\s''"]{6,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [cockroachdb, database, password]
+    context_keywords: [cockroach, password]
+    
+  - id: tidb-password
+    name: TiDB Database Password
+    description: TiDB distributed SQL password
+    regex: '(?i)tidb.{0,20}password[:=]\s*[''"]?([^\s''"]{6,})[''"]?'
+    confidence: 85
+    severity: critical
+    tags: [tidb, database, password]
+    context_keywords: [tidb, password]
+    
+  - id: timescaledb-password
+    name: TimescaleDB Password
+    description: TimescaleDB time-series password
+    regex: '(?i)timescale(db)?.{0,20}password[:=]\s*[''"]?([^\s''"]{6,})[''"]?'
+    confidence: 85
+    severity: critical
+    tags: [timescaledb, postgresql, password]
+    context_keywords: [timescale, password]

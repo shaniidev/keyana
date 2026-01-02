@@ -1,0 +1,429 @@
+# Slack Secret Detection Patterns
+# Author: github.com/shaniidev
+# Category: Communication
+# Total Patterns: 50
+
+name: Slack Credentials & Secrets
+version: 1.0
+author: github.com/shaniidev
+category: communication
+provider: Slack
+severity: critical
+updated: 2026-01-02
+
+patterns:
+  - id: slack-bot-token
+    name: Slack Bot Token
+    description: Bot user OAuth token
+    regex: '\bxoxb-[0-9]{10,13}-[0-9]{10,13}-[a-zA-Z0-9]{24}\b'
+    confidence: 99
+    severity: critical
+    tags: [slack, bot, oauth, token, credentials]
+    
+  - id: slack-user-token
+    name: Slack User Token
+    description: User OAuth token
+    regex: '\bxoxp-[0-9]{10,13}-[0-9]{10,13}-[0-9]{10,13}-[a-f0-9]{32}\b'
+    confidence: 99
+    severity: critical
+    tags: [slack, user, oauth, token, credentials]
+    
+  - id: slack-workspace-token
+    name: Slack Workspace Token
+    description: Workspace-level access token
+    regex: '\bxoxa-[0-9]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+'
+    confidence: 96
+    severity: critical
+    tags: [slack, workspace, token, credentials]
+    
+  - id: slack-app-token
+    name: Slack App-Level Token
+    description: App-level token for Socket Mode
+    regex: '\bxapp-[0-9]+-[A-Z0-9]+-[0-9]+-[a-f0-9]{64}\b'
+    confidence: 98
+    severity: critical
+    tags: [slack, app, socket-mode, token]
+    
+  - id: slack-configuration-token
+    name: Slack Configuration Token
+    description: App configuration token
+    regex: '\bxoxe\.xoxp-1-[a-zA-Z0-9-]+\b'
+    confidence: 96
+    severity: critical
+    tags: [slack, configuration, token]
+    
+  - id: slack-refresh-token
+    name: Slack Refresh Token
+    description: OAuth refresh token for token rotation
+    regex: '\bxoxe-1-[a-zA-Z0-9-]+\b'
+    confidence: 95
+    severity: critical
+    tags: [slack, refresh, oauth, token]
+    
+  - id: slack-legacy-token
+    name: Slack Legacy Token
+    description: Legacy/test API token
+    regex: '\bxoxs-[0-9]+-[0-9]+-[0-9]+-[a-f0-9]+'
+    confidence: 92
+    severity: critical
+    tags: [slack, legacy, token, deprecated]
+    
+  - id: slack-webhook-url
+    name: Slack Incoming Webhook URL
+    description: Incoming webhook for posting messages
+    regex: 'https://hooks\.slack\.com/services/T[A-Z0-9]+/B[A-Z0-9]+/[a-zA-Z0-9]+'
+    confidence: 98
+    severity: high
+    tags: [slack, webhook, incoming, url]
+    
+  - id: slack-workflow-webhook
+    name: Slack Workflow Webhook URL
+    description: Workflow Builder webhook
+    regex: 'https://hooks\.slack\.com/workflows/T[A-Z0-9]+/A[A-Z0-9]+/[0-9]+/[a-zA-Z0-9]+'
+    confidence: 96
+    severity: high
+    tags: [slack, workflow, webhook, url]
+    
+  - id: slack-api-trigger
+    name: Slack API Trigger URL
+    description: Workflow trigger URL
+    regex: 'https://hooks\.slack\.com/triggers/T[A-Z0-9]+/[0-9]+/[a-f0-9]+'
+    confidence: 92
+    severity: high
+    tags: [slack, trigger, workflow, url]
+    
+  - id: slack-client-id
+    name: Slack Client ID
+    description: OAuth app client identifier
+    regex: '(?i)slack.{0,20}client.{0,20}id[:=]\s*[''"]?([0-9]+\.[0-9]+)[''"]?'
+    confidence: 85
+    severity: medium
+    tags: [slack, client-id, oauth, app]
+    context_keywords: [slack, client, id]
+    
+  - id: slack-client-secret
+    name: Slack Client Secret
+    description: OAuth app client secret
+    regex: '(?i)slack.{0,20}client.{0,20}secret[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [slack, client-secret, oauth, credentials]
+    context_keywords: [slack, client, secret]
+    
+  - id: slack-signing-secret
+    name: Slack Signing Secret
+    description: Request signature verification secret
+    regex: '(?i)slack.{0,20}signing.{0,20}secret[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [slack, signing, secret, verification]
+    context_keywords: [slack, signing, secret]
+    
+  - id: slack-verification-token
+    name: Slack Verification Token (Deprecated)
+    description: Legacy verification token
+    regex: '(?i)slack.{0,20}verification.{0,20}token[:=]\s*[''"]?([a-zA-Z0-9]{24})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [slack, verification, token, deprecated]
+    context_keywords: [slack, verification, token]
+    
+  - id: slack-app-id
+    name: Slack App ID
+    description: Application identifier
+    regex: '(?i)slack.{0,20}app.{0,20}id[:=]\s*[''"]?(A[A-Z0-9]{10})[''"]?'
+    confidence: 82
+    severity: low
+    tags: [slack, app, identifier]
+    context_keywords: [slack, app, id]
+    
+  - id: slack-team-id
+    name: Slack Team/Workspace ID
+    description: Workspace identifier
+    regex: '(?i)slack.{0,20}team.{0,20}id[:=]\s*[''"]?(T[A-Z0-9]{8,10})[''"]?'
+    confidence: 78
+    severity: low
+    tags: [slack, team, workspace, identifier]
+    context_keywords: [slack, team, workspace, id]
+    
+  - id: slack-channel-id
+    name: Slack Channel ID
+    description: Channel identifier
+    regex: '(?i)slack.{0,20}channel.{0,20}id[:=]\s*[''"]?(C[A-Z0-9]{8,10})[''"]?'
+    confidence: 75
+    severity: low
+    tags: [slack, channel, identifier]
+    context_keywords: [slack, channel, id]
+    
+  - id: slack-user-id
+    name: Slack User ID
+    description: User identifier
+    regex: '(?i)slack.{0,20}user.{0,20}id[:=]\s*[''"]?(U[A-Z0-9]{8,10})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [slack, user, identifier]
+    context_keywords: [slack, user, id]
+    
+  - id: slack-bot-id
+    name: Slack Bot ID
+    description: Bot user identifier
+    regex: '(?i)slack.{0,20}bot.{0,20}id[:=]\s*[''"]?(B[A-Z0-9]{8,10})[''"]?'
+    confidence: 75
+    severity: low
+    tags: [slack, bot, identifier]
+    context_keywords: [slack, bot, id]
+    
+  - id: slack-enterprise-id
+    name: Slack Enterprise Grid ID
+    description: Enterprise Grid organization identifier
+    regex: '(?i)slack.{0,20}enterprise.{0,20}id[:=]\s*[''"]?(E[A-Z0-9]{8,10})[''"]?'
+    confidence: 80
+    severity: medium
+    tags: [slack, enterprise, grid, identifier]
+    context_keywords: [slack, enterprise, id]
+    
+  - id: slack-file-id
+    name: Slack File ID
+    description: Uploaded file identifier
+    regex: '(?i)slack.{0,20}file.{0,20}id[:=]\s*[''"]?(F[A-Z0-9]{8,10})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [slack, file, identifier]
+    context_keywords: [slack, file, id]
+    
+  - id: slack-message-ts
+    name: Slack Message Timestamp
+    description: Message unique identifier/timestamp
+    regex: '(?i)slack.{0,20}(message.{0,10})?(ts|timestamp)[:=]\s*[''"]?(\d{10}\.\d{6})[''"]?'
+    confidence: 70
+    severity: low
+    tags: [slack, message, timestamp, identifier]
+    context_keywords: [slack, ts, timestamp]
+    
+  - id: slack-response-url
+    name: Slack Response URL
+    description: Ephemeral message response URL
+    regex: 'https://hooks\.slack\.com/actions/T[A-Z0-9]+/[0-9]+/[a-zA-Z0-9]+'
+    confidence: 88
+    severity: medium
+    tags: [slack, response, url, ephemeral]
+    
+  - id: slack-file-url-private
+    name: Slack Private File URL
+    description: Private file download URL
+    regex: 'https://files\.slack\.com/files-pri/T[A-Z0-9]+-F[A-Z0-9]+/[^\s]+'
+    confidence: 85
+    severity: medium
+    tags: [slack, file, private, url]
+    
+  - id: slack-oauth-redirect
+    name: Slack OAuth Redirect URL
+    description: OAuth installation redirect
+    regex: 'https://slack\.com/oauth/v2/(authorize|access)\?[^\s]*client_id=[^\s&]+'
+    confidence: 78
+    severity: medium
+    tags: [slack, oauth, redirect, url]
+    
+  - id: slack-api-base
+    name: Slack API Call with Token
+    description: API request with authorization
+    regex: 'https://slack\.com/api/[^\s]+.*Authorization:\s*Bearer\s+xox[a-z]-[^\s]+'
+    confidence: 92
+    severity: critical
+    tags: [slack, api, authorization, token]
+    
+  - id: slack-connect-token
+    name: Slack Connect Token
+    description: Cross-organization connect token
+    regex: '\bxoxb-[0-9]+-[0-9]+-[a-zA-Z0-9]+\b'
+    confidence: 94
+    severity: critical
+    tags: [slack, connect, cross-org, token]
+    
+  - id: slack-scim-token
+    name: Slack SCIM Token
+    description: Enterprise SCIM provisioning token
+    regex: '(?i)slack.{0,20}scim.{0,20}token[:=]\s*[''"]?(xoxp-[^\s''"]+)[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [slack, scim, enterprise, provisioning, token]
+    context_keywords: [slack, scim, token]
+    
+  - id: slack-discovery-token
+    name: Slack Discovery API Token
+    description: Enterprise Discovery API token
+    regex: '(?i)discovery.{0,20}token[:=]\s*[''"]?(xoxb-[^\s''"]+)[''"]?'
+    confidence: 88
+    severity: high
+    tags: [slack, discovery, enterprise, token]
+    context_keywords: [discovery, token]
+    
+  - id: slack-audit-logs-token
+    name: Slack Audit Logs API Token
+    description: Enterprise audit logs access
+    regex: '(?i)audit.{0,10}logs?.{0,20}token[:=]\s*[''"]?(xoxp-[^\s''"]+)[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [slack, audit, logs, enterprise, token]
+    context_keywords: [audit, logs, token]
+    
+  - id: slack-shared-invite
+    name: Slack Shared Invite Link
+    description: Workspace invite link
+    regex: 'https://join\.slack\.com/t/[a-z0-9-]+/shared_invite/[a-zA-Z0-9]+'
+    confidence: 82
+    severity: medium
+    tags: [slack, invite, shared, link]
+    
+  - id: slack-deep-link
+    name: Slack Deep Link with Credentials
+    description: Deep link containing sensitive data
+    regex: 'slack://[^\s]*token=[^\s&]+'
+    confidence: 85
+    severity: high
+    tags: [slack, deeplink, token]
+    
+  - id: slack-manifest-token
+    name: Slack App Manifest Token
+    description: App manifest update token
+    regex: '(?i)manifest.{0,20}token[:=]\s*[''"]?(xoxe[^\s''"]+)[''"]?'
+    confidence: 88
+    severity: high
+    tags: [slack, manifest, app, token]
+    context_keywords: [manifest, token]
+    
+  - id: slack-socket-mode-token
+    name: Slack Socket Mode Connection Token
+    description: WebSocket connection token
+    regex: '(?i)socket.{0,10}mode.{0,20}token[:=]\s*[''"]?(xapp-[^\s''"]+)[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [slack, socket-mode, websocket, token]
+    context_keywords: [socket, mode, token]
+    
+  - id: slack-interactive-token
+    name: Slack Interactive Component Token
+    description: Interactive message/modal token
+    regex: '(?i)interactive.{0,20}token[:=]\s*[''"]?(xoxb-[^\s''"]+)[''"]?'
+    confidence: 85
+    severity: high
+    tags: [slack, interactive, modal, token]
+    context_keywords: [interactive, token]
+    
+  - id: slack-slash-command-token
+    name: Slack Slash Command Token
+    description: Custom slash command verification
+    regex: '(?i)slash.{0,10}command.{0,20}token[:=]\s*[''"]?([a-zA-Z0-9]{24})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [slack, slash-command, token]
+    context_keywords: [slash, command, token]
+    
+  - id: slack-oauth-v2-access
+    name: Slack OAuth v2 Access Response
+    description: OAuth token in API response
+    regex: '"access_token"\s*:\s*"(xoxb-[^"]+)"'
+    confidence: 96
+    severity: critical
+    tags: [slack, oauth, response, token]
+    
+  - id: slack-authed-user-token
+    name: Slack Authed User Token
+    description: User token from OAuth flow
+    regex: '"authed_user"[^\}]*"access_token"\s*:\s*"(xoxp-[^"]+)"'
+    confidence: 95
+    severity: critical
+    tags: [slack, oauth, user, token]
+    
+  - id: slack-bot-user-id
+    name: Slack Bot User ID
+    description: Bot user identifier in OAuth
+    regex: '"bot_user_id"\s*:\s*"(U[A-Z0-9]+)"'
+    confidence: 75
+    severity: low
+    tags: [slack, bot, user-id, oauth]
+    
+  - id: slack-incoming-webhook-config
+    name: Slack Incoming Webhook Configuration
+    description: Complete webhook config object
+    regex: '"incoming_webhook"[^\}]*"url"\s*:\s*"(https://hooks\.slack\.com/services/[^"]+)"'
+    confidence: 94
+    severity: high
+    tags: [slack, incoming-webhook, configuration]
+    
+  - id: slack-events-api-url
+    name: Slack Events API Request URL
+    description: Events subscription endpoint
+    regex: '(?i)events?.{0,20}(url|endpoint)[:=]\s*[''"]?(https://[^\s''"]+/slack/events?)[''"]?'
+    confidence: 72
+    severity: low
+    tags: [slack, events, api, url]
+    context_keywords: [events, slack, url]
+    
+  - id: slack-interactivity-url
+    name: Slack Interactivity Request URL
+    description: Interactive components endpoint
+    regex: '(?i)interactivity.{0,20}(url|endpoint)[:=]\s*[''"]?(https://[^\s''"]+/slack/interactive)[''"]?'
+    confidence: 70
+    severity: low
+    tags: [slack, interactivity, url]
+    context_keywords: [interactivity, slack, url]
+    
+  - id: slack-bolt-token
+    name: Slack Bolt Framework Token
+    description: Bolt SDK initialization token
+    regex: '(?i)new\s+(App|Bolt)\s*\(\s*\{[^\}]*token\s*:\s*[''"]?(xox[a-z]-[^\s''"]+)[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [slack, bolt, sdk, token]
+    
+  - id: slack-hubot-token
+    name: Slack Hubot Adapter Token
+    description: Hubot slack adapter token
+    regex: '(?i)HUBOT_SLACK_TOKEN\s*[:=]\s*[''"]?(xoxb-[^\s''"]+)[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [slack, hubot, adapter, token]
+    
+  - id: slack-botkit-token
+    name: Slack Botkit Token
+    description: Botkit framework token
+    regex: '(?i)SLACK_BOT_TOKEN\s*[:=]\s*[''"]?(xoxb-[^\s''"]+)[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [slack, botkit, framework, token]
+    
+  - id: slack-oauth-scope
+    name: Slack OAuth Scopes with Token
+    description: Token with scope definition
+    regex: 'scope\s*[:=]\s*[''"]?[^\s''"]*[''"]?\s*.*token\s*[:=]\s*[''"]?(xox[a-z]-[^\s''"]+)[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [slack, oauth, scope, token]
+    
+  - id: slack-enterprise-install
+    name: Slack Enterprise Install Token
+    description: Org-wide app installation token
+    regex: '(?i)enterprise.{0,10}install.{0,20}token[:=]\s*[''"]?(xoxb-[^\s''"]+)[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [slack, enterprise, install, token]
+    context_keywords: [enterprise, install, token]
+    
+  - id: slack-admin-api-token
+    name: Slack Admin API Token
+    description: Enterprise Grid admin token
+    regex: '(?i)admin.{0,10}api.{0,20}token[:=]\s*[''"]?(xoxp-[^\s''"]+)[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [slack, admin, api, enterprise, token]
+    context_keywords: [admin, api, token]
+    
+  - id: slack-dnd-token
+    name: Slack DND API Token
+    description: Do Not Disturb management token
+    regex: '(?i)dnd.{0,20}token[:=]\s*[''"]?(xoxp-[^\s''"]+)[''"]?'
+    confidence: 82
+    severity: high
+    tags: [slack, dnd, token]
+    context_keywords: [dnd, token]

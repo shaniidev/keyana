@@ -1,0 +1,414 @@
+# Stripe Payment Secret Detection Patterns
+# Author: github.com/shaniidev
+# Category: Payment Gateway
+# Total Patterns: 50
+
+name: Stripe Payment Credentials & Secrets
+version: 1.0
+author: github.com/shaniidev
+category: payment
+provider: Stripe
+severity: critical
+updated: 2026-01-02
+
+patterns:
+  - id: stripe-secret-key-live
+    name: Stripe Live Secret Key
+    description: Stripe production secret API key
+    regex: '\bsk_live_[0-9a-zA-Z]{24,}\b'
+    confidence: 99
+    severity: critical
+    tags: [stripe, payment, secret-key, live, credentials]
+    
+  - id: stripe-secret-key-test
+    name: Stripe Test Secret Key
+    description: Stripe test/sandbox secret API key
+    regex: '\bsk_test_[0-9a-zA-Z]{24,}\b'
+    confidence: 95
+    severity: high
+    tags: [stripe, payment, secret-key, test]
+    
+  - id: stripe-publishable-key-live
+    name: Stripe Live Publishable Key
+    description: Stripe production publishable key
+    regex: '\bpk_live_[0-9a-zA-Z]{24,}\b'
+    confidence: 92
+    severity: medium
+    tags: [stripe, payment, publishable-key, live]
+    
+  - id: stripe-publishable-key-test
+    name: Stripe Test Publishable Key
+    description: Stripe test publishable key
+    regex: '\bpk_test_[0-9a-zA-Z]{24,}\b'
+    confidence: 85
+    severity: low
+    tags: [stripe, payment, publishable-key, test]
+    
+  - id: stripe-restricted-key
+    name: Stripe Restricted API Key
+    description: Stripe restricted permissions key
+    regex: '\brk_live_[0-9a-zA-Z]{24,}\b'
+    confidence: 98
+    severity: critical
+    tags: [stripe, payment, restricted-key, credentials]
+    
+  - id: stripe-webhook-secret
+    name: Stripe Webhook Signing Secret
+    description: Webhook endpoint verification secret
+    regex: '\bwhsec_[0-9a-zA-Z]{32,}\b'
+    confidence: 98
+    severity: critical
+    tags: [stripe, payment, webhook, signing-secret]
+    
+  - id: stripe-connect-client-id
+    name: Stripe Connect Client ID
+    description: Connect platform client identifier
+    regex: '\bca_[0-9a-zA-Z]{24,}\b'
+    confidence: 90
+    severity: medium
+    tags: [stripe, connect, client-id, platform]
+    
+  - id: stripe-api-key-context
+    name: Stripe API Key (Context)
+    description: Stripe key with explicit context
+    regex: '(?i)stripe.{0,20}(api|secret).{0,20}key[:=]\s*[''"]?(sk_(live|test)_[0-9a-zA-Z]{24,})[''"]?'
+    confidence: 99
+    severity: critical
+    tags: [stripe, api-key, credentials]
+    context_keywords: [stripe, api, secret, key]
+    
+  - id: stripe-account-id
+    name: Stripe Account ID
+    description: Stripe connected account identifier
+    regex: '\bacct_[0-9a-zA-Z]{16,}\b'
+    confidence: 85
+    severity: low
+    tags: [stripe, account, identifier]
+    
+  - id: stripe-customer-id
+    name: Stripe Customer ID
+    description: Stripe customer identifier
+    regex: '\bcus_[0-9a-zA-Z]{14,}\b'
+    confidence: 75
+    severity: low
+    tags: [stripe, customer, identifier]
+    
+  - id: stripe-payment-intent-id
+    name: Stripe Payment Intent ID
+    description: Payment intent identifier
+    regex: '\bpi_[0-9a-zA-Z]{24,}\b'
+    confidence: 72
+    severity: low
+    tags: [stripe, payment-intent, identifier]
+    
+  - id: stripe-setup-intent-id
+    name: Stripe Setup Intent ID
+    description: Setup intent identifier
+    regex: '\bseti_[0-9a-zA-Z]{24,}\b'
+    confidence: 72
+    severity: low
+    tags: [stripe, setup-intent, identifier]
+    
+  - id: stripe-subscription-id
+    name: Stripe Subscription ID
+    description: Subscription identifier
+    regex: '\bsub_[0-9a-zA-Z]{14,}\b'
+    confidence: 75
+    severity: low
+    tags: [stripe, subscription, billing, identifier]
+    
+  - id: stripe-invoice-id
+    name: Stripe Invoice ID
+    description: Invoice identifier
+    regex: '\bin_[0-9a-zA-Z]{14,}\b'
+    confidence: 72
+    severity: low
+    tags: [stripe, invoice, billing, identifier]
+    
+  - id: stripe-charge-id
+    name: Stripe Charge ID
+    description: Charge identifier
+    regex: '\bch_[0-9a-zA-Z]{14,}\b'
+    confidence: 72
+    severity: low
+    tags: [stripe, charge, identifier]
+    
+  - id: stripe-refund-id
+    name: Stripe Refund ID
+    description: Refund identifier
+    regex: '\bre_[0-9a-zA-Z]{14,}\b'
+    confidence: 72
+    severity: low
+    tags: [stripe, refund, identifier]
+    
+  - id: stripe-payout-id
+    name: Stripe Payout ID
+    description: Payout to connected account identifier
+    regex: '\bpo_[0-9a-zA-Z]{14,}\b'
+    confidence: 72
+    severity: low
+    tags: [stripe, payout, identifier]
+    
+  - id: stripe-product-id
+    name: Stripe Product ID
+    description: Product identifier
+    regex: '\bprod_[0-9a-zA-Z]{14,}\b'
+    confidence: 70
+    severity: low
+    tags: [stripe, product, identifier]
+    
+  - id: stripe-price-id
+    name: Stripe Price ID
+    description: Price/plan identifier
+    regex: '\bprice_[0-9a-zA-Z]{14,}\b'
+    confidence: 70
+    severity: low
+    tags: [stripe, price, plan, identifier]
+    
+  - id: stripe-coupon-id
+    name: Stripe Coupon ID
+    description: Discount coupon identifier
+    regex: '(?i)stripe.{0,20}coupon[:=]\s*[''"]?([0-9a-zA-Z_\-]{3,50})[''"]?'
+    confidence: 65
+    severity: low
+    tags: [stripe, coupon, discount, identifier]
+    
+  - id: stripe-payment-method-id
+    name: Stripe Payment Method ID
+    description: Payment method identifier
+    regex: '\bpm_[0-9a-zA-Z]{24,}\b'
+    confidence: 75
+    severity: low
+    tags: [stripe, payment-method, identifier]
+    
+  - id: stripe-source-id
+    name: Stripe Source ID
+    description: Legacy source identifier
+    regex: '\bsrc_[0-9a-zA-Z]{24,}\b'
+    confidence: 72
+    severity: low
+    tags: [stripe, source, legacy, identifier]
+    
+  - id: stripe-bank-account-id
+    name: Stripe Bank Account ID
+    description: Bank account identifier
+    regex: '\bba_[0-9a-zA-Z]{14,}\b'
+    confidence: 78
+    severity: medium
+    tags: [stripe, bank-account, identifier]
+    
+  - id: stripe-card-id
+    name: Stripe Card ID
+    description: Card identifier
+    regex: '\bcard_[0-9a-zA-Z]{14,}\b'
+    confidence: 75
+    severity: low
+    tags: [stripe, card, identifier]
+    
+  - id: stripe-terminal-reader-id
+    name: Stripe Terminal Reader ID
+    description: Terminal hardware identifier
+    regex: '\btmr_[0-9a-zA-Z]{24,}\b'
+    confidence: 78
+    severity: low
+    tags: [stripe, terminal, reader, identifier]
+    
+  - id: stripe-connect-transfer-id
+    name: Stripe Transfer ID
+    description: Connect platform transfer identifier
+    regex: '\btr_[0-9a-zA-Z]{14,}\b'
+    confidence: 72
+    severity: low
+    tags: [stripe, connect, transfer, identifier]
+    
+  - id: stripe-file-id
+    name: Stripe File Upload ID
+    description: Uploaded file identifier
+    regex: '\bfile_[0-9a-zA-Z]{14,}\b'
+    confidence: 70
+    severity: low
+    tags: [stripe, file, identifier]
+    
+  - id: stripe-event-id
+    name: Stripe Event ID
+    description: Webhook event identifier
+    regex: '\bevt_[0-9a-zA-Z]{14,}\b'
+    confidence: 70
+    severity: low
+    tags: [stripe, event, webhook, identifier]
+    
+  - id: stripe-balance-transaction-id
+    name: Stripe Balance Transaction ID
+    description: Balance transaction identifier
+    regex: '\btxn_[0-9a-zA-Z]{14,}\b'
+    confidence: 72
+    severity: low
+    tags: [stripe, balance, transaction, identifier]
+    
+  - id: stripe-dispute-id
+    name: Stripe Dispute ID
+    description: Chargeback dispute identifier
+    regex: '\bdp_[0-9a-zA-Z]{14,}\b'
+    confidence: 75
+    severity: medium
+    tags: [stripe, dispute, chargeback, identifier]
+    
+  - id: stripe-session-id
+    name: Stripe Checkout Session ID
+    description: Checkout session identifier
+    regex: '\bcs_(live|test)_[0-9a-zA-Z]{24,}\b'
+    confidence: 85
+    severity: medium
+    tags: [stripe, checkout, session, identifier]
+    
+  - id: stripe-tax-id
+    name: Stripe Tax ID
+    description: Customer tax identifier
+    regex: '\btxi_[0-9a-zA-Z]{14,}\b'
+    confidence: 72
+    severity: low
+    tags: [stripe, tax, identifier]
+    
+  - id: stripe-payment-link-id
+    name: Stripe Payment Link ID
+    description: Payment link identifier
+    regex: '\bplink_[0-9a-zA-Z]{14,}\b'
+    confidence: 78
+    severity: medium
+    tags: [stripe, payment-link, identifier]
+    
+  - id: stripe-quote-id
+    name: Stripe Quote ID
+    description: Quote/estimate identifier
+    regex: '\bqt_[0-9a-zA-Z]{14,}\b'
+    confidence: 70
+    severity: low
+    tags: [stripe, quote, identifier]
+    
+  - id: stripe-issuing-card-id
+    name: Stripe Issuing Card ID
+    description: Issued virtual/physical card
+    regex: '\bic_[0-9a-zA-Z]{14,}\b'
+    confidence: 82
+    severity: medium
+    tags: [stripe, issuing, card, identifier]
+    
+  - id: stripe-issuing-cardholder-id
+    name: Stripe Issuing Cardholder ID
+    description: Cardholder identifier
+    regex: '\bich_[0-9a-zA-Z]{14,}\b'
+    confidence: 78
+    severity: low
+    tags: [stripe, issuing, cardholder, identifier]
+    
+  - id: stripe-radar-block-id
+    name: Stripe Radar Block ID
+    description: Fraud prevention block identifier
+    regex: '\bibl_[0-9a-zA-Z]{14,}\b'
+    confidence: 75
+    severity: low
+    tags: [stripe, radar, fraud, identifier]
+    
+  - id: stripe-identity-verification-id
+    name: Stripe Identity Verification Session ID
+    description: Identity verification session
+    regex: '\bvs_[0-9a-zA-Z]{14,}\b'
+    confidence: 78
+    severity: medium
+    tags: [stripe, identity, verification, identifier]
+    
+  - id: stripe-financial-connections-id
+    name: Stripe Financial Connections Session ID
+    description: Bank connection session
+    regex: '\bfcsess_[0-9a-zA-Z]{14,}\b'
+    confidence: 78
+    severity: medium
+    tags: [stripe, financial-connections, banking, identifier]
+    
+  - id: stripe-climate-order-id
+    name: Stripe Climate Order ID
+    description: Climate/carbon offset order
+    regex: '\bcmor_[0-9a-zA-Z]{14,}\b'
+    confidence: 70
+    severity: low
+    tags: [stripe, climate, carbon, identifier]
+    
+  - id: stripe-reporting-run-id
+    name: Stripe Reporting Run ID
+    description: Financial report run identifier
+    regex: '\bfrr_[0-9a-zA-Z]{14,}\b'
+    confidence: 72
+    severity: low
+    tags: [stripe, reporting, identifier]
+    
+  - id: stripe-sigma-query
+    name: Stripe Sigma Scheduled Query ID
+    description: Sigma SQL query identifier
+    regex: '\bsqr_[0-9a-zA-Z]{14,}\b'
+    confidence: 75
+    severity: low
+    tags: [stripe, sigma, query, identifier]
+    
+  - id: stripe-tax-rate-id
+    name: Stripe Tax Rate ID
+    description: Tax rate configuration identifier
+    regex: '\btxr_[0-9a-zA-Z]{14,}\b'
+    confidence: 70
+    severity: low
+    tags: [stripe, tax-rate, identifier]
+    
+  - id: stripe-billing-portal-config
+    name: Stripe Billing Portal Config ID
+    description: Customer portal configuration
+    regex: '\bbpc_[0-9a-zA-Z]{14,}\b'
+    confidence: 72
+    severity: low
+    tags: [stripe, billing-portal, configuration, identifier]
+    
+  - id: stripe-promotion-code-id
+    name: Stripe Promotion Code ID
+    description: Promotion/discount code identifier
+    regex: '\bpromo_[0-9a-zA-Z]{14,}\b'
+    confidence: 72
+    severity: low
+    tags: [stripe, promotion, discount, identifier]
+    
+  - id: stripe-test-clock-id
+    name: Stripe Test Clock ID
+    description: Billing test clock identifier
+    regex: '\bclock_[0-9a-zA-Z]{14,}\b'
+    confidence: 68
+    severity: low
+    tags: [stripe, test-clock, testing, identifier]
+    
+  - id: stripe-terminal-location-id
+    name: Stripe Terminal Location ID
+    description: Terminal hardware location
+    regex: '\btml_[0-9a-zA-Z]{14,}\b'
+    confidence: 70
+    severity: low
+    tags: [stripe, terminal, location, identifier]
+    
+  - id: stripe-treasury-financial-account
+    name: Stripe Treasury Financial Account ID
+    description: Treasury account identifier
+    regex: '\bfa_[0-9a-zA-Z]{14,}\b'
+    confidence: 80
+    severity: medium
+    tags: [stripe, treasury, financial-account, identifier]
+    
+  - id: stripe-webhook-endpoint-id
+    name: Stripe Webhook Endpoint ID
+    description: Webhook configuration identifier
+    regex: '\bwe_[0-9a-zA-Z]{14,}\b'
+    confidence: 75
+    severity: low
+    tags: [stripe, webhook, endpoint, identifier]
+    
+  - id: stripe-entitlement-id
+    name: Stripe Entitlement Feature ID
+    description: Product entitlement feature
+    regex: '\bfeat_[0-9a-zA-Z]{14,}\b'
+    confidence: 68
+    severity: low
+    tags: [stripe, entitlement, feature, identifier]

@@ -1,0 +1,55 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/keyana
+keyana-linux
+keyana-darwin
+keyana-windows.exe
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Output directories
+keyana_output/
+output/
+results/
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/
+.cache/
+
+# Build artifacts
+dist/
+build/
+bin/
+
+# Environment files
+.env
+.env.local

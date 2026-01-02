@@ -1,0 +1,427 @@
+# Auth0 & OAuth Providers Secret Detection Patterns
+# Author: github.com/shaniidev
+# Category: Authentication
+# Total Patterns: 50
+
+name: Auth0 & OAuth Credentials & Secrets
+version: 1.0
+author: github.com/shaniidev
+category: auth
+provider: Auth0 and OAuth
+severity: critical
+updated: 2026-01-02
+
+patterns:
+  # Auth0 Patterns
+  - id: auth0-domain
+    name: Auth0 Domain
+    description: Auth0 tenant domain
+    regex: '(?i)auth0.{0,20}domain[:=]\s*[''"]?([a-z0-9\-]+\.(us|eu|au|jp|uk)?\.?auth0\.com)[''"]?'
+    confidence: 85
+    severity: medium
+    tags: [auth0, domain, tenant]
+    context_keywords: [auth0, domain]
+    
+  - id: auth0-client-id
+    name: Auth0 Client ID
+    description: Auth0 application client ID
+    regex: '(?i)auth0.{0,20}client.{0,20}id[:=]\s*[''"]?([a-zA-Z0-9]{32})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [auth0, client-id, oauth]
+    context_keywords: [auth0, client, id]
+    
+  - id: auth0-client-secret
+    name: Auth0 Client Secret
+    description: Auth0 application client secret
+    regex: '(?i)auth0.{0,20}client.{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9_\-]{64,})[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [auth0, client-secret, credentials]
+    context_keywords: [auth0, client, secret]
+    entropy_check: true
+    min_entropy: 4.5
+    
+  - id: auth0-api-token
+    name: Auth0 Management API Token
+    description: Management API access token
+    regex: '(?i)auth0.{0,20}(management|api).{0,20}token[:=]\s*[''"]?(eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [auth0, management-api, token]
+    context_keywords: [auth0, management, api, token]
+    
+  - id: auth0-api-v2-token
+    name: Auth0 Management API v2 Key
+    description: Machine-to-machine API token
+    regex: '(?i)AUTH0.{0,10}(M2M|MACHINE).{0,20}TOKEN[:=]\s*[''"]?([^\s''"]{100,})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [auth0, m2m, api, token]
+    context_keywords: [auth0, m2m, machine, token]
+    
+  - id: auth0-audience
+    name: Auth0 API Audience/Identifier
+    description: API audience URL
+    regex: '(?i)auth0.{0,20}audience[:=]\s*[''"]?(https?://[^\s''"]+)[''"]?'
+    confidence: 75
+    severity: low
+    tags: [auth0, audience, api]
+    context_keywords: [auth0, audience]
+    
+  - id: auth0-connection
+    name: Auth0 Connection Name
+    description: Social/database connection
+    regex: '(?i)auth0.{0,20}connection[:=]\s*[''"]?([a-zA-Z0-9\-_]+)[''"]?'
+    confidence: 70
+    severity: low
+    tags: [auth0, connection]
+    context_keywords: [auth0, connection]
+    
+  - id: auth0-refresh-token
+    name: Auth0 Refresh Token
+    description: OAuth refresh token
+    regex: '(?i)auth0.{0,20}refresh.{0,20}token[:=]\s*[''"]?([a-zA-Z0-9_-]{50,})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [auth0, refresh-token, oauth]
+    context_keywords: [auth0, refresh, token]
+    
+  # Okta Patterns
+  - id: okta-api-token
+    name: Okta API Token
+    description: Okta org API token
+    regex: '(?i)okta.{0,20}(api)?token[:=]\s*[''"]?(00[a-zA-Z0-9_-]{40})[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [okta, api-token, credentials]
+    context_keywords: [okta, token]
+    
+  - id: okta-client-id
+    name: Okta Client ID
+    description: OAuth application client ID
+    regex: '(?i)okta.{0,20}client.{0,20}id[:=]\s*[''"]?([a-zA-Z0-9]{20})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [okta, client-id, oauth]
+    context_keywords: [okta, client, id]
+    
+  - id: okta-client-secret
+    name: Okta Client Secret
+    description: OAuth application secret
+    regex: '(?i)okta.{0,20}client.{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9_-]{40,})[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [okta, client-secret, credentials]
+    context_keywords: [okta, client, secret]
+    
+  - id: okta-org-url
+    name: Okta Organization URL
+    description: Okta tenant URL
+    regex: 'https://[a-z0-9\-]+\.(okta|oktapreview|okta-emea)\.com'
+    confidence: 82
+    severity: low
+    tags: [okta, org, url, tenant]
+    
+  - id: okta-issuer
+    name: Okta Issuer URL
+    description: OIDC issuer endpoint
+    regex: 'https://[a-z0-9\-]+\.okta\.com/oauth2/(default|[a-z0-9]+)'
+    confidence: 80
+    severity: medium
+    tags: [okta, issuer, oidc, oauth]
+    
+  # AWS Cognito Patterns  
+  - id: cognito-user-pool-id
+    name: AWS Cognito User Pool ID
+    description: User pool identifier
+    regex: '[a-z]{2}-[a-z]+-\d{1,2}_[A-Za-z0-9]+'
+    confidence: 82
+    severity: medium
+    tags: [aws, cognito, user-pool]
+    
+  - id: cognito-app-client-id
+    name: Cognito App Client ID
+    description: Application client identifier
+    regex: '(?i)cognito.{0,20}(app|client).{0,20}id[:=]\s*[''"]?([a-z0-9]{26})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [aws, cognito, client-id]
+    context_keywords: [cognito, app, client, id]
+    
+  - id: cognito-app-client-secret
+    name: Cognito App Client Secret
+    description: Application client secret
+    regex: '(?i)cognito.{0,20}(app|client).{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9+/=]{52})[''"]?'
+    confidence: 95
+    severity: critical
+    tags: [aws, cognito, client-secret, credentials]
+    context_keywords: [cognito, app, client, secret]
+    
+  - id: cognito-identity-pool-id
+    name: Cognito Identity Pool ID
+    description: Identity pool identifier
+    regex: '[a-z]{2}-[a-z]+-\d{1,2}:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
+    confidence: 85
+    severity: medium
+    tags: [aws, cognito, identity-pool]
+    
+  # Firebase Auth Patterns
+  - id: firebase-auth-api-key
+    name: Firebase Auth API Key
+    description: Firebase authentication API key
+    regex: '(?i)firebase.{0,20}(auth|api).{0,20}key[:=]\s*[''"]?(AIza[0-9A-Za-z\-_]{35})[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [firebase, auth, api-key]
+    context_keywords: [firebase, auth, api, key]
+    
+  - id: firebase-auth-domain
+    name: Firebase Auth Domain
+    description: Firebase project auth domain
+    regex: '(?i)auth.{0,5}domain[:=]\s*[''"]?([a-z0-9\-]+\.firebaseapp\.com)[''"]?'
+    confidence: 78
+    severity: low
+    tags: [firebase, auth, domain]
+    context_keywords: [auth, domain, firebase]
+    
+  - id: firebase-service-account
+    name: Firebase Admin SDK Service Account
+    description: Firebase Admin service account JSON
+    regex: '"project_id"\s*:\s*"[^"]+"\s*,\s*"private_key_id"\s*:\s*"[a-f0-9]{40}"'
+    confidence: 92
+    severity: critical
+    tags: [firebase, admin, service-account]
+    
+  # Clerk Patterns
+  - id: clerk-secret-key
+    name: Clerk Secret Key
+    description: Clerk authentication secret
+    regex: '\bsk_live_[a-zA-Z0-9]{40,}\b'
+    confidence: 96
+    severity: critical
+    tags: [clerk, secret-key, auth]
+    
+  - id: clerk-publishable-key
+    name: Clerk Publishable Key
+    description: Clerk frontend publishable key
+    regex: '\bpk_live_[a-zA-Z0-9]{40,}\b'
+    confidence: 88
+    severity: medium
+    tags: [clerk, publishable-key, auth]
+    
+  - id: clerk-test-secret
+    name: Clerk Test Secret Key
+    description: Clerk test environment secret
+    regex: '\bsk_test_[a-zA-Z0-9]{40,}\b'
+    confidence: 90
+    severity: high
+    tags: [clerk, test, secret-key]
+    
+  # Supabase Auth Patterns
+  - id: supabase-anon-key
+    name: Supabase Anon/Public Key
+    description: Supabase anonymous access key
+    regex: '(?i)supabase.{0,20}(anon|public).{0,20}key[:=]\s*[''"]?(eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)[''"]?'
+    confidence: 88
+    severity: medium
+    tags: [supabase, anon-key, public]
+    context_keywords: [supabase, anon, public, key]
+    
+  - id: supabase-service-role-key
+    name: Supabase Service Role Key
+    description: Supabase admin service key
+    regex: '(?i)supabase.{0,20}service.{0,20}(role)?key[:=]\s*[''"]?(eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)[''"]?'
+    confidence: 98
+    severity: critical
+    tags: [supabase, service-role, admin, credentials]
+    context_keywords: [supabase, service, role, key]
+    
+  - id: supabase-jwt-secret
+    name: Supabase JWT Secret
+    description: JWT signing secret
+    regex: '(?i)supabase.{0,20}jwt.{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9_\-]{32,})[''"]?'
+    confidence: 95
+    severity: critical
+    tags: [supabase, jwt, secret]
+    context_keywords: [supabase, jwt, secret]
+    
+  # Keycloak Patterns
+  - id: keycloak-admin-password
+    name: Keycloak Admin Password
+    description: Keycloak admin credentials
+    regex: '(?i)keycloak.{0,20}admin.{0,20}password[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [keycloak, admin, password, credentials]
+    context_keywords: [keycloak, admin, password]
+    
+  - id: keycloak-client-secret
+    name: Keycloak Client Secret
+    description: OIDC client secret
+    regex: '(?i)keycloak.{0,20}client.{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9\-]{32,})[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [keycloak, client-secret, oidc]
+    context_keywords: [keycloak, client, secret]
+    
+  - id: keycloak-realm-rsa-private
+    name: Keycloak Realm RSA Key
+    description: Realm signing private key
+    regex: '(?i)keycloak.{0,20}(realm|rsa).{0,20}(private)?key[:=]\s*[''"]?(-----BEGIN[^-]+KEY-----[\s\S]+-----END[^-]+KEY-----)[''"]?'
+    confidence: 95
+    severity: critical
+    tags: [keycloak, realm, rsa, private-key]
+    
+  # FusionAuth Patterns
+  - id: fusionauth-api-key
+    name: FusionAuth API Key
+    description: FusionAuth server API key
+    regex: '(?i)fusionauth.{0,20}api.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9_\-]{64,})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [fusionauth, api-key]
+    context_keywords: [fusionauth, api, key]
+    
+  - id: fusionauth-client-secret
+    name: FusionAuth Client Secret
+    description: OAuth client secret
+    regex: '(?i)fusionauth.{0,20}client.{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9_\-]{64,})[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [fusionauth, client-secret]
+    context_keywords: [fusionauth, client, secret]
+    
+  # Generic OAuth/OIDC Patterns
+  - id: oauth-client-secret
+    name: Generic OAuth Client Secret
+    description: OAuth 2.0 client secret
+    regex: '(?i)oauth.{0,20}client.{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9_\-]{32,})[''"]?'
+    confidence: 85
+    severity: critical
+    tags: [oauth, client-secret, generic]
+    context_keywords: [oauth, client, secret]
+    entropy_check: true
+    min_entropy: 4.0
+    
+  - id: oidc-client-secret
+    name: OIDC Client Secret
+    description: OpenID Connect client secret
+    regex: '(?i)oidc.{0,20}client.{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9_\-]{32,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [oidc, openid, client-secret]
+    context_keywords: [oidc, openid, client, secret]
+    
+  - id: oauth-access-token
+    name: Generic OAuth Access Token
+    description: Bearer access token
+    regex: '(?i)(access|bearer).{0,10}token[:=]\s*[''"]?([a-zA-Z0-9_\-]{50,})[''"]?'
+    confidence: 78
+    severity: high
+    tags: [oauth, access-token, bearer]
+    context_keywords: [access, bearer, token]
+    
+  - id: oauth-refresh-token
+    name: Generic OAuth Refresh Token
+    description: OAuth refresh token
+    regex: '(?i)refresh.{0,20}token[:=]\s*[''"]?([a-zA-Z0-9_\-/+=]{50,})[''"]?'
+    confidence: 82
+    severity: critical
+    tags: [oauth, refresh-token]
+    context_keywords: [refresh, token]
+    
+  # SAML Patterns
+  - id: saml-private-key
+    name: SAML Signing Private Key
+    description: SAML assertion signing key
+    regex: '(?i)saml.{0,20}(signing|private).{0,20}key[:=]\s*[''"]?(-----BEGIN[^-]+KEY-----[\s\S]+-----END[^-]+KEY-----)[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [saml, signing, private-key]
+    context_keywords: [saml, signing, private, key]
+    
+  - id: saml-encryption-key
+    name: SAML Encryption Key
+    description: SAML assertion encryption key
+    regex: '(?i)saml.{0,20}encryption.{0,20}key[:=]\s*[''"]?(-----BEGIN[^-]+KEY-----[\s\S]+-----END[^-]+KEY-----)[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [saml, encryption, private-key]
+    context_keywords: [saml, encryption, key]
+    
+  # Session Secrets
+  - id: session-secret
+    name: Session Secret Key
+    description: HTTP session signing secret
+    regex: '(?i)session.{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9_\-+=/.]{32,})[''"]?'
+    confidence: 85
+    severity: critical
+    tags: [session, secret, signing]
+    context_keywords: [session, secret]
+    entropy_check: true
+    min_entropy: 4.0
+    
+  - id: cookie-secret
+    name: Cookie Signing Secret
+    description: Secure cookie signing key
+    regex: '(?i)cookie.{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9_\-+=/.]{32,})[''"]?'
+    confidence: 85
+    severity: critical
+    tags: [cookie, secret, signing]
+    context_keywords: [cookie, secret]
+    
+  - id: csrf-secret
+    name: CSRF Secret Token
+    description: Cross-site request forgery secret
+    regex: '(?i)csrf.{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9_\-+=/.]{32,})[''"]?'
+    confidence: 82
+    severity: high
+    tags: [csrf, secret, security]
+    context_keywords: [csrf, secret]
+    
+  # Passport.js Patterns
+  - id: passport-facebook-secret
+    name: Passport.js Facebook Secret
+    description: Facebook OAuth integration
+    regex: '(?i)(facebook|fb).{0,20}(app|client).{0,20}secret[:=]\s*[''"]?([a-f0-9]{32})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [passport, facebook, oauth, secret]
+    context_keywords: [facebook, fb, secret]
+    
+  - id: passport-google-secret
+    name: Passport.js Google Secret
+    description: Google OAuth integration
+    regex: '(?i)google.{0,20}client.{0,20}secret[:=]\s*[''"]?(GOCSPX-[a-zA-Z0-9_-]{28})[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [passport, google, oauth, secret]
+    context_keywords: [google, client, secret]
+    
+  - id: passport-twitter-secret
+    name: Passport.js Twitter/X Secret
+    description: Twitter/X OAuth integration
+    regex: '(?i)(twitter|x).{0,20}(consumer|api).{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9]{50})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [passport, twitter, x, oauth, secret]
+    context_keywords: [twitter, consumer, api, secret]
+    
+  - id: passport-linkedin-secret
+    name: Passport.js LinkedIn Secret
+    description: LinkedIn OAuth integration
+    regex: '(?i)linkedin.{0,20}client.{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9]{16})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [passport, linkedin, oauth, secret]
+    context_keywords: [linkedin, client, secret]
+    
+  - id: passport-github-secret
+    name: Passport.js GitHub Secret
+    description: GitHub OAuth integration
+    regex: '(?i)github.{0,20}client.{0,20}secret[:=]\s*[''"]?([a-f0-9]{40})[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [passport, github, oauth, secret]
+    context_keywords: [github, client, secret]

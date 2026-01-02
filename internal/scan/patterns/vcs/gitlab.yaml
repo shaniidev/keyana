@@ -1,0 +1,399 @@
+# GitLab Secret Detection Patterns
+# Author: github.com/shaniidev
+# Category: Version Control
+# Total Patterns: 50
+
+name: GitLab Credentials & Secrets
+version: 1.0
+author: github.com/shaniidev
+category: vcs
+provider: GitLab
+severity: critical
+updated: 2026-01-02
+
+patterns:
+  - id: gitlab-personal-access-token
+    name: GitLab Personal Access Token
+    description: GitLab PAT for API access
+    regex: '\bglpat-[a-zA-Z0-9_-]{20}\b'
+    confidence: 99
+    severity: critical
+    tags: [gitlab, pat, personal-access-token, credentials]
+    
+  - id: gitlab-personal-access-token-v2
+    name: GitLab Personal Access Token v2
+    description: Newer format PAT
+    regex: '\bglpat-[a-zA-Z0-9]{20,}\b'
+    confidence: 98
+    severity: critical
+    tags: [gitlab, pat, credentials]
+    
+  - id: gitlab-pipeline-trigger-token
+    name: GitLab Pipeline Trigger Token
+    description: CI/CD pipeline trigger token
+    regex: '\bglptt-[a-zA-Z0-9_-]{40}\b'
+    confidence: 96
+    severity: critical
+    tags: [gitlab, pipeline, trigger, token]
+    
+  - id: gitlab-runner-registration-token
+    name: GitLab Runner Registration Token
+    description: Runner registration token
+    regex: '\bGR1348941[a-zA-Z0-9_-]{20}\b'
+    confidence: 94
+    severity: critical
+    tags: [gitlab, runner, registration, token]
+    
+  - id: gitlab-runner-token
+    name: GitLab Runner Authentication Token
+    description: Existing runner auth token
+    regex: '\bglrt-[a-zA-Z0-9_-]{20}\b'
+    confidence: 95
+    severity: critical
+    tags: [gitlab, runner, auth, token]
+    
+  - id: gitlab-oauth-app-secret
+    name: GitLab OAuth Application Secret
+    description: OAuth app secret
+    regex: '(?i)gitlab.{0,20}(oauth|app).{0,20}secret[:=]\s*[''"]?([a-f0-9]{64})[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [gitlab, oauth, app-secret]
+    context_keywords: [gitlab, oauth, app, secret]
+    
+  - id: gitlab-deploy-token
+    name: GitLab Deploy Token
+    description: Repository deploy token
+    regex: '\bgldt-[a-zA-Z0-9_-]{20}\b'
+    confidence: 96
+    severity: high
+    tags: [gitlab, deploy, token]
+    
+  - id: gitlab-feed-token
+    name: GitLab Feed Token
+    description: RSS/Atom feed access token
+    regex: '\bglft-[a-zA-Z0-9_-]{20}\b'
+    confidence: 85
+    severity: medium
+    tags: [gitlab, feed, token]
+    
+  - id: gitlab-incoming-email-token
+    name: GitLab Incoming Email Token
+    description: Email-based issue creation
+    regex: '\bglimt-[a-zA-Z0-9_-]{25}\b'
+    confidence: 82
+    severity: medium
+    tags: [gitlab, email, token]
+    
+  - id: gitlab-agent-token
+    name: GitLab Agent Token
+    description: Kubernetes agent token
+    regex: '\bglagent-[a-zA-Z0-9_-]{50}\b'
+    confidence: 92
+    severity: high
+    tags: [gitlab, agent, kubernetes, token]
+    
+  - id: gitlab-scim-token
+    name: GitLab SCIM Token
+    description: SCIM provisioning token
+    regex: '\bglsoat-[a-zA-Z0-9_-]{20}\b'
+    confidence: 90
+    severity: critical
+    tags: [gitlab, scim, provisioning, token]
+    
+  - id: gitlab-project-access-token
+    name: GitLab Project Access Token
+    description: Project-scoped access token
+    regex: '\bglpat-[a-zA-Z0-9]{20}$'
+    confidence: 94
+    severity: critical
+    tags: [gitlab, project, access-token]
+    
+  - id: gitlab-group-access-token  
+    name: GitLab Group Access Token
+    description: Group-scoped access token
+    regex: '(?i)group.{0,20}(access)?token[:=]\s*[''"]?(glpat-[a-zA-Z0-9_-]{20})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [gitlab, group, access-token]
+    context_keywords: [group, access, token]
+    
+  - id: gitlab-api-key
+    name: GitLab API Key
+    description: Generic API key reference
+    regex: '(?i)gitlab.{0,20}api.{0,20}key[:=]\s*[''"]?(glpat-[a-zA-Z0-9_-]+)[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [gitlab, api, key]
+    context_keywords: [gitlab, api, key]
+    
+  - id: gitlab-private-token
+    name: GitLab Private Token (Header)
+    description: Private token in HTTP header
+    regex: 'PRIVATE-TOKEN:\s*(glpat-[a-zA-Z0-9_-]+)'
+    confidence: 98
+    severity: critical
+    tags: [gitlab, private-token, header]
+    
+  - id: gitlab-job-token
+    name: GitLab CI Job Token
+    description: CI/CD job execution token
+    regex: '\bCI_JOB_TOKEN[:=]\s*[''"]?([a-zA-Z0-9_-]{64})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [gitlab, ci, job-token]
+    
+  - id: gitlab-registry-password
+    name: GitLab Container Registry Password
+    description: Docker registry credentials
+    regex: '(?i)gitlab.{0,20}registry.{0,20}password[:=]\s*[''"]?([^\s''"]{20,})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [gitlab, registry, docker, password]
+    context_keywords: [gitlab, registry, password]
+    
+  - id: gitlab-webhook-secret
+    name: GitLab Webhook Secret
+    description: Webhook verification token
+    regex: '(?i)gitlab.{0,20}webhook.{0,20}(secret|token)[:=]\s*[''"]?([a-zA-Z0-9_-]{20,})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [gitlab, webhook, secret]
+    context_keywords: [gitlab, webhook, secret, token]
+    
+  - id: gitlab-clone-url-with-token
+    name: GitLab Clone URL with Token
+    description: HTTPS clone with embedded token
+    regex: 'https://[^:]+:([a-zA-Z0-9_-]+)@gitlab\.(com|[a-z]+)/[^\s]+'
+    confidence: 95
+    severity: critical
+    tags: [gitlab, clone, url, token, credentials]
+    
+  - id: gitlab-api-with-token
+    name: GitLab API with Private Token
+    description: API call with token in URL
+    regex: 'https://gitlab\.[^\s]+\?private_token=([a-zA-Z0-9_-]+)'
+    confidence: 96
+    severity: critical
+    tags: [gitlab, api, url, token]
+    
+  - id: gitlab-project-id
+    name: GitLab Project ID
+    description: Numeric project identifier
+    regex: '(?i)gitlab.{0,20}project.{0,20}id[:=]\s*[''"]?(\d{5,10})[''"]?'
+    confidence: 70
+    severity: low
+    tags: [gitlab, project, identifier]
+    context_keywords: [gitlab, project, id]
+    
+  - id: gitlab-group-id
+    name: GitLab Group ID
+    description: Numeric group identifier
+    regex: '(?i)gitlab.{0,20}group.{0,20}id[:=]\s*[''"]?(\d{5,10})[''"]?'
+    confidence: 68
+    severity: low
+    tags: [gitlab, group, identifier]
+    context_keywords: [gitlab, group, id]
+    
+  - id: gitlab-user-id
+    name: GitLab User ID
+    description: Numeric user identifier
+    regex: '(?i)gitlab.{0,20}user.{0,20}id[:=]\s*[''"]?(\d{5,10})[''"]?'
+    confidence: 65
+    severity: low
+    tags: [gitlab, user, identifier]
+    context_keywords: [gitlab, user, id]
+    
+  - id: gitlab-ci-variable
+    name: GitLab CI Variable (Masked)
+    description: Masked CI/CD variable reference
+    regex: '\$\{?(CI_[A-Z_]+|[A-Z_]+_TOKEN|[A-Z_]+_KEY)\}?'
+    confidence: 65
+    severity: medium
+    tags: [gitlab, ci, variable]
+    
+  - id: gitlab-package-registry
+    name: GitLab Package Registry Token
+    description: Package registry auth
+    regex: '(?i)(npm|maven|pypi).{0,20}gitlab.{0,20}(token|password)[:=]\s*[''"]?([^\s''"]{20,})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [gitlab, package, registry, token]
+    context_keywords: [gitlab, package, registry]
+    
+  - id: gitlab-terraform-state
+    name: GitLab Terraform State Token
+    description: Terraform state backend token
+    regex: '(?i)gitlab.{0,20}terraform.{0,20}token[:=]\s*[''"]?(glpat-[a-zA-Z0-9_-]+)[''"]?'
+    confidence: 90
+    severity: high
+    tags: [gitlab, terraform, state, token]
+    context_keywords: [gitlab, terraform, token]
+    
+  - id: gitlab-merge-request-token
+    name: GitLab Merge Request Approval Token
+    description: MR approval system token
+    regex: '(?i)merge.{0,10}request.{0,20}token[:=]\s*[''"]?([a-zA-Z0-9_-]{20,})[''"]?'
+    confidence: 75
+    severity: medium
+    tags: [gitlab, merge-request, approval, token]
+    context_keywords: [merge, request, token]
+    
+  - id: gitlab-snippet-token
+    name: GitLab Snippet Access Token
+    description: Snippet repository token
+    regex: '(?i)snippet.{0,20}token[:=]\s*[''"]?([a-zA-Z0-9_-]{20,})[''"]?'
+    confidence: 72
+    severity: medium
+    tags: [gitlab, snippet, token]
+    context_keywords: [snippet, token]
+    
+  - id: gitlab-wiki-token
+    name: GitLab Wiki Access Token
+    description: Wiki repository token
+    regex: '(?i)wiki.{0,20}(access)?token[:=]\s*[''"]?([a-zA-Z0-9_-]{20,})[''"]?'
+    confidence: 70
+    severity: medium
+    tags: [gitlab, wiki, token]
+    context_keywords: [wiki, token]
+    
+  - id: gitlab-self-managed-url
+    name: GitLab Self-Managed URL with Token
+    description: Self-hosted GitLab with token
+    regex: 'https://[a-z0-9\-]+\.[a-z]+/[^\s]*\.git#token=([a-zA-Z0-9_-]+)'
+    confidence: 88
+    severity: critical
+    tags: [gitlab, self-managed, url, token]
+    
+  - id: gitlab-registry-url
+    name: GitLab Container Registry URL
+    description: Registry image URL
+    regex: 'registry\.gitlab\.com/[a-zA-Z0-9\-_]+/[a-zA-Z0-9\-_]+'
+    confidence: 75
+    severity: low
+    tags: [gitlab, registry, container, url]
+    
+  - id: gitlab-pages-domain
+    name: GitLab Pages Domain
+    description: GitLab Pages URL with access
+    regex: 'https://[a-z0-9\-]+\.gitlab\.io/[^\s]*\?.*token=([a-zA-Z0-9_-]+)'
+    confidence: 82
+    severity: high
+    tags: [gitlab, pages, domain, token]
+    
+  - id: gitlab-security-token
+    name: GitLab Security Dashboard Token
+    description: Security scanning access token
+    regex: '(?i)security.{0,20}(scanner|dashboard).{0,20}token[:=]\s*[''"]?([a-zA-Z0-9_-]{20,})[''"]?'
+    confidence: 82
+    severity: high
+    tags: [gitlab, security, scanner, token]
+    context_keywords: [security, scanner, dashboard]
+    
+  - id: gitlab-sast-token
+    name: GitLab SAST Token
+    description: Static analysis token
+    regex: '(?i)sast.{0,20}token[:=]\s*[''"]?([a-zA-Z0-9_-]{20,})[''"]?'
+    confidence: 78
+    severity: high
+    tags: [gitlab, sast, security, token]
+    context_keywords: [sast, token]
+    
+  - id: gitlab-dast-token
+    name: GitLab DAST Token
+    description: Dynamic analysis token
+    regex: '(?i)dast.{0,20}(api)?token[:=]\s*[''"]?([a-zA-Z0-9_-]{20,})[''"]?'
+    confidence: 78
+    severity: high
+    tags: [gitlab, dast, security, token]
+    context_keywords: [dast, token]
+    
+  - id: gitlab-dependency-scanning-token
+    name: GitLab Dependency Scanning Token
+    description: Dependency scan access
+    regex: '(?i)dependency.{0,10}scanning.{0,20}token[:=]\s*[''"]?([a-zA-Z0-9_-]{20,})[''"]?'
+    confidence: 78
+    severity: high
+    tags: [gitlab, dependency, scanning, token]
+    context_keywords: [dependency, scanning, token]
+    
+  - id: gitlab-container-scanning-token
+    name: GitLab Container Scanning Token
+    description: Container image scanning
+    regex: '(?i)container.{0,10}scanning.{0,20}token[:=]\s*[''"]?([a-zA-Z0-9_-]{20,})[''"]?'
+    confidence: 78
+    severity: high
+    tags: [gitlab, container, scanning, token]
+    context_keywords: [container, scanning, token]
+    
+  - id: gitlab-secret-detection-token
+    name: GitLab Secret Detection Token
+    description: Secret detection scanner token
+    regex: '(?i)secret.{0,10}detection.{0,20}token[:=]\s*[''"]?([a-zA-Z0-9_-]{20,})[''"]?'
+    confidence: 80
+    severity: high
+    tags: [gitlab, secret-detection, scanning, token]
+    context_keywords: [secret, detection, token]
+    
+  - id: gitlab-code-quality-token
+    name: GitLab Code Quality Token
+    description: Code quality analysis token
+    regex: '(?i)code.{0,10}quality.{0,20}token[:=]\s*[''"]?([a-zA-Z0-9_-]{20,})[''"]?'
+    confidence: 75
+    severity: medium
+    tags: [gitlab, code-quality, token]
+    context_keywords: [code, quality, token]
+    
+  - id: gitlab-review-app-token
+    name: GitLab Review Apps Token
+    description: Review environment token
+    regex: '(?i)review.{0,10}app.{0,20}token[:=]\s*[''"]?([a-zA-Z0-9_-]{20,})[''"]?'
+    confidence: 75
+    severity: medium
+    tags: [gitlab, review-apps, token]
+    context_keywords: [review, app, token]
+    
+  - id: gitlab-service-account
+    name: GitLab Service Account Token
+    description: Service account automation token
+    regex: '(?i)(service.{0,10}account|sa).{0,20}token[:=]\s*[''"]?(glpat-[a-zA-Z0-9_-]+)[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [gitlab, service-account, automation, token]
+    context_keywords: [service, account, token]
+    
+  - id: gitlab-duo-token
+    name: GitLab Duo AI Token
+    description: GitLab AI assistant token
+    regex: '(?i)(duo|ai).{0,20}token[:=]\s*[''"]?(glduo-[a-zA-Z0-9_-]+)[''"]?'
+    confidence: 85
+    severity: high
+    tags: [gitlab, duo, ai, token]
+    context_keywords: [duo, ai, token]
+    
+  - id: gitlab-impersonation-token
+    name: GitLab Impersonation Token
+    description: Admin user impersonation token
+    regex: '(?i)impersonation.{0,20}token[:=]\s*[''"]?(glpat-[a-zA-Z0-9_-]+)[''"]?'
+    confidence: 95
+    severity: critical
+    tags: [gitlab, impersonation, admin, token]
+    context_keywords: [impersonation, token]
+    
+  - id: gitlab-geo-token
+    name: GitLab Geo Replication Token
+    description: Geo node synchronization
+    regex: '(?i)geo.{0,20}(node|replication).{0,20}token[:=]\s*[''"]?([a-zA-Z0-9_-]{20,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [gitlab, geo, replication, token]
+    context_keywords: [geo, node, replication]
+    
+  - id: gitlab-cluster-token
+    name: GitLab Kubernetes Cluster Token
+    description: K8s cluster integration token
+    regex: '(?i)cluster.{0,20}(integration)?token[:=]\s*[''"]?([a-zA-Z0-9_-]{64,})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [gitlab, kubernetes, cluster, token]
+    context_keywords: [cluster, integration, token]

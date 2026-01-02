@@ -1,0 +1,426 @@
+# Private Keys & Cryptographic Secrets
+# Author: github.com/shaniidev
+# Category: Cryptography
+# Total Patterns: 50
+
+name: Private Keys & Cryptographic Secrets
+version: 1.0
+author: github.com/shaniidev
+category: crypto
+provider: General
+severity: critical
+updated: 2026-01-02
+
+patterns:
+  # RSA Keys
+  - id: rsa-private-key
+    name: RSA Private Key
+    description: RSA private key in PEM format
+    regex: '-----BEGIN RSA PRIVATE KEY-----[\s\S]+-----END RSA PRIVATE KEY-----'
+    confidence: 99
+    severity: critical
+    tags: [rsa, private-key, pem, cryptography]
+    
+  - id: rsa-private-key-encrypted
+    name: RSA Private Key (Encrypted)
+    description: Password-protected RSA key
+    regex: '-----BEGIN ENCRYPTED PRIVATE KEY-----[\s\S]+-----END ENCRYPTED PRIVATE KEY-----'
+    confidence: 98
+    severity: critical
+    tags: [rsa, private-key, encrypted, pem]
+    
+  # EC Keys
+  - id: ec-private-key
+    name: EC Private Key
+    description: Elliptic Curve private key
+    regex: '-----BEGIN EC PRIVATE KEY-----[\s\S]+-----END EC PRIVATE KEY-----'
+    confidence: 99
+    severity: critical
+    tags: [ec, elliptic-curve, private-key, pem]
+    
+  # DSA Keys
+  - id: dsa-private-key
+    name: DSA Private Key
+    description: Digital Signature Algorithm private key
+    regex: '-----BEGIN DSA PRIVATE KEY-----[\s\S]+-----END DSA PRIVATE KEY-----'
+    confidence: 99
+    severity: critical
+    tags: [dsa, private-key, pem]
+    
+  # Generic Private Keys
+  - id: generic-private-key
+    name: Generic Private Key
+    description: Generic PKCS#8 private key
+    regex: '-----BEGIN PRIVATE KEY-----[\s\S]+-----END PRIVATE KEY-----'
+    confidence: 99
+    severity: critical
+    tags: [private-key, pkcs8, pem]
+    
+  # OpenSSH Keys
+  - id: openssh-private-key
+    name: OpenSSH Private Key
+    description: Modern OpenSSH format private key
+    regex: '-----BEGIN OPENSSH PRIVATE KEY-----[\s\S]+-----END OPENSSH PRIVATE KEY-----'
+    confidence: 99
+    severity: critical
+    tags: [openssh, ssh, private-key]
+    
+  - id: ssh-ed25519-key
+    name: SSH Ed25519 Private Key
+    description: Ed25519 algorithm SSH key
+    regex: '-----BEGIN OPENSSH PRIVATE KEY-----[\s\S]*ed25519[\s\S]*-----END OPENSSH PRIVATE KEY-----'
+    confidence: 98
+    severity: critical
+    tags: [ssh, ed25519, private-key]
+    
+  # PGP/GPG Keys
+  - id: pgp-private-key
+    name: PGP Private Key Block
+    description: PGP/GPG private key
+    regex: '-----BEGIN PGP PRIVATE KEY BLOCK-----[\s\S]+-----END PGP PRIVATE KEY BLOCK-----'
+    confidence: 99
+    severity: critical
+    tags: [pgp, gpg, private-key, encryption]
+    
+  - id: pgp-message
+    name: PGP Encrypted Message
+    description: Encrypted PGP message
+    regex: '-----BEGIN PGP MESSAGE-----[\s\S]+-----END PGP MESSAGE-----'
+    confidence: 85
+    severity: medium
+    tags: [pgp, gpg, encrypted-message]
+    
+  # SSL/TLS Certificates
+  - id: x509-certificate
+    name: X.509 Certificate
+    description: SSL/TLS certificate
+    regex: '-----BEGIN CERTIFICATE-----[\s\S]+-----END CERTIFICATE-----'
+    confidence: 70
+    severity: low
+    tags: [x509, certificate, ssl, tls]
+    
+  - id: certificate-request
+    name: Certificate Signing Request
+    description: CSR for SSL certificate
+    regex: '-----BEGIN CERTIFICATE REQUEST-----[\s\S]+-----END CERTIFICATE REQUEST-----'
+    confidence: 72
+    severity: low
+    tags: [csr, certificate-request, ssl]
+    
+  # PKCS#12
+  - id: pkcs12-file
+    name: PKCS#12 File Path
+    description: Reference to .p12/.pfx file
+    regex: '(?i)(pkcs12|pfx|p12).{0,20}(file|path)[:=]\s*[''"]?([^\s''"]+\.(p12|pfx))[''"]?'
+    confidence: 85
+    severity: high
+    tags: [pkcs12, pfx, p12, certificate]
+    context_keywords: [pkcs12, pfx, p12]
+    
+  # JWT Secrets
+  - id: jwt-token
+    name: JWT Token
+    description: JSON Web Token (may contain secrets in payload)
+    regex: '\beyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b'
+    confidence: 75
+    severity: high
+    tags: [jwt, token, authentication]
+    
+  - id: jwt-secret-key
+    name: JWT Secret Key
+    description: Secret used for JWT signing
+    regex: '(?i)jwt.{0,20}secret(_?key)?[:=]\s*[''"]?([a-zA-Z0-9_\-+=/.]{20,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [jwt, secret, signing]
+    context_keywords: [jwt, secret, key]
+    entropy_check: true
+    min_entropy: 4.0
+    
+  - id: jwt-hs256-secret
+    name: JWT HS256 Secret
+    description: HMAC SHA256 JWT signing secret
+    regex: '(?i)(HS256|hmac).{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9_\-+=/.]{32,})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [jwt, hs256, hmac, secret]
+    context_keywords: [hs256, hmac, secret]
+    
+  # API Signing Keys
+  - id: hmac-secret-key
+    name: HMAC Secret Key
+    description: Generic HMAC signing secret
+    regex: '(?i)hmac.{0,20}(secret|key)[:=]\s*[''"]?([a-zA-Z0-9_\-+=/.]{32,})[''"]?'
+    confidence: 85
+    severity: critical
+    tags: [hmac, secret, signing]
+    context_keywords: [hmac, secret, key]
+    entropy_check: true
+    
+  - id: aes-encryption-key
+    name: AES Encryption Key
+    description: AES symmetric encryption key
+    regex: '(?i)aes.{0,20}(encryption|secret).{0,20}key[:=]\s*[''"]?([A-Fa-f0-9]{32,64})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [aes, encryption, symmetric-key]
+    context_keywords: [aes, encryption, key]
+    
+  - id: encryption-key-hex
+    name: Encryption Key (Hex)
+    description: 256-bit hex encryption key
+    regex: '(?i)encryption.{0,20}key[:=]\s*[''"]?([A-Fa-f0-9]{64})[''"]?'
+    confidence: 85
+    severity: critical
+    tags: [encryption, key, hex]
+    context_keywords: [encryption, key]
+    
+  - id: encryption-key-base64
+    name: Encryption Key (Base64)
+    description: Base64-encoded encryption key
+    regex: '(?i)encryption.{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]{44})[''"]?'
+    confidence: 82
+    severity: critical
+    tags: [encryption, key, base64]
+    context_keywords: [encryption, key]
+    
+  # Cryptocurrency
+  - id: bitcoin-private-key-wif
+    name: Bitcoin Private Key (WIF)
+    description: Wallet Import Format private key
+    regex: '\b[5KL][1-9A-HJ-NP-Za-km-z]{50,51}\b'
+    confidence: 92
+    severity: critical
+    tags: [bitcoin, btc, private-key, wif, cryptocurrency]
+    
+  - id: bitcoin-private-key-hex
+    name: Bitcoin Private Key (Hex)
+    description: Raw hex format private key
+    regex: '(?i)bitcoin.{0,20}(private|priv).{0,20}key[:=]\s*[''"]?([a-fA-F0-9]{64})[''"]?'
+    confidence: 85
+    severity: critical
+    tags: [bitcoin, btc, private-key, hex]
+    context_keywords: [bitcoin, btc, private, key]
+    
+  - id: ethereum-private-key
+    name: Ethereum Private Key
+    description: Ethereum wallet private key
+    regex: '(?i)(ethereum|eth).{0,20}(private|priv).{0,20}key[:=]\s*[''"]?(0x)?([a-fA-F0-9]{64})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [ethereum, eth, private-key, cryptocurrency]
+    context_keywords: [ethereum, eth, private, key]
+    
+  - id: ethereum-keystore
+    name: Ethereum Keystore JSON
+    description: Encrypted keystore file contents
+    regex: '\{"version":\s*3,\s*"id":\s*"[a-f0-9\-]+",\s*"address":\s*"[a-f0-9]{40}"'
+    confidence: 85
+    severity: high
+    tags: [ethereum, keystore, encrypted]
+    
+  - id: solana-private-key
+    name: Solana Private Key
+    description: Solana wallet private key (base58)
+    regex: '(?i)solana.{0,20}(private|priv|secret).{0,20}key[:=]\s*[''"]?([1-9A-HJ-NP-Za-km-z]{87,88})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [solana, sol, private-key, cryptocurrency]
+    context_keywords: [solana, sol, private, secret, key]
+    
+  - id: seed-phrase-mnemonic
+    name: Cryptocurrency Seed Phrase
+    description: BIP39 mnemonic recovery phrase
+    regex: '(?i)(seed|mnemonic|recovery).{0,20}(phrase|words)[:=]\s*[''"]?((\b[a-z]{3,8}\b\s*){12,24})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [cryptocurrency, seed-phrase, mnemonic, bip39]
+    context_keywords: [seed, mnemonic, recovery, phrase]
+    
+  - id: xrp-secret-key
+    name: XRP/Ripple Secret Key
+    description: XRP wallet secret
+    regex: '\bs[rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz]{28}\b'
+    confidence: 88
+    severity: critical
+    tags: [xrp, ripple, secret-key, cryptocurrency]
+    
+  - id: stellar-secret-key
+    name: Stellar Secret Key
+    description: Stellar wallet secret key
+    regex: '\bS[A-Z2-7]{55}\b'
+    confidence: 92
+    severity: critical
+    tags: [stellar, xlm, secret-key, cryptocurrency]
+    
+  - id: tron-private-key
+    name: Tron Private Key
+    description: Tron wallet private key
+    regex: '(?i)tron.{0,20}(private|priv).{0,20}key[:=]\s*[''"]?([a-fA-F0-9]{64})[''"]?'
+    confidence: 85
+    severity: critical
+    tags: [tron, trx, private-key, cryptocurrency]
+    context_keywords: [tron, trx, private, key]
+    
+  # Encryption Passphrases
+  - id: gpg-passphrase
+    name: GPG/PGP Passphrase
+    description: Passphrase for encrypted keys
+    regex: '(?i)(gpg|pgp).{0,20}passphrase[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 85
+    severity: critical
+    tags: [gpg, pgp, passphrase, encryption]
+    context_keywords: [gpg, pgp, passphrase]
+    
+  - id: keystore-password
+    name: Keystore Password
+    description: Java keystore password
+    regex: '(?i)keystore.{0,20}password[:=]\s*[''"]?([^\s''"]{6,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [keystore, java, password]
+    context_keywords: [keystore, password]
+    
+  - id: truststore-password
+    name: Truststore Password
+    description: Java truststore password
+    regex: '(?i)truststore.{0,20}password[:=]\s*[''"]?([^\s''"]{6,})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [truststore, java, password]
+    context_keywords: [truststore, password]
+    
+  # Signing Secrets
+  - id: code-signing-key
+    name: Code Signing Private Key
+    description: Software code signing key
+    regex: '(?i)code.{0,5}signing.{0,20}(private|key)[:=]\s*[''"]?([^\s''"]{20,})[''"]?'
+    confidence: 85
+    severity: critical
+    tags: [code-signing, private-key]
+    context_keywords: [code, signing, key]
+    
+  - id: apple-auth-key
+    name: Apple Auth Key
+    description: Apple authentication key (.p8)
+    regex: '-----BEGIN PRIVATE KEY-----[\s\S]*MIGTAgEAMBMGByqGSM49[\s\S]*-----END PRIVATE KEY-----'
+    confidence: 92
+    severity: critical
+    tags: [apple, auth, private-key, p8]
+    
+  - id: google-cloud-service-key
+    name: Google Cloud Service Account Key
+    description: GCP service account private key
+    regex: '"private_key":\s*"-----BEGIN PRIVATE KEY-----[^"]+-----END PRIVATE KEY-----\\n"'
+    confidence: 98
+    severity: critical
+    tags: [gcp, google, service-account, private-key]
+    
+  # SSH Related
+  - id: ssh-passphrase
+    name: SSH Key Passphrase
+    description: Passphrase for SSH private key
+    regex: '(?i)ssh.{0,20}passphrase[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [ssh, passphrase, key]
+    context_keywords: [ssh, passphrase]
+    
+  - id: ssh-authorized-key
+    name: SSH Authorized Key
+    description: Public key in authorized_keys format
+    regex: 'ssh-(rsa|ed25519|dss|ecdsa)\s+[A-Za-z0-9+/]+[=]{0,3}(\s+[^\s]+)?'
+    confidence: 70
+    severity: low
+    tags: [ssh, authorized-keys, public-key]
+    
+  # TLS/SSL Related
+  - id: ssl-private-key-path
+    name: SSL Private Key Path
+    description: Path to SSL private key file
+    regex: '(?i)ssl.{0,20}(key|private).{0,20}(file|path)[:=]\s*[''"]?([^\s''"]+\.(key|pem))[''"]?'
+    confidence: 82
+    severity: high
+    tags: [ssl, tls, key, path]
+    context_keywords: [ssl, key, file, path]
+    
+  - id: tls-private-key-inline
+    name: TLS Private Key (Inline)
+    description: TLS key embedded in config
+    regex: '(?i)(tls|ssl).{0,20}private.{0,20}key[:=]\s*[|>]?\s*(-----BEGIN[^-]+PRIVATE KEY-----[\s\S]+-----END[^-]+PRIVATE KEY-----)'
+    confidence: 95
+    severity: critical
+    tags: [tls, ssl, private-key, inline]
+    
+  # Certificate Private Keys
+  - id: pkcs8-private-key
+    name: PKCS#8 Private Key
+    description: PKCS#8 format private key
+    regex: '-----BEGIN PRIVATE KEY-----[\s\S]+-----END PRIVATE KEY-----'
+    confidence: 98
+    severity: critical
+    tags: [pkcs8, private-key, pem]
+    
+  - id: encrypted-pkcs8-key
+    name: Encrypted PKCS#8 Key
+    description: Password-protected PKCS#8 key
+    regex: '-----BEGIN ENCRYPTED PRIVATE KEY-----[\s\S]+-----END ENCRYPTED PRIVATE KEY-----'
+    confidence: 96
+    severity: critical
+    tags: [pkcs8, encrypted, private-key]
+    
+  # Vault/Secret Management
+  - id: hashicorp-vault-token
+    name: HashiCorp Vault Token
+    description: Vault authentication token
+    regex: '\b(hvs\.[a-zA-Z0-9_-]{24,}|s\.[a-zA-Z0-9]{24})\b'
+    confidence: 96
+    severity: critical
+    tags: [hashicorp, vault, token, secrets]
+    
+  - id: vault-root-token
+    name: HashiCorp Vault Root Token
+    description: Vault root/admin token
+    regex: '(?i)vault.{0,20}root.{0,20}token[:=]\s*[''"]?(hvs\.[a-zA-Z0-9_-]+|s\.[a-zA-Z0-9]+)[''"]?'
+    confidence: 98
+    severity: critical
+    tags: [hashicorp, vault, root, token]
+    context_keywords: [vault, root, token]
+    
+  - id: vault-unseal-key
+    name: HashiCorp Vault Unseal Key
+    description: Key for unsealing Vault
+    regex: '(?i)unseal.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9+/=]{44})[''"]?'
+    confidence: 95
+    severity: critical
+    tags: [hashicorp, vault, unseal, key]
+    context_keywords: [unseal, key, vault]
+    
+  - id: sops-age-key
+    name: SOPS Age Private Key
+    description: Age encryption key for SOPS
+    regex: 'AGE-SECRET-KEY-[A-Z0-9]{59}'
+    confidence: 98
+    severity: critical
+    tags: [sops, age, encryption, key]
+    
+  # Master Keys
+  - id: master-key-generic
+    name: Generic Master Key
+    description: Master encryption/signing key
+    regex: '(?i)master.{0,20}key[:=]\s*[''"]?([A-Fa-f0-9]{32,128})[''"]?'
+    confidence: 85
+    severity: critical
+    tags: [master, key, encryption]
+    context_keywords: [master, key]
+    
+  - id: api-signing-key
+    name: API Signing Key
+    description: Key for signing API requests
+    regex: '(?i)api.{0,20}signing.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9_\-+=/.]{32,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [api, signing, key]
+    context_keywords: [api, signing, key]
+    entropy_check: true
+    min_entropy: 4.2

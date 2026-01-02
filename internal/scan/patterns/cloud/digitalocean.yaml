@@ -1,0 +1,394 @@
+# Digital Ocean Secret Detection Patterns
+# Author: github.com/shaniidev
+# Category: Cloud Infrastructure
+# Total Patterns: 50
+
+name: DigitalOcean Credentials & Secrets
+version: 1.0
+author: github.com/shaniidev
+category: cloud
+provider: DigitalOcean
+severity: critical
+updated: 2026-01-02
+
+patterns:
+  - id: digitalocean-access-token
+    name: DigitalOcean Personal Access Token
+    description: DigitalOcean API access token
+    regex: '(?i)(digitalocean|do).{0,20}(access|api|personal).{0,20}token[:=]\s*[''"]?(dop_v1_[a-f0-9]{64})[''"]?'
+    confidence: 98
+    severity: critical
+    tags: [digitalocean, do, access-token, api]
+    context_keywords: [digitalocean, do, token]
+    
+  - id: digitalocean-oauth-token
+    name: DigitalOcean OAuth Token
+    description: OAuth application token
+    regex: '(?i)digitalocean.{0,20}oauth[:=]\s*[''"]?(doo_v1_[a-f0-9]{64})[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [digitalocean, oauth, token]
+    
+  - id: digitalocean-spaces-key
+    name: DigitalOcean Spaces Access Key
+    description: Spaces (S3-compatible) access key
+    regex: '(?i)(do|digitalocean).{0,20}spaces.{0,20}(access|key)[:=]\s*[''"]?([A-Z0-9]{20})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [digitalocean, spaces, s3, access-key]
+    context_keywords: [spaces, digitalocean, key]
+    
+  - id: digitalocean-spaces-secret
+    name: DigitalOcean Spaces Secret Key
+    description: Spaces secret access key
+    regex: '(?i)(do|digitalocean).{0,20}spaces.{0,20}secret[:=]\s*[''"]?([A-Za-z0-9/+=]{40})[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [digitalocean, spaces, s3, secret-key]
+    context_keywords: [spaces, secret]
+    entropy_check: true
+    min_entropy: 4.5
+    
+  - id: digitalocean-database-connection
+    name: DigitalOcean Managed Database Connection String
+    description: Database cluster connection URL
+    regex: '(postgres|mysql|redis|mongodb)://[^:]+:([^@]+)@([a-z0-9\-]+\-do\-user\-[a-z0-9\-]+\.(db\.ondigitalocean\.com|[a-z]{2}\-[a-z]{3}\d\-\d+\.db\.ondigitalocean\.com)):\d+/[^\s]+'
+    confidence: 96
+    severity: critical
+    tags: [digitalocean, database, connection-string]
+    
+  - id: digitalocean-app-platform-token
+    name: DigitalOcean App Platform Deploy Token
+    description: App Platform deployment token
+    regex: '(?i)(do|digitalocean).{0,20}app.{0,20}(platform|deploy).{0,20}token[:=]\s*[''"]?(doa_[a-f0-9]{64})[''"]?'
+    confidence: 94
+    severity: high
+    tags: [digitalocean, app-platform, deploy-token]
+    
+  - id: digitalocean-kubernetes-config
+    name: DigitalOcean Kubernetes Kubeconfig
+    description: DOKS cluster configuration
+    regex: 'apiVersion:\s*v1.*kind:\s*Config.*clusters:.*server:\s*https://[a-f0-9\-]+\.k8s\.ondigitalocean\.com'
+    confidence: 92
+    severity: critical
+    tags: [digitalocean, kubernetes, doks, kubeconfig]
+    
+  - id: digitalocean-registry-token
+    name: DigitalOcean Container Registry Token
+    description: DOCR authentication token
+    regex: '(?i)(do|digitalocean).{0,20}(container|registry).{0,20}token[:=]\s*[''"]?(docr_[a-f0-9]{64})[''"]?'
+    confidence: 94
+    severity: high
+    tags: [digitalocean, registry, container, token]
+    
+  - id: digitalocean-loadbalancer-id
+    name: DigitalOcean Load Balancer ID
+    description: Load balancer UUID
+    regex: '(?i)(do|digitalocean).{0,20}(lb|load.{0,10}balancer).{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 75
+    severity: low
+    tags: [digitalocean, load-balancer, id]
+    
+  - id: digitalocean-firewall-id
+    name: DigitalOcean Firewall ID
+    description: Cloud firewall UUID
+    regex: '(?i)(do|digitalocean).{0,20}firewall.{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [digitalocean, firewall, id]
+    
+  - id: digitalocean-droplet-id
+    name: DigitalOcean Droplet ID
+    description: Virtual machine instance ID
+    regex: '(?i)(do|digitalocean).{0,20}droplet.{0,20}id[:=]\s*[''"]?(\d{8,10})[''"]?'
+    confidence: 70
+    severity: low
+    tags: [digitalocean, droplet, vm, id]
+    
+  - id: digitalocean-volume-id
+    name: DigitalOcean Block Storage Volume ID
+    description: Volume UUID
+    regex: '(?i)(do|digitalocean).{0,20}volume.{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [digitalocean, volume, storage, id]
+    
+  - id: digitalocean-snapshot-id
+    name: DigitalOcean Snapshot ID
+    description: Droplet/volume snapshot UUID
+    regex: '(?i)(do|digitalocean).{0,20}snapshot.{0,20}id[:=]\s*[''"]?(\d{8,10})[''"]?'
+    confidence: 70
+    severity: low
+    tags: [digitalocean, snapshot, backup, id]
+    
+  - id: digitalocean-image-id
+    name: DigitalOcean Custom Image ID
+    description: Custom image UUID
+    regex: '(?i)(do|digitalocean).{0,20}image.{0,20}id[:=]\s*[''"]?(\d{8,10})[''"]?'
+    confidence: 68
+    severity: low
+    tags: [digitalocean, image, id]
+    
+  - id: digitalocean-floating-ip
+    name: DigitalOcean Reserved/Floating IP
+    description: Reserved public IP address
+    regex: '(?i)(do|digitalocean).{0,20}(floating|reserved).{0,20}ip[:=]\s*[''"]?(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [digitalocean, floating-ip, ip]
+    
+  - id: digitalocean-vpc-id
+    name: DigitalOcean VPC ID
+    description: Virtual Private Cloud UUID
+    regex: '(?i)(do|digitalocean).{0,20}vpc.{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 75
+    severity: low
+    tags: [digitalocean, vpc, network, id]
+    
+  - id: digitalocean-ssh-key-fingerprint
+    name: DigitalOcean SSH Key Fingerprint
+    description: SSH public key fingerprint
+    regex: '(?i)(do|digitalocean).{0,20}ssh.{0,20}(key|fingerprint)[:=]\s*[''"]?([a-f0-9]{2}(:[a-f0-9]{2}){15})[''"]?'
+    confidence: 78
+    severity: medium
+    tags: [digitalocean, ssh, key, fingerprint]
+    
+  - id: digitalocean-cdn-endpoint
+    name: DigitalOcean CDN Endpoint
+    description: Spaces CDN endpoint URL
+    regex: '[a-z0-9\-]+\.(nyc3|ams3|sgp1|sfo3)\.cdn\.digitaloceanspaces\.com'
+    confidence: 82
+    severity: low
+    tags: [digitalocean, cdn, spaces, endpoint]
+    
+  - id: digitalocean-spaces-endpoint
+    name: DigitalOcean Spaces Endpoint
+    description: Spaces bucket endpoint
+    regex: '[a-z0-9\-]+\.(nyc3|ams3|sgp1|sfo3|fra1)\.digitaloceanspaces\.com'
+    confidence: 80
+    severity: low
+    tags: [digitalocean, spaces, endpoint]
+    
+  - id: digitalocean-function-namespace
+    name: DigitalOcean Functions Namespace
+    description: Serverless functions namespace
+    regex: '(?i)(do|digitalocean).{0,20}function.{0,20}namespace[:=]\s*[''"]?(fn-[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 80
+    severity: medium
+    tags: [digitalocean, functions, serverless, namespace]
+    
+  - id: digitalocean-monitoring-alert
+    name: DigitalOcean Monitoring Alert Policy
+    description: Alert policy UUID
+    regex: '(?i)(do|digitalocean).{0,20}alert.{0,20}(policy|id)[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [digitalocean, monitoring, alert, id]
+    
+  - id: digitalocean-project-id
+    name: DigitalOcean Project ID
+    description: Project organization UUID
+    regex: '(?i)(do|digitalocean).{0,20}project.{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 75
+    severity: low
+    tags: [digitalocean, project, id]
+    
+  - id: digitalocean-team-id
+    name: DigitalOcean Team ID
+    description: Team/organization UUID
+    regex: '(?i)(do|digitalocean).{0,20}team.{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [digitalocean, team, organization, id]
+    
+  - id: digitalocean-domain-token
+    name: DigitalOcean Domain DNS Token
+    description: Domain management token
+    regex: '(?i)(do|digitalocean).{0,20}(domain|dns).{0,20}token[:=]\s*[''"]?(dot_[a-f0-9]{64})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [digitalocean, domain, dns, token]
+    
+  - id: digitalocean-certificate-id
+    name: DigitalOcean SSL Certificate ID
+    description: Managed certificate UUID
+    regex: '(?i)(do|digitalocean).{0,20}(cert|certificate).{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 75
+    severity: medium
+    tags: [digitalocean, certificate, ssl, id]
+    
+  - id: digitalocean-reserved-ip-id
+    name: DigitalOcean Reserved IP ID
+    description: Reserved IP resource UUID
+    regex: '(?i)(do|digitalocean).{0,20}reserved.{0,20}ip.{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 75
+    severity: low
+    tags: [digitalocean, reserved-ip, network, id]
+    
+  - id: digitalocean-tag-name
+    name: DigitalOcean Resource Tag
+    description: Resource tagging identifier
+    regex: '(?i)(do|digitalocean).{0,20}tag[:=]\s*[''"]?([a-z0-9\-_]{1,255})[''"]?'
+    confidence: 65
+    severity: low
+    tags: [digitalocean, tag, metadata]
+    
+  - id: digitalocean-size-slug
+    name: DigitalOcean Droplet Size Slug
+    description: Instance size identifier
+    regex: '(?i)(do|digitalocean).{0,20}size[:=]\s*[''"]?(s-\d+vcpu-\d+gb|c-\d+|m-\d+vcpu-\d+gb|g-\d+vcpu-\d+gb)[''"]?'
+    confidence: 70
+    severity: low
+    tags: [digitalocean, size, droplet]
+    
+  - id: digitalocean-region-slug
+    name: DigitalOcean Region Slug
+    description: Data center region identifier
+    regex: '(?i)(do|digitalocean).{0,20}region[:=]\s*[''"]?(nyc1|nyc2|nyc3|ams2|ams3|sfo1|sfo2|sfo3|sgp1|lon1|fra1|tor1|blr1|syd1)[''"]?'
+    confidence: 72
+    severity: low
+    tags: [digitalocean, region, datacenter]
+    
+  - id: digitalocean-app-id
+    name: DigitalOcean App Platform App ID
+    description: App Platform application UUID
+    regex: '(?i)(do|digitalocean).{0,20}app.{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 78
+    severity: medium
+    tags: [digitalocean, app-platform, app, id]
+    
+  - id: digitalocean-app-spec
+    name: DigitalOcean App Spec with Secrets
+    description: App specification YAML/JSON with env vars
+    regex: '(?i)(envs?|environment):\s*-\s*key:\s*[A-Z_]+\s*value:\s*[^\s]{10,}'
+    confidence: 70
+    severity: medium
+    tags: [digitalocean, app-platform, env, secrets]
+    
+  - id: digitalocean-uptime-check-id
+    name: DigitalOcean Uptime Check ID
+    description: Uptime monitoring check UUID
+    regex: '(?i)(do|digitalocean).{0,20}uptime.{0,20}(check|id)[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [digitalocean, uptime, monitoring, id]
+    
+  - id: digitalocean-webhook-url
+    name: DigitalOcean Webhook URL
+    description: Event webhook endpoint
+    regex: 'https://[a-z0-9\-]+\.digitalocean\.com/webhooks?/[a-f0-9\-]{36,}'
+    confidence: 80
+    severity: medium
+    tags: [digitalocean, webhook, url]
+    
+  - id: digitalocean-backup-policy
+    name: DigitalOcean Backup Policy ID
+    description: Automated backup policy
+    regex: '(?i)(do|digitalocean).{0,20}backup.{0,20}policy[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [digitalocean, backup, policy, id]
+    
+  - id: digitalocean-registry-name
+    name: DigitalOcean Container Registry Name
+    description: DOCR registry identifier
+    regex: '(?i)(do|digitalocean).{0,20}registry.{0,20}name[:=]\s*[''"]?([a-z][a-z0-9\-]{0,62})[''"]?'
+    confidence: 75
+    severity: low
+    tags: [digitalocean, registry, container, name]
+    
+  - id: digitalocean-database-cluster-id
+    name: DigitalOcean Database Cluster ID
+    description: Managed database cluster UUID
+    regex: '(?i)(do|digitalocean).{0,20}(db|database).{0,20}cluster.{0,20}id[:=]\s*[''"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})[''"]?'
+    confidence: 80
+    severity: medium
+    tags: [digitalocean, database, cluster, id]
+    
+  - id: digitalocean-database-user
+    name: DigitalOcean Database User Credentials
+    description: DB user with password
+    regex: '(?i)(do|digitalocean).{0,20}(db|database).{0,20}(user|username)[:=]\s*[''"]?([a-z][a-z0-9_]{0,62})[''"]?\s*.*password[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [digitalocean, database, credentials, password]
+    
+  - id: digitalocean-redis-password
+    name: DigitalOcean Managed Redis Password
+    description: Redis cluster authentication
+    regex: '(?i)(do|digitalocean).{0,20}redis.{0,20}password[:=]\s*[''"]?([a-zA-Z0-9]{20,})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [digitalocean, redis, password, credentials]
+    
+  - id: digitalocean-kafka-cluster
+    name: DigitalOcean Managed Kafka Config
+    description: Kafka cluster connection
+    regex: '(?i)(do|digitalocean).{0,20}kafka.{0,20}(broker|bootstrap)[:=]\s*[''"]?([a-z0-9\-]+\-kafka\-[a-z0-9\-]+\.db\.ondigitalocean\.com:\d+)[''"]?'
+    confidence: 85
+    severity: high
+    tags: [digitalocean, kafka, cluster, connection]
+    
+  - id: digitalocean-opensearch-endpoint
+    name: DigitalOcean Managed OpenSearch Endpoint
+    description: OpenSearch cluster endpoint
+    regex: '(?i)(do|digitalocean).{0,20}opensearch.{0,20}endpoint[:=]\s*[''"]?(https://[a-z0-9\-]+\-opensearch\-[a-z0-9\-]+\.db\.ondigitalocean\.com:\d+)[''"]?'
+    confidence: 88
+    severity: high
+    tags: [digitalocean, opensearch, elasticsearch, endpoint]
+    
+  - id: digitalocean-mongodb-uri
+    name: DigitalOcean Managed MongoDB Connection URI
+    description: MongoDB cluster connection string
+    regex: 'mongodb\+srv://[^:]+:([^@]+)@[a-z0-9\-]+\-mongodb\-[a-z0-9\-]+\.db\.ondigitalocean\.com/[^\s?]+'
+    confidence: 96
+    severity: critical
+    tags: [digitalocean, mongodb, connection-string, credentials]
+    
+  - id: digitalocean-mysql-ca-cert
+    name: DigitalOcean MySQL CA Certificate
+    description: Database SSL/TLS certificate
+    regex: '-----BEGIN CERTIFICATE-----[\s\S]+digitalocean[\s\S]+-----END CERTIFICATE-----'
+    confidence: 85
+    severity: medium
+    tags: [digitalocean, mysql, certificate, ssl]
+    
+  - id: digitalocean-doctl-config
+    name: DigitalOcean CLI (doctl) Config
+    description: doctl configuration with access token  
+    regex: 'access-token:\s*dop_v1_[a-f0-9]{64}'
+    confidence: 96
+    severity: critical
+    tags: [digitalocean, doctl, cli, config, token]
+    
+  - id: digitalocean-terraform-token
+    name: DigitalOcean Terraform Provider Token
+    description: Token in Terraform configuration
+    regex: 'provider\s+"digitalocean"\s*\{[^\}]*token\s*=\s*"(dop_v1_[a-f0-9]{64})"[^\}]*\}'
+    confidence: 98
+    severity: critical
+    tags: [digitalocean, terraform, iac, token]
+    
+  - id: digitalocean-ansible-api-token
+    name: DigitalOcean Ansible API Token
+    description: Token in Ansible playbook/inventory
+    regex: '(?i)do_api_token:\s*[''"]?(dop_v1_[a-f0-9]{64})[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [digitalocean, ansible, automation, token]
+    
+  - id: digitalocean-github-actions-token
+    name: DigitalOcean GitHub Actions Secret
+    description: DO token in GitHub workflows
+    regex: 'DIGITALOCEAN_ACCESS_TOKEN:\s*\$\{\{\s*secrets\.[A-Z_]+\s*\}\}'
+    confidence: 75
+    severity: medium
+    tags: [digitalocean, github-actions, ci, token]
+    
+  - id: digitalocean-pulumi-token
+    name: DigitalOcean Pulumi Token
+    description: Token in Pulumi stack config
+    regex: '(?i)digital(ocean)?:token:\s*[''"]?(dop_v1_[a-f0-9]{64})[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [digitalocean, pulumi, iac, token]

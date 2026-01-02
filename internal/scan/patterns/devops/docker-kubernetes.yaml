@@ -1,0 +1,402 @@
+# Docker & Kubernetes Secret Detection Patterns
+# Author: github.com/shaniidev
+# Category: DevOps/Containers
+# Total Patterns: 50
+
+name: Docker & Kubernetes Credentials & Secrets
+version: 1.0
+author: github.com/shaniidev
+category: devops
+provider: Docker and Kubernetes
+severity: critical
+updated: 2026-01-02
+
+patterns:
+  # Docker Hub / Registry Patterns
+  - id: docker-hub-password
+    name: Docker Hub Password
+    description: Docker Hub account password
+    regex: '(?i)docker(hub)?.{0,20}password[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [docker, hub, password, credentials]
+    context_keywords: [docker, hub, password]
+    
+  - id: docker-hub-token
+    name: Docker Hub Access Token
+    description: Docker Hub personal access token
+    regex: '\bdckr_pat_[a-zA-Z0-9_-]{27}\b'
+    confidence: 98
+    severity: critical
+    tags: [docker, hub, pat, token]
+    
+  - id: docker-registry-auth
+    name: Docker Registry Auth
+    description: Base64 encoded registry credentials
+    regex: '"auth"\s*:\s*"([A-Za-z0-9+/=]{20,})"'
+    confidence: 85
+    severity: high
+    tags: [docker, registry, auth, base64]
+    
+  - id: docker-config-json
+    name: Docker Config JSON Credentials
+    description: Complete docker config with auth
+    regex: '"auths"\s*:\s*\{[^\}]+"\s*:\s*\{\s*"auth"\s*:\s*"([A-Za-z0-9+/=]+)"'
+    confidence: 92
+    severity: critical
+    tags: [docker, config, credentials, auth]
+    
+  - id: docker-registry-password
+    name: Docker Registry Password
+    description: Private registry password
+    regex: '(?i)(registry|docker).{0,20}password[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 85
+    severity: critical
+    tags: [docker, registry, password]
+    context_keywords: [docker, registry, password]
+    
+  - id: docker-login-command
+    name: Docker Login with Password
+    description: Docker login command with exposed password
+    regex: 'docker\s+login\s+.*-p\s+([^\s]+)'
+    confidence: 94
+    severity: critical
+    tags: [docker, login, command, password]
+    
+  - id: docker-compose-password
+    name: Docker Compose Environment Password
+    description: Password in docker-compose.yml
+    regex: '(?i)(password|secret|key):\s*([^\s#]+)'
+    confidence: 75
+    severity: high
+    tags: [docker, compose, environment, password]
+    
+  - id: dockerhub-api-key
+    name: Docker Hub API Key
+    description: Docker Hub API access key
+    regex: '(?i)dockerhub.{0,20}api.{0,20}key[:=]\s*[''"]?([a-zA-Z0-9\-_]{32,})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [docker, hub, api-key]
+    context_keywords: [dockerhub, api, key]
+    
+  - id: docker-swarm-join-token
+    name: Docker Swarm Join Token
+    description: Swarm worker/manager join token
+    regex: 'SWMTKN-1-[a-z0-9]{50}-[a-z0-9]{25}'
+    confidence: 96
+    severity: critical
+    tags: [docker, swarm, join, token]
+    
+  - id: docker-content-trust-key
+    name: Docker Content Trust Key
+    description: DCT signing key passphrase
+    regex: '(?i)docker.{0,10}content.{0,10}trust.{0,20}(key|passphrase)[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [docker, dct, content-trust, key]
+    context_keywords: [docker, content, trust, key]
+    
+  # Kubernetes Patterns
+  - id: kubernetes-service-account-token
+    name: Kubernetes Service Account Token
+    description: K8s SA bearer token
+    regex: '(?i)(k8s|kubernetes).{0,20}(service.{0,10}account|sa).{0,20}token[:=]\s*[''"]?(eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)[''"]?'
+    confidence: 95
+    severity: critical
+    tags: [kubernetes, k8s, service-account, token]
+    context_keywords: [kubernetes, k8s, service, account, token]
+    
+  - id: kubernetes-bearer-token
+    name: Kubernetes Bearer Token
+    description: API server bearer token
+    regex: '(?i)bearer\s+(eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)'
+    confidence: 92
+    severity: critical
+    tags: [kubernetes, bearer, token]
+    
+  - id: kubernetes-kubeconfig-password
+    name: Kubeconfig Password
+    description: Password in kubeconfig file
+    regex: 'password:\s*([^\s]+)'
+    confidence: 85
+    severity: critical
+    tags: [kubernetes, kubeconfig, password]
+    
+  - id: kubernetes-kubeconfig-token
+    name: Kubeconfig Token
+    description: Token in kubeconfig file
+    regex: 'token:\s*([a-zA-Z0-9_\-\.]+)'
+    confidence: 88
+    severity: critical
+    tags: [kubernetes, kubeconfig, token]
+    
+  - id: kubernetes-client-certificate
+    name: Kubernetes Client Certificate Data
+    description: Base64 encoded client cert
+    regex: 'client-certificate-data:\s*([A-Za-z0-9+/=]+)'
+    confidence: 90
+    severity: high
+    tags: [kubernetes, client, certificate]
+    
+  - id: kubernetes-client-key
+    name: Kubernetes Client Key Data
+    description: Base64 encoded client key
+    regex: 'client-key-data:\s*([A-Za-z0-9+/=]+)'
+    confidence: 95
+    severity: critical
+    tags: [kubernetes, client, key, private]
+    
+  - id: kubernetes-ca-data
+    name: Kubernetes CA Certificate Data
+    description: Base64 encoded CA certificate
+    regex: 'certificate-authority-data:\s*([A-Za-z0-9+/=]+)'
+    confidence: 82
+    severity: medium
+    tags: [kubernetes, ca, certificate]
+    
+  - id: kubernetes-secret-data
+    name: Kubernetes Secret Data
+    description: Base64 encoded secret value
+    regex: 'data:\s*\n\s+[a-zA-Z0-9_-]+:\s*([A-Za-z0-9+/=]+)'
+    confidence: 78
+    severity: high
+    tags: [kubernetes, secret, data, base64]
+    
+  - id: kubernetes-tls-crt
+    name: Kubernetes TLS Certificate
+    description: TLS certificate in secret
+    regex: 'tls\.crt:\s*([A-Za-z0-9+/=]+)'
+    confidence: 82
+    severity: medium
+    tags: [kubernetes, tls, certificate]
+    
+  - id: kubernetes-tls-key
+    name: Kubernetes TLS Private Key
+    description: TLS private key in secret
+    regex: 'tls\.key:\s*([A-Za-z0-9+/=]+)'
+    confidence: 95
+    severity: critical
+    tags: [kubernetes, tls, private-key]
+    
+  - id: kubernetes-docker-config-secret
+    name: Kubernetes Docker Config Secret
+    description: Registry credentials in K8s secret
+    regex: '\.dockerconfigjson:\s*([A-Za-z0-9+/=]+)'
+    confidence: 92
+    severity: critical
+    tags: [kubernetes, docker, registry, secret]
+    
+  - id: kubernetes-basic-auth
+    name: Kubernetes Basic Auth Secret
+    description: Basic authentication secret
+    regex: 'username:\s*([A-Za-z0-9+/=]+)\s+password:\s*([A-Za-z0-9+/=]+)'
+    confidence: 88
+    severity: critical
+    tags: [kubernetes, basic-auth, credentials]
+    
+  - id: kubernetes-ssh-auth
+    name: Kubernetes SSH Auth Secret
+    description: SSH private key secret
+    regex: 'ssh-privatekey:\s*([A-Za-z0-9+/=]+)'
+    confidence: 94
+    severity: critical
+    tags: [kubernetes, ssh, private-key]
+    
+  - id: kubernetes-api-server
+    name: Kubernetes API Server URL
+    description: K8s API endpoint
+    regex: 'server:\s*(https://[^\s]+)'
+    confidence: 75
+    severity: low
+    tags: [kubernetes, api-server, url]
+    
+  - id: helm-registry-password
+    name: Helm Registry Password
+    description: Helm chart repository credentials
+    regex: '(?i)helm.{0,20}(registry|repo).{0,20}password[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [kubernetes, helm, registry, password]
+    context_keywords: [helm, registry, password]
+    
+  - id: helm-password
+    name: Helm Password in Values
+    description: Password value in Helm chart
+    regex: '(?i)password:\s*[''"]?([^\s''"}]+)[''"]?'
+    confidence: 72
+    severity: high
+    tags: [kubernetes, helm, values, password]
+    
+  - id: eks-cluster-token
+    name: AWS EKS Cluster Token
+    description: EKS authentication token
+    regex: 'k8s-aws-v1\.[A-Za-z0-9_-]+'
+    confidence: 94
+    severity: critical
+    tags: [kubernetes, eks, aws, token]
+    
+  - id: aks-kubeconfig
+    name: Azure AKS Kubeconfig
+    description: AKS cluster configuration
+    regex: 'server:\s*https://[a-z0-9\-]+\.azmk8s\.io'
+    confidence: 82
+    severity: high
+    tags: [kubernetes, aks, azure, kubeconfig]
+    
+  - id: gke-kubeconfig
+    name: Google GKE Kubeconfig
+    description: GKE cluster configuration
+    regex: 'name:\s*gke_[a-z0-9\-]+_[a-z0-9\-]+_[a-z0-9\-]+'
+    confidence: 82
+    severity: high
+    tags: [kubernetes, gke, google, kubeconfig]
+    
+  - id: rancher-api-token
+    name: Rancher API Token
+    description: Rancher management token
+    regex: 'token-[a-z0-9]{5}:[a-z0-9]{54}'
+    confidence: 94
+    severity: critical
+    tags: [kubernetes, rancher, api, token]
+    
+  - id: openshift-token
+    name: OpenShift Access Token
+    description: OpenShift API token
+    regex: '(?i)openshift.{0,20}token[:=]\s*[''"]?(sha256~[A-Za-z0-9_-]{43})[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [kubernetes, openshift, token]
+    context_keywords: [openshift, token]
+    
+  - id: openshift-registry-token
+    name: OpenShift Registry Token
+    description: Internal registry token
+    regex: '(?i)openshift.{0,20}registry.{0,20}token[:=]\s*[''"]?([A-Za-z0-9_\-]{50,})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [kubernetes, openshift, registry, token]
+    context_keywords: [openshift, registry, token]
+    
+  - id: harbor-robot-token
+    name: Harbor Robot Account Token
+    description: Harbor registry robot token
+    regex: '\bHarborRobotToken\b.*:.*[a-zA-Z0-9]+'
+    confidence: 90
+    severity: critical
+    tags: [kubernetes, harbor, registry, robot, token]
+    
+  - id: harbor-cli-secret
+    name: Harbor CLI Secret
+    description: Harbor CLI authentication
+    regex: '(?i)harbor.{0,20}(cli|password|secret)[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [kubernetes, harbor, cli, secret]
+    context_keywords: [harbor, cli, password, secret]
+    
+  - id: quay-api-token
+    name: Quay.io API Token
+    description: Quay registry API token
+    regex: '(?i)quay.{0,20}(api)?token[:=]\s*[''"]?([a-zA-Z0-9]{40,})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [kubernetes, quay, registry, token]
+    context_keywords: [quay, token]
+    
+  - id: ecr-login-token
+    name: AWS ECR Login Token
+    description: ECR registry auth token
+    regex: 'AWS:[A-Za-z0-9+/=]+'
+    confidence: 82
+    severity: high
+    tags: [kubernetes, ecr, aws, registry, token]
+    
+  - id: acr-password
+    name: Azure ACR Password
+    description: Azure Container Registry password
+    regex: '(?i)acr.{0,20}(admin)?password[:=]\s*[''"]?([a-zA-Z0-9+/=]{40,})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [kubernetes, acr, azure, registry, password]
+    context_keywords: [acr, azurecr, password]
+    
+  - id: gcr-service-account
+    name: GCR Service Account Key
+    description: Google Container Registry auth
+    regex: '"type"\s*:\s*"service_account".*"private_key"'
+    confidence: 90
+    severity: critical
+    tags: [kubernetes, gcr, google, registry, service-account]
+    
+  - id: kubectl-proxy-token
+    name: kubectl Proxy Token
+    description: Kubernetes dashboard proxy auth
+    regex: '(?i)proxy.{0,20}token[:=]\s*[''"]?([A-Za-z0-9_\-]{20,})[''"]?'
+    confidence: 78
+    severity: high
+    tags: [kubernetes, kubectl, proxy, token]
+    context_keywords: [proxy, token]
+    
+  - id: istio-gateway-secret
+    name: Istio Gateway TLS Secret
+    description: Service mesh gateway credentials
+    regex: '(?i)istio.{0,20}(gateway|tls).{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9\-_]+)[''"]?'
+    confidence: 75
+    severity: medium
+    tags: [kubernetes, istio, gateway, tls, secret]
+    context_keywords: [istio, gateway, tls]
+    
+  - id: linkerd-identity-key
+    name: Linkerd Identity Key
+    description: Linkerd service mesh identity
+    regex: '(?i)linkerd.{0,20}identity.{0,20}key[:=]\s*[''"]?([A-Za-z0-9+/=]+)[''"]?'
+    confidence: 82
+    severity: high
+    tags: [kubernetes, linkerd, identity, key]
+    context_keywords: [linkerd, identity, key]
+    
+  - id: argocd-admin-password
+    name: ArgoCD Admin Password
+    description: ArgoCD initial admin password
+    regex: '(?i)argocd.{0,20}(admin|initial).{0,20}password[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [kubernetes, argocd, admin, password]
+    context_keywords: [argocd, admin, password]
+    
+  - id: argocd-auth-token
+    name: ArgoCD Auth Token
+    description: ArgoCD API authentication token
+    regex: '(?i)argocd.{0,20}(auth)?token[:=]\s*[''"]?(eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [kubernetes, argocd, auth, token]
+    context_keywords: [argocd, auth, token]
+    
+  - id: flux-source-secret
+    name: FluxCD Source Secret
+    description: Flux GitOps source credentials
+    regex: '(?i)flux.{0,20}(source|git).{0,20}secret[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 80
+    severity: high
+    tags: [kubernetes, flux, gitops, secret]
+    context_keywords: [flux, source, git, secret]
+    
+  - id: tekton-pipeline-secret
+    name: Tekton Pipeline Secret
+    description: Tekton CI/CD secret
+    regex: '(?i)tekton.{0,20}(pipeline|secret)[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 78
+    severity: high
+    tags: [kubernetes, tekton, cicd, secret]
+    context_keywords: [tekton, pipeline, secret]
+    
+  - id: velero-credentials
+    name: Velero Backup Credentials
+    description: Velero backup/restore credentials
+    regex: '(?i)velero.{0,20}(aws|gcp|azure).{0,20}(secret|key|password)[:=]\s*[''"]?([^\s''"]{8,})[''"]?'
+    confidence: 85
+    severity: critical
+    tags: [kubernetes, velero, backup, credentials]
+    context_keywords: [velero, backup, credentials]

@@ -1,0 +1,433 @@
+# GitHub Secret Detection Patterns
+# Author: github.com/shaniidev
+# Category: Version Control
+# Total Patterns: 50
+
+name: GitHub Credentials & Secrets
+version: 1.0
+author: github.com/shaniidev
+category: vcs
+provider: GitHub
+severity: critical
+updated: 2026-01-02
+
+patterns:
+  - id: github-pat-classic
+    name: GitHub Personal Access Token (Classic)
+    description: Classic personal access token
+    regex: '\bghp_[A-Za-z0-9]{36}\b'
+    confidence: 99
+    severity: critical
+    tags: [github, pat, personal-access-token, credentials]
+    
+  - id: github-pat-fine-grained
+    name: GitHub Fine-grained Personal Access Token
+    description: Fine-grained PAT with specific permissions
+    regex: '\bgithub_pat_[A-Za-z0-9]{22}_[A-Za-z0-9]{59}\b'
+    confidence: 99
+    severity: critical
+    tags: [github, pat, fine-grained, credentials]
+    
+  - id: github-oauth-access-token
+    name: GitHub OAuth Access Token
+    description: OAuth application access token
+    regex: '\bgho_[A-Za-z0-9]{36}\b'
+    confidence: 98
+    severity: critical
+    tags: [github, oauth, access-token, credentials]
+    
+  - id: github-oauth-refresh-token
+    name: GitHub OAuth Refresh Token
+    description: OAuth refresh token
+    regex: '\bghr_[A-Za-z0-9]{36}\b'
+    confidence: 98
+    severity: critical
+    tags: [github, oauth, refresh-token, credentials]
+    
+  - id: github-app-installation-token
+    name: GitHub App Installation Token
+    description: GitHub App installation access token
+    regex: '\bghs_[A-Za-z0-9]{36}\b'
+    confidence: 98
+    severity: critical
+    tags: [github, app, installation-token, credentials]
+    
+  - id: github-user-to-server-token
+    name: GitHub User-to-Server Token
+    description: GitHub App user-to-server token
+    regex: '\bghu_[A-Za-z0-9]{36}\b'
+    confidence: 98
+    severity: critical
+    tags: [github, app, user-to-server, token]
+    
+  - id: github-app-private-key
+    name: GitHub App Private Key
+    description: GitHub App RSA private key
+    regex: '-----BEGIN RSA PRIVATE KEY-----[\s\S]+-----END RSA PRIVATE KEY-----'
+    confidence: 95
+    severity: critical
+    tags: [github, app, private-key, rsa]
+    
+  - id: github-app-id
+    name: GitHub App ID
+    description: GitHub App identifier
+    regex: '(?i)github.{0,20}app.{0,20}id[:=]\s*[''"]?(\d{6,8})[''"]?'
+    confidence: 78
+    severity: medium
+    tags: [github, app, app-id, identifier]
+    context_keywords: [github, app, id]
+    
+  - id: github-app-client-id
+    name: GitHub App Client ID
+    description: OAuth App client identifier
+    regex: '(?i)github.{0,20}client.{0,20}id[:=]\s*[''"]?(Iv1\.[a-f0-9]{16})[''"]?'
+    confidence: 92
+    severity: high
+    tags: [github, app, client-id, oauth]
+    context_keywords: [github, client, id]
+    
+  - id: github-app-client-secret
+    name: GitHub App Client Secret
+    description: OAuth App client secret
+    regex: '(?i)github.{0,20}client.{0,20}secret[:=]\s*[''"]?([a-f0-9]{40})[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [github, app, client-secret, oauth, credentials]
+    context_keywords: [github, client, secret]
+    
+  - id: github-webhook-secret
+    name: GitHub Webhook Secret
+    description: Webhook payload signing secret
+    regex: '(?i)github.{0,20}webhook.{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9_-]{20,})[''"]?'
+    confidence: 90
+    severity: high
+    tags: [github, webhook, secret, signing]
+    context_keywords: [github, webhook, secret]
+    
+  - id: github-actions-secret
+    name: GitHub Actions Secret Reference
+    description: Secret referenced in workflow
+    regex: '\$\{\{\s*secrets\.([A-Z_][A-Z0-9_]*)\s*\}\}'
+    confidence: 70
+    severity: low
+    tags: [github, actions, secret, workflow]
+    
+  - id: github-actions-oidc-token
+    name: GitHub Actions OIDC Token
+    description: OIDC token for cloud authentication
+    regex: '(?i)ACTIONS_ID_TOKEN_REQUEST_TOKEN[:=]\s*[''"]?([a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+)[''"]?'
+    confidence: 88
+    severity: high
+    tags: [github, actions, oidc, token]
+    
+  - id: github-runner-registration-token
+    name: GitHub Actions Runner Registration Token
+    description: Self-hosted runner registration
+    regex: '(?i)runner.{0,20}registration.{0,20}token[:=]\s*[''"]?([A-Z0-9]{29})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [github, actions, runner, registration-token]
+    context_keywords: [runner, registration, token]
+    
+  - id: github-deploy-key
+    name: GitHub Deploy Key
+    description: Repository deploy key (SSH)
+    regex: '(?i)github.{0,20}deploy.{0,20}key[:=]\s*[''"]?(ssh-rsa\s+[A-Za-z0-9+/]+[=]{0,3})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [github, deploy-key, ssh]
+    context_keywords: [github, deploy, key]
+    
+  - id: github-ssh-key
+    name: GitHub SSH Key
+    description: SSH key for Git operations
+    regex: 'ssh-(rsa|ed25519)\s+[A-Za-z0-9+/]+[=]{0,3}\s+[^\s]+@github'
+    confidence: 85
+    severity: high
+    tags: [github, ssh, key, authentication]
+    
+  - id: github-copilot-token
+    name: GitHub Copilot Token
+    description: Copilot AI assistant token
+    regex: '(?i)copilot.{0,20}token[:=]\s*[''"]?(ghu_[A-Za-z0-9]{36}|tid=[a-f0-9\-]{36})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [github, copilot, ai, token]
+    context_keywords: [copilot, token]
+    
+  - id: github-npm-token
+    name: GitHub NPM Token
+    description: GitHub Packages NPM authentication
+    regex: '//npm\.pkg\.github\.com/:_authToken=([a-zA-Z0-9_-]+)'
+    confidence: 95
+    severity: critical
+    tags: [github, npm, packages, token]
+    
+  - id: github-nuget-token
+    name: GitHub NuGet Token
+    description: GitHub Packages NuGet authentication
+    regex: '(?i)nuget.{0,20}github.{0,20}token[:=]\s*[''"]?(ghp_[A-Za-z0-9]{36})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [github, nuget, packages, token]
+    
+  - id: github-container-registry
+    name: GitHub Container Registry Token
+    description: GHCR authentication token
+    regex: '(?i)(ghcr\.io|docker\.pkg\.github\.com).{0,50}(ghp_[A-Za-z0-9]{36}|ghs_[A-Za-z0-9]{36})'
+    confidence: 94
+    severity: critical
+    tags: [github, ghcr, container, registry, token]
+    
+  - id: github-enterprise-server-token
+    name: GitHub Enterprise Server Token
+    description: GHES personal access token
+    regex: '(?i)github.{0,10}enterprise.{0,20}token[:=]\s*[''"]?(ghes_[A-Za-z0-9]{36})[''"]?'
+    confidence: 96
+    severity: critical
+    tags: [github, enterprise, ghes, token]
+    context_keywords: [github, enterprise, token]
+    
+  - id: github-gist-token
+    name: GitHub Gist Token
+    description: Token with gist scope
+    regex: '(?i)gist.{0,20}token[:=]\s*[''"]?(ghp_[A-Za-z0-9]{36})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [github, gist, token]
+    context_keywords: [gist, token]
+    
+  - id: github-api-url-with-token
+    name: GitHub API URL with Token
+    description: API call with embedded token
+    regex: 'https://api\.github\.com/[^\s]*\?.*access_token=([a-zA-Z0-9_-]+)'
+    confidence: 95
+    severity: critical
+    tags: [github, api, url, token]
+
+  - id: github-clone-with-token
+    name: GitHub Clone URL with Token
+    description: HTTPS clone with embedded token
+    regex: 'https://([a-zA-Z0-9_-]+)@github\.com/[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+\.git'
+    confidence: 92
+    severity: critical
+    tags: [github, clone, url, token, credentials]
+    
+  - id: github-raw-content-token
+    name: GitHub Raw Content with Token
+    description: Raw file access with token
+    regex: 'https://raw\.githubusercontent\.com/[^\s]*\?token=([a-zA-Z0-9_-]+)'
+    confidence: 88
+    severity: high
+    tags: [github, raw, content, token]
+    
+  - id: github-graphql-token
+    name: GitHub GraphQL API Token
+    description: GraphQL API authentication
+    regex: '(?i)Authorization:\s*bearer\s+(ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36})'
+    confidence: 96
+    severity: critical
+    tags: [github, graphql, api, token]
+    
+  - id: github-pages-token
+    name: GitHub Pages Deploy Token
+    description: Pages deployment authentication
+    regex: '(?i)pages.{0,20}token[:=]\s*[''"]?(ghp_[A-Za-z0-9]{36})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [github, pages, deploy, token]
+    context_keywords: [pages, token, deploy]
+    
+  - id: github-codespaces-token
+    name: GitHub Codespaces Token
+    description: Codespaces authentication token
+    regex: '(?i)codespaces.{0,20}token[:=]\s*[''"]?(ghu_[A-Za-z0-9]{36})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [github, codespaces, token]
+    context_keywords: [codespaces, token]
+    
+  - id: github-dependabot-secret
+    name: GitHub Dependabot Secret
+    description: Dependabot secret reference
+    regex: '\$\{\{\s*secrets\.DEPENDABOT_[A-Z_]+\s*\}\}'
+    confidence: 72
+    severity: medium
+    tags: [github, dependabot, secret]
+    
+  - id: github-advanced-security-token
+    name: GitHub Advanced Security Token
+    description: GHAS code scanning token
+    regex: '(?i)(code.{0,10}scanning|ghas).{0,20}token[:=]\s*[''"]?(ghp_[A-Za-z0-9]{36})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [github, ghas, security, token]
+    context_keywords: [ghas, scanning, security]
+    
+  - id: github-sponsors-webhook
+    name: GitHub Sponsors Webhook Secret
+    description: Sponsors webhook signing secret
+    regex: '(?i)sponsors.{0,20}webhook.{0,20}secret[:=]\s*[''"]?([a-zA-Z0-9_-]{20,})[''"]?'
+    confidence: 85
+    severity: high
+    tags: [github, sponsors, webhook, secret]
+    context_keywords: [sponsors, webhook, secret]
+    
+  - id: github-release-asset-token
+    name: GitHub Release Asset Token
+    description: Private release asset access
+    regex: 'https://github\.com/[^\s]+/releases/download/[^\s]+\?.*token=([a-zA-Z0-9_-]+)'
+    confidence: 85
+    severity: high
+    tags: [github, release, asset, token]
+    
+  - id: github-lfs-token
+    name: GitHub LFS Token
+    description: Large File Storage authentication
+    regex: '(?i)(lfs|git.{0,5}lfs).{0,20}token[:=]\s*[''"]?(ghp_[A-Za-z0-9]{36})[''"]?'
+    confidence: 88
+    severity: high
+    tags: [github, lfs, storage, token]
+    context_keywords: [lfs, git, token]
+    
+  - id: github-org-token
+    name: GitHub Organization Token
+    description: Org-level automation token
+    regex: '(?i)(org|organization).{0,20}token[:=]\s*[''"]?(ghp_[A-Za-z0-9]{36})[''"]?'
+    confidence: 85
+    severity: critical
+    tags: [github, organization, token]
+    context_keywords: [org, organization, token]
+    
+  - id: github-discussions-token
+    name: GitHub Discussions Token
+    description: Discussions API token
+    regex: '(?i)discussions.{0,20}token[:=]\s*[''"]?(ghp_[A-Za-z0-9]{36})[''"]?'
+    confidence: 80
+    severity: high
+    tags: [github, discussions, token]
+    context_keywords: [discussions, token]
+    
+  - id: github-packages-token
+    name: GitHub Packages Token
+    description: General packages authentication
+    regex: '(?i)(packages|pkg).{0,20}token[:=]\s*[''"]?(ghp_[A-Za-z0-9]{36})[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [github, packages, token]
+    context_keywords: [packages, pkg, token]
+    
+  - id: github-merge-queue-token
+    name: GitHub Merge Queue Token
+    description: Merge queue automation token
+    regex: '(?i)merge.{0,10}queue.{0,20}token[:=]\s*[''"]?(ghp_[A-Za-z0-9]{36})[''"]?'
+    confidence: 82
+    severity: high
+    tags: [github, merge-queue, token]
+    context_keywords: [merge, queue, token]
+    
+  - id: github-status-check-token
+    name: GitHub Status Check Token
+    description: CI status update token
+    regex: '(?i)status.{0,10}check.{0,20}token[:=]\s*[''"]?(ghp_[A-Za-z0-9]{36})[''"]?'
+    confidence: 82
+    severity: high
+    tags: [github, status, check, token]
+    context_keywords: [status, check, token]
+    
+  - id: github-team-sync-token
+    name: GitHub Team Sync Token
+    description: Team synchronization token
+    regex: '(?i)team.{0,10}sync.{0,20}token[:=]\s*[''"]?(ghp_[A-Za-z0-9]{36})[''"]?'
+    confidence: 82
+    severity: high
+    tags: [github, team, sync, token]
+    context_keywords: [team, sync, token]
+    
+  - id: github-repo-dispatch-token
+    name: GitHub Repository Dispatch Token  
+    description: Repository dispatch event token
+    regex: '(?i)repo.{0,10}dispatch.{0,20}token[:=]\s*[''"]?(ghp_[A-Za-z0-9]{36})[''"]?'
+    confidence: 82
+    severity: high
+    tags: [github, repository, dispatch, token]
+    context_keywords: [repo, dispatch, token]
+    
+  - id: github-workflow-dispatch-token
+    name: GitHub Workflow Dispatch Token
+    description: Workflow trigger token
+    regex: '(?i)workflow.{0,10}dispatch.{0,20}token[:=]\s*[''"]?(ghp_[A-Za-z0-9]{36})[''"]?'
+    confidence: 82
+    severity: high
+    tags: [github, workflow, dispatch, token]
+    context_keywords: [workflow, dispatch, token]
+    
+  - id: github-environments-token
+    name: GitHub Environments Token
+    description: Environment-specific token
+    regex: '(?i)environment.{0,20}token[:=]\s*[''"]?(ghp_[A-Za-z0-9]{36})[''"]?'
+    confidence: 80
+    severity: high
+    tags: [github, environments, token]
+    context_keywords: [environment, token]
+    
+  - id: github-repository-id
+    name: GitHub Repository ID
+    description: Numeric repository identifier
+    regex: '(?i)github.{0,20}repo(sitory)?.{0,20}id[:=]\s*[''"]?(\d{7,10})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [github, repository, identifier]
+    context_keywords: [github, repo, id]
+    
+  - id: github-installation-id
+    name: GitHub App Installation ID
+    description: App installation identifier
+    regex: '(?i)installation.{0,20}id[:=]\s*[''"]?(\d{7,10})[''"]?'
+    confidence: 75
+    severity: medium
+    tags: [github, app, installation, identifier]
+    context_keywords: [installation, id]
+    
+  - id: github-jwt-token
+    name: GitHub App JWT Token
+    description: JWT for App authentication
+    regex: '(?i)github.{0,20}jwt[:=]\s*[''"]?(eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)[''"]?'
+    confidence: 90
+    severity: critical
+    tags: [github, app, jwt, token]
+    context_keywords: [github, jwt, token]
+    
+  - id: github-octokit-auth
+    name: Octokit Authentication Token
+    description: Octokit SDK authentication
+    regex: 'auth:\s*[''"]?(ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|ghs_[A-Za-z0-9]{36})[''"]?'
+    confidence: 94
+    severity: critical
+    tags: [github, octokit, sdk, token]
+    
+  - id: github-cli-token
+    name: GitHub CLI (gh) Token
+    description: GitHub CLI authentication
+    regex: 'oauth_token:\s*[''"]?(ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36})[''"]?'
+    confidence: 92
+    severity: critical
+    tags: [github, cli, gh, token]
+    
+  - id: github-enterprise-cloud-token
+    name: GitHub Enterprise Cloud Token
+    description: Enterprise Cloud PAT
+    regex: '(?i)enterprise.{0,10}cloud.{0,20}token[:=]\s*[''"]?(ghp_[A-Za-z0-9]{36})[''"]?'
+    confidence: 88
+    severity: critical
+    tags: [github, enterprise, cloud, token]
+    context_keywords: [enterprise, cloud, token]
+    
+  - id: github-organization-id
+    name: GitHub Organization ID
+    description: Numeric organization identifier
+    regex: '(?i)github.{0,20}org(anization)?.{0,20}id[:=]\s*[''"]?(\d{7,10})[''"]?'
+    confidence: 72
+    severity: low
+    tags: [github, organization, identifier]
+    context_keywords: [github, org, id]
