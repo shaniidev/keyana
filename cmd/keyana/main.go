@@ -3,19 +3,20 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"keyana/internal/beautify"
-	"keyana/internal/config"
-	"keyana/internal/core"
-	"keyana/internal/discovery"
-	"keyana/internal/download"
-	"keyana/internal/scan"
-	"keyana/internal/ui"
-	"keyana/internal/utils"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/shaniidev/keyana/internal/beautify"
+	"github.com/shaniidev/keyana/internal/config"
+	"github.com/shaniidev/keyana/internal/core"
+	"github.com/shaniidev/keyana/internal/discovery"
+	"github.com/shaniidev/keyana/internal/download"
+	"github.com/shaniidev/keyana/internal/scan"
+	"github.com/shaniidev/keyana/internal/ui"
+	"github.com/shaniidev/keyana/internal/utils"
 )
 
 func main() {
