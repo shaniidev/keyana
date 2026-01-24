@@ -13,10 +13,10 @@ import (
 	"sync"
 	"time"
 
-	"keyana/internal/config"
-	"keyana/internal/core"
-	"keyana/internal/ui"
-	"keyana/internal/utils"
+	"github.com/shaniidev/keyana/internal/config"
+	"github.com/shaniidev/keyana/internal/core"
+	"github.com/shaniidev/keyana/internal/ui"
+	"github.com/shaniidev/keyana/internal/utils"
 )
 
 // templatePatternsLoaded tracks if templates were loaded
