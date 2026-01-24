@@ -4,7 +4,7 @@ A JavaScript secret scanner and reconnaissance tool for security researchers.
 
 [![Go Version](https://img.shields.io/badge/Go-1.25+-00ADD8?style=flat-square&logo=go)](https://golang.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
-[![Release](https://img.shields.io/badge/Version-1.0.0-blue?style=flat-square)](https://github.com/shaniidev/keyana/releases)
+[![Release](https://img.shields.io/badge/Version-1.0.1-blue?style=flat-square)](https://github.com/shaniidev/keyana/releases)
 
 ## What is Keyana?
 
