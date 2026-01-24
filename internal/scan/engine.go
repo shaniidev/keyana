@@ -3,9 +3,10 @@ package scan
 import (
 	"bytes"
 	"fmt"
-	"keyana/internal/core"
-	"keyana/internal/utils"
 	"sync"
+
+	"github.com/shaniidev/keyana/internal/core"
+	"github.com/shaniidev/keyana/internal/utils"
 
 	"github.com/cloudflare/ahocorasick"
 )
