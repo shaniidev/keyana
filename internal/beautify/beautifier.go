@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"sync"
 
-	"keyana/internal/config"
-	"keyana/internal/core"
-	"keyana/internal/ui"
+	"github.com/shaniidev/keyana/internal/config"
+	"github.com/shaniidev/keyana/internal/core"
+	"github.com/shaniidev/keyana/internal/ui"
 )
 
 type Beautifier struct {
