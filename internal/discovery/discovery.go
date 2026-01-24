@@ -3,9 +3,6 @@ package discovery
 import (
 	"bufio"
 	"fmt"
-	"keyana/internal/config"
-	"keyana/internal/ui"
-	"keyana/internal/utils"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -13,6 +10,10 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/shaniidev/keyana/internal/config"
+	"github.com/shaniidev/keyana/internal/ui"
+	"github.com/shaniidev/keyana/internal/utils"
 )
 
 type DiscoveryManager struct {
