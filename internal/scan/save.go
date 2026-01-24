@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"keyana/internal/config"
-	"keyana/internal/core"
+	"github.com/shaniidev/keyana/internal/config"
+	"github.com/shaniidev/keyana/internal/core"
 )
 
 func SaveSecrets(secrets []core.Secret, cfg *config.Config) {
