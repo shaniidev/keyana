@@ -446,7 +446,7 @@ func printBanner() {
 /_/ |_/_____/   /_/_/  |_/_/ |_/_/  |_|`)
 	ui.Println(ui.Bold+ui.Yellow, "    KEYANA", ui.Reset, "- ", ui.Green, "If it's in JS, KEYANA will find it.")
 	ui.Println(ui.Bold+ui.Blue, "    Author:", ui.Reset, " github.com/shaniidev")
-	ui.Println(ui.Gray, "    Version: 1.0.0")
+	ui.Println(ui.Gray, "    Version: 1.0.2")
 	fmt.Println()
 }
 
