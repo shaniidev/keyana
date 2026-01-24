@@ -1,4 +1,4 @@
-module keyana
+module github.com/shaniidev/keyana
 
 go 1.25.5
 
