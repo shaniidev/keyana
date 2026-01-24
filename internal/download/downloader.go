@@ -3,13 +3,14 @@ package download
 import (
 	"bufio"
 	"fmt"
-	"keyana/internal/config"
-	"keyana/internal/core"
-	"keyana/internal/ui"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
+
+	"github.com/shaniidev/keyana/internal/config"
+	"github.com/shaniidev/keyana/internal/core"
+	"github.com/shaniidev/keyana/internal/ui"
 )
 
 type Downloader struct {
